@@ -149,7 +149,12 @@ class MqttConnection:
     def _on_disconnect(self, client, userdata, *args) -> None:
         self._connected.clear()
         if not self._stop.is_set():
-            log.warning("MQTT disconnected, reconnecting...")
+            now = time.monotonic()
+            quick = now - getattr(self, "_last_disconnect", 0.0) < 5.0
+            self._last_disconnect = now
+            log.warning("MQTT disconnected, reconnecting...%s", (
+                " (repeats quickly: is another instance with client id '%s' running?)" % self.client_id)
+                if quick else "")
 
     def _on_message(self, client, userdata, msg) -> None:
         try:

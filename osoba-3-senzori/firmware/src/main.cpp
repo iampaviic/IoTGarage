@@ -87,7 +87,8 @@ void publishSpot(uint8_t i) {
     else doc["occupied"] = f.state() == SpotState::Occupied;
     if (f.filteredCm() >= 0) doc["distanceCm"] = roundf(f.filteredCm() * 10) / 10;
     else doc["distanceCm"] = nullptr;
-    doc["sensorStatus"] = simOverride[i] >= 0 ? "SIMULATED" : f.statusName();
+    // simulated broken sensor (mode 2) reports the real fault status so alarms can be tested
+    doc["sensorStatus"] = (simOverride[i] == 0 || simOverride[i] == 1) ? "SIMULATED" : f.statusName();
     doc["deviceId"] = DEVICE_ID;
     doc["uptimeMs"] = millis();
     if (timeValid()) {
