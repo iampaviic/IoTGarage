@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "garage-contract"
+version = "0.1.0"
+description = "IoT Garage: shared MQTT topics, message schemas and helpers"
+requires-python = ">=3.8"
+dependencies = [
+    "paho-mqtt>=1.6",
+    "jsonschema>=4.0",
+]
+
+[project.scripts]
+garage-monitor = "garage_contract.monitor:main"
+
+[tool.setuptools]
+packages = ["garage_contract"]
+
+[tool.setuptools.package-data]
+garage_contract = ["schemas/*.json"]

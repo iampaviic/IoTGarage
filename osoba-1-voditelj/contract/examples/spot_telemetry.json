@@ -1,0 +1,10 @@
+{
+  "spotId": "P01",
+  "state": "OCCUPIED",
+  "occupied": true,
+  "distanceCm": 6.4,
+  "sensorStatus": "OK",
+  "deviceId": "esp32-spots",
+  "uptimeMs": 512345,
+  "timestamp": "2026-10-19T08:30:00Z"
+}

@@ -1,0 +1,11 @@
+# Everything for development and tests on a laptop (Python >= 3.8):
+#   python -m venv .venv && . .venv/bin/activate      (Windows: .venv\Scripts\activate)
+#   pip install -r requirements-dev.txt
+# System packages: tesseract-ocr and mosquitto (apt / brew / Windows installers), see README.md
+-e osoba-1-voditelj/contract
+-e osoba-5-alpr[headless]
+-e osoba-8-baza-testovi/sessions
+-e osoba-6-ocr-edge
+-e osoba-7-thingsboard/bridge
+pytest>=7
+pyserial>=3.5

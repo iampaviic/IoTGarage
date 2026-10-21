@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tb-bridge"
+version = "0.1.0"
+description = "IoT Garage: local MQTT -> ThingsBoard gateway bridge with offline buffer"
+requires-python = ">=3.8"
+# local package: garage-contract (osoba-1-voditelj/contract)
+dependencies = ["paho-mqtt>=1.6", "requests>=2.20"]
+
+[project.scripts]
+garage-tb-bridge = "tb_bridge.bridge:main"
+
+[tool.setuptools]
+packages = ["tb_bridge"]

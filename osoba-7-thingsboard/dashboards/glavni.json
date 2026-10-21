@@ -1,0 +1,1668 @@
+{
+ "title": "Garaža - nadzor",
+ "configuration": {
+  "description": "Stanje mjesta, rampi i kamera u stvarnom vremenu; ručno upravljanje; odluke i alarmi.",
+  "widgets": {
+   "972a8469-1641-9f82-8b9d-2434e465e150": {
+    "typeFullFqn": "system.cards.markdown_card",
+    "type": "latest",
+    "sizeX": 16,
+    "sizeY": 9,
+    "config": {
+     "datasources": [
+      {
+       "type": "entity",
+       "entityAliasId": "5048f48a-6a7f-5222-ac5b-95ab025e5c5b",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "state",
+         "type": "timeseries",
+         "label": "spotState",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.6394267984578837,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      },
+      {
+       "type": "entity",
+       "entityAliasId": "e145c489-a634-52b8-9ab6-8976486cd04f",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "state",
+         "type": "timeseries",
+         "label": "gateState",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.025010755222666936,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        },
+        {
+         "name": "vehiclePresent",
+         "type": "timeseries",
+         "label": "vehiclePresent",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.27502931836911926,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      },
+      {
+       "type": "entity",
+       "entityAliasId": "de2be91f-87f7-57ce-b966-68a104c1e8eb",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "plate",
+         "type": "timeseries",
+         "label": "alprPlate",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.22321073814882275,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        },
+        {
+         "name": "ocrConfidence",
+         "type": "timeseries",
+         "label": "alprConfidence",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.7364712141640124,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      },
+      {
+       "type": "entity",
+       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "freeSpots",
+         "type": "timeseries",
+         "label": "freeSpots",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.6766994874229113,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      }
+     ],
+     "timewindow": {
+      "realtime": {
+       "timewindowMs": 60000
+      }
+     },
+     "showTitle": true,
+     "backgroundColor": "#fff",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "8px",
+     "settings": {
+      "useMarkdownTextFunction": true,
+      "markdownTextPattern": "### Markdown/HTML card\n - **Current entity**: ${entityName}.\n - **Current value**: ${Temperature}.",
+      "markdownTextFunction": "\nvar spots = [], gates = {}, alpr = {}, edge = {};\nfor (var i = 0; i < data.length; i++) {\n  var d = data[i], n = d.entityName || '';\n  if (n.indexOf('ParkingSpot') === 0) spots.push(d);\n  else if (n === 'EntranceGate' || n === 'ExitGate') gates[n] = d;\n  else if (n.indexOf('ALPR') === 0) alpr[n] = d;\n  else if (n === 'Garage-Edge') edge = d;\n}\nspots.sort(function (a, b) { return a.entityName < b.entityName ? -1 : 1; });\nfunction spotClass(s) { return s === 'FREE' ? 'free' : (s === 'OCCUPIED' ? 'occ' : 'unk'); }\nfunction spotText(s) { return s === 'FREE' ? 'slobodno' : (s === 'OCCUPIED' ? 'zauzeto' : 'nepoznato'); }\nfunction gateClass(s) { return s === 'OPEN' ? 'open' : (s === 'ERROR' ? 'err' : (s === 'OPENING' || s === 'CLOSING' ? 'moving' : 'closed')); }\nvar gateNames = { CLOSED: 'zatvorena', OPENING: 'otvara se', OPEN: 'otvorena', CLOSING: 'zatvara se', ERROR: 'KVAR' };\nfunction fmtPlate(p) {\n  var m = /^([A-Z]{2})(\\d{3,4})([A-Z]{1,2})$/.exec(p || '');\n  return m ? m[1] + ' ' + m[2] + '-' + m[3] : (p || '-');\n}\nfunction gateHtml(name, label, camera) {\n  var g = gates[name] || {}, a = alpr[camera] || {};\n  var conf = a.alprConfidence !== undefined && a.alprConfidence !== '' ? Math.round(Number(a.alprConfidence) * 100) + ' %' : '';\n  return '<div class=\"gate ' + gateClass(g.gateState) + '\">' +\n    '<div class=\"gname\">' + label + '</div>' +\n    '<div class=\"barrier\"></div>' +\n    '<div class=\"gstate\">' + (gateNames[g.gateState] || '-') + (String(g.vehiclePresent) === 'true' ? ' &middot; vozilo' : '') + '</div>' +\n    '<div class=\"plate\">' + fmtPlate(a.alprPlate) + '</div>' +\n    '<div class=\"conf\">' + (conf ? 'pouzdanost ' + conf : '') + '</div></div>';\n}\nvar html = '<div class=\"garage\"><div class=\"spots\">';\nfor (var j = 0; j < spots.length; j++) {\n  var s = spots[j];\n  html += '<div class=\"spot ' + spotClass(s.spotState) + '\"><div class=\"sid\">P' + s.entityName.slice(-2) + '</div>' +\n          '<div class=\"car\"></div><div class=\"stxt\">' + spotText(s.spotState) + '</div></div>';\n}\nhtml += '</div><div class=\"lane\">&larr; &nbsp; prometnica &nbsp; &rarr;</div><div class=\"gates\">' +\n        gateHtml('EntranceGate', 'ULAZ', 'ALPR-Entrance') +\n        '<div class=\"free-count\"><div class=\"num\">' + (edge.freeSpots !== undefined && edge.freeSpots !== '' ? edge.freeSpots : '-') +\n        '</div><div>slobodnih mjesta</div></div>' +\n        gateHtml('ExitGate', 'IZLAZ', 'ALPR-Exit') + '</div></div>';\nreturn html;\n",
+      "applyDefaultMarkdownStyle": false,
+      "markdownCss": "\n.garage { font-family: Roboto, Arial, sans-serif; height: 100%; display: flex; flex-direction: column; gap: 10px; }\n.spots { display: flex; gap: 8px; flex: 1; min-height: 110px; }\n.spot { flex: 1; border-radius: 8px; border: 3px dashed #ffffff; color: #fff; display: flex; flex-direction: column;\n        align-items: center; justify-content: space-between; padding: 6px 0; font-weight: 500; }\n.spot .sid { font-size: 20px; }\n.spot .stxt { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; }\n.spot.free { background: #2e7d32; }\n.spot.occ { background: #c62828; }\n.spot.unk { background: #757575; }\n.spot .car { width: 46%; height: 34%; border-radius: 6px; }\n.spot.occ .car { background: rgba(255,255,255,.85); }\n.lane { text-align: center; background: #424242; color: #fafafa; padding: 6px; border-radius: 6px; letter-spacing: 2px; }\n.gates { display: flex; gap: 10px; }\n.gate { flex: 1; border-radius: 8px; padding: 8px; background: #eceff1; text-align: center; border-left: 8px solid #c62828; }\n.gate.open { border-left-color: #2e7d32; }\n.gate.moving { border-left-color: #f9a825; }\n.gate.err { border-left-color: #6a1b9a; background: #f3e5f5; }\n.gate .gname { font-weight: 700; letter-spacing: 1px; }\n.gate .barrier { height: 6px; margin: 6px 20%; background: repeating-linear-gradient(90deg, #c62828 0 12px, #fff 12px 24px); }\n.gate.open .barrier { transform: rotate(-60deg); transform-origin: left; width: 30px; }\n.gate .plate { display: inline-block; margin-top: 6px; padding: 2px 10px; border: 2px solid #212121; border-radius: 4px;\n               background: #fff; font: 700 20px 'DejaVu Sans Condensed', Arial Narrow, sans-serif; letter-spacing: 1px; }\n.gate .conf, .gate .gstate { font-size: 12px; color: #455a64; margin-top: 2px; }\n.free-count { flex: 0 0 140px; background: #1565c0; color: #fff; border-radius: 8px; display: flex; flex-direction: column;\n              justify-content: center; align-items: center; }\n.free-count .num { font-size: 44px; font-weight: 700; line-height: 1; }\n"
+     },
+     "title": "Tlocrt garaže",
+     "showTitleIcon": false,
+     "iconColor": "rgba(0, 0, 0, 0.87)",
+     "iconSize": "24px",
+     "titleTooltip": "",
+     "dropShadow": true,
+     "enableFullscreen": true,
+     "widgetStyle": {},
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "showLegend": false,
+     "useDashboardTimewindow": true,
+     "displayTimewindow": true
+    },
+    "row": 0,
+    "col": 0,
+    "id": "972a8469-1641-9f82-8b9d-2434e465e150"
+   },
+   "3b8faa18-37f8-a88b-17fc-695a07a0ca6e": {
+    "typeFullFqn": "system.cards.value_card",
+    "type": "latest",
+    "sizeX": 4,
+    "sizeY": 3,
+    "config": {
+     "datasources": [
+      {
+       "type": "entity",
+       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "freeSpots",
+         "type": "timeseries",
+         "label": "Slobodna mjesta",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.4219218196852704,
+         "units": null,
+         "decimals": 0,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      }
+     ],
+     "timewindow": {
+      "realtime": {
+       "timewindowMs": 60000
+      }
+     },
+     "showTitle": false,
+     "backgroundColor": "rgba(0, 0, 0, 0)",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "0px",
+     "settings": {
+      "labelPosition": "top",
+      "layout": "square",
+      "showLabel": true,
+      "labelFont": {
+       "family": "Roboto",
+       "size": 16,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "labelColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.87)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "showIcon": true,
+      "iconSize": 40,
+      "iconSizeUnit": "px",
+      "icon": "local_parking",
+      "iconColor": {
+       "type": "function",
+       "color": "#5469FF",
+       "colorFunction": "return value > 0 ? '#2e7d32' : '#c62828';"
+      },
+      "valueFont": {
+       "family": "Roboto",
+       "size": 52,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "valueColor": {
+       "type": "function",
+       "color": "rgba(0, 0, 0, 0.87)",
+       "colorFunction": "return value > 0 ? '#2e7d32' : '#c62828';"
+      },
+      "showDate": true,
+      "dateFormat": {
+       "format": null,
+       "lastUpdateAgo": true,
+       "custom": false
+      },
+      "dateFont": {
+       "family": "Roboto",
+       "size": 12,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "dateColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.38)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "background": {
+       "type": "color",
+       "color": "#fff",
+       "overlay": {
+        "enabled": false,
+        "color": "rgba(255,255,255,0.72)",
+        "blur": 3
+       }
+      }
+     },
+     "title": "Slobodna mjesta",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "units": "",
+     "decimals": 0,
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "widgetStyle": {},
+     "actions": {},
+     "configMode": "basic",
+     "displayTimewindow": true,
+     "margin": "0px",
+     "borderRadius": "0px",
+     "widgetCss": "",
+     "pageSize": 1024,
+     "noDataDisplayMessage": "",
+     "showTitleIcon": false,
+     "titleTooltip": "",
+     "titleFont": {
+      "size": 12,
+      "sizeUnit": "px",
+      "family": null,
+      "weight": null,
+      "style": null,
+      "lineHeight": "1.6"
+     },
+     "titleIcon": "",
+     "iconColor": "rgba(0, 0, 0, 0.87)",
+     "iconSize": "14px",
+     "timewindowStyle": {
+      "showIcon": true,
+      "iconSize": "14px",
+      "icon": "query_builder",
+      "iconPosition": "left",
+      "font": {
+       "size": 12,
+       "sizeUnit": "px",
+       "family": null,
+       "weight": null,
+       "style": null,
+       "lineHeight": "1"
+      },
+      "color": null
+     }
+    },
+    "row": 0,
+    "col": 16,
+    "id": "3b8faa18-37f8-a88b-17fc-695a07a0ca6e"
+   },
+   "b74d0fb1-32e7-0629-8fad-c1a606cb0fb3": {
+    "typeFullFqn": "system.cards.value_card",
+    "type": "latest",
+    "sizeX": 4,
+    "sizeY": 3,
+    "config": {
+     "datasources": [
+      {
+       "type": "entity",
+       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "occupancyPct",
+         "type": "timeseries",
+         "label": "Popunjenost",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.5053552881033624,
+         "units": "%",
+         "decimals": 0,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      }
+     ],
+     "timewindow": {
+      "realtime": {
+       "timewindowMs": 60000
+      }
+     },
+     "showTitle": false,
+     "backgroundColor": "rgba(0, 0, 0, 0)",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "0px",
+     "settings": {
+      "labelPosition": "top",
+      "layout": "square",
+      "showLabel": true,
+      "labelFont": {
+       "family": "Roboto",
+       "size": 16,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "labelColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.87)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "showIcon": true,
+      "iconSize": 40,
+      "iconSizeUnit": "px",
+      "icon": "pie_chart",
+      "iconColor": {
+       "type": "constant",
+       "color": "#5469FF",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "valueFont": {
+       "family": "Roboto",
+       "size": 52,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "valueColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.87)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "showDate": true,
+      "dateFormat": {
+       "format": null,
+       "lastUpdateAgo": true,
+       "custom": false
+      },
+      "dateFont": {
+       "family": "Roboto",
+       "size": 12,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "dateColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.38)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "background": {
+       "type": "color",
+       "color": "#fff",
+       "overlay": {
+        "enabled": false,
+        "color": "rgba(255,255,255,0.72)",
+        "blur": 3
+       }
+      }
+     },
+     "title": "Popunjenost",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "units": "%",
+     "decimals": 0,
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "widgetStyle": {},
+     "actions": {},
+     "configMode": "basic",
+     "displayTimewindow": true,
+     "margin": "0px",
+     "borderRadius": "0px",
+     "widgetCss": "",
+     "pageSize": 1024,
+     "noDataDisplayMessage": "",
+     "showTitleIcon": false,
+     "titleTooltip": "",
+     "titleFont": {
+      "size": 12,
+      "sizeUnit": "px",
+      "family": null,
+      "weight": null,
+      "style": null,
+      "lineHeight": "1.6"
+     },
+     "titleIcon": "",
+     "iconColor": "rgba(0, 0, 0, 0.87)",
+     "iconSize": "14px",
+     "timewindowStyle": {
+      "showIcon": true,
+      "iconSize": "14px",
+      "icon": "query_builder",
+      "iconPosition": "left",
+      "font": {
+       "size": 12,
+       "sizeUnit": "px",
+       "family": null,
+       "weight": null,
+       "style": null,
+       "lineHeight": "1"
+      },
+      "color": null
+     }
+    },
+    "row": 0,
+    "col": 20,
+    "id": "b74d0fb1-32e7-0629-8fad-c1a606cb0fb3"
+   },
+   "72ff5d2a-386e-cbe0-6b65-a6a48b8148f6": {
+    "typeFullFqn": "system.cards.value_card",
+    "type": "latest",
+    "sizeX": 4,
+    "sizeY": 3,
+    "config": {
+     "datasources": [
+      {
+       "type": "entity",
+       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "activeSessions",
+         "type": "timeseries",
+         "label": "Vozila u garaži",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.6498844377795232,
+         "units": null,
+         "decimals": 0,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      }
+     ],
+     "timewindow": {
+      "realtime": {
+       "timewindowMs": 60000
+      }
+     },
+     "showTitle": false,
+     "backgroundColor": "rgba(0, 0, 0, 0)",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "0px",
+     "settings": {
+      "labelPosition": "top",
+      "layout": "square",
+      "showLabel": true,
+      "labelFont": {
+       "family": "Roboto",
+       "size": 16,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "labelColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.87)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "showIcon": true,
+      "iconSize": 40,
+      "iconSizeUnit": "px",
+      "icon": "directions_car",
+      "iconColor": {
+       "type": "constant",
+       "color": "#5469FF",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "valueFont": {
+       "family": "Roboto",
+       "size": 52,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "valueColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.87)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "showDate": true,
+      "dateFormat": {
+       "format": null,
+       "lastUpdateAgo": true,
+       "custom": false
+      },
+      "dateFont": {
+       "family": "Roboto",
+       "size": 12,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "dateColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.38)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "background": {
+       "type": "color",
+       "color": "#fff",
+       "overlay": {
+        "enabled": false,
+        "color": "rgba(255,255,255,0.72)",
+        "blur": 3
+       }
+      }
+     },
+     "title": "Aktivne sesije",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "units": "",
+     "decimals": 0,
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "widgetStyle": {},
+     "actions": {},
+     "configMode": "basic",
+     "displayTimewindow": true,
+     "margin": "0px",
+     "borderRadius": "0px",
+     "widgetCss": "",
+     "pageSize": 1024,
+     "noDataDisplayMessage": "",
+     "showTitleIcon": false,
+     "titleTooltip": "",
+     "titleFont": {
+      "size": 12,
+      "sizeUnit": "px",
+      "family": null,
+      "weight": null,
+      "style": null,
+      "lineHeight": "1.6"
+     },
+     "titleIcon": "",
+     "iconColor": "rgba(0, 0, 0, 0.87)",
+     "iconSize": "14px",
+     "timewindowStyle": {
+      "showIcon": true,
+      "iconSize": "14px",
+      "icon": "query_builder",
+      "iconPosition": "left",
+      "font": {
+       "size": 12,
+       "sizeUnit": "px",
+       "family": null,
+       "weight": null,
+       "style": null,
+       "lineHeight": "1"
+      },
+      "color": null
+     }
+    },
+    "row": 3,
+    "col": 16,
+    "id": "72ff5d2a-386e-cbe0-6b65-a6a48b8148f6"
+   },
+   "c241330b-01a9-e71f-de8a-774bcf36d58b": {
+    "typeFullFqn": "system.cards.value_card",
+    "type": "latest",
+    "sizeX": 4,
+    "sizeY": 3,
+    "config": {
+     "datasources": [
+      {
+       "type": "entity",
+       "entityAliasId": "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "state",
+         "type": "timeseries",
+         "label": "Ulazna rampa",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.5892656838759087,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      }
+     ],
+     "timewindow": {
+      "realtime": {
+       "timewindowMs": 60000
+      }
+     },
+     "showTitle": false,
+     "backgroundColor": "rgba(0, 0, 0, 0)",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "0px",
+     "settings": {
+      "labelPosition": "top",
+      "layout": "square",
+      "showLabel": true,
+      "labelFont": {
+       "family": "Roboto",
+       "size": 16,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "labelColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.87)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "showIcon": true,
+      "iconSize": 40,
+      "iconSizeUnit": "px",
+      "icon": "fence",
+      "iconColor": {
+       "type": "function",
+       "color": "#5469FF",
+       "colorFunction": "var c = {OPEN: '#2e7d32', OPENING: '#f9a825', CLOSING: '#f9a825', CLOSED: '#c62828', ERROR: '#6a1b9a'}[value];\nreturn c || 'rgba(0,0,0,0.54)';"
+      },
+      "valueFont": {
+       "family": "Roboto",
+       "size": 52,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "valueColor": {
+       "type": "function",
+       "color": "rgba(0, 0, 0, 0.87)",
+       "colorFunction": "var c = {OPEN: '#2e7d32', OPENING: '#f9a825', CLOSING: '#f9a825', CLOSED: '#c62828', ERROR: '#6a1b9a'}[value];\nreturn c || 'rgba(0,0,0,0.54)';"
+      },
+      "showDate": true,
+      "dateFormat": {
+       "format": null,
+       "lastUpdateAgo": true,
+       "custom": false
+      },
+      "dateFont": {
+       "family": "Roboto",
+       "size": 12,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "dateColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.38)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "background": {
+       "type": "color",
+       "color": "#fff",
+       "overlay": {
+        "enabled": false,
+        "color": "rgba(255,255,255,0.72)",
+        "blur": 3
+       }
+      }
+     },
+     "title": "Ulazna rampa",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "units": "",
+     "decimals": null,
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "widgetStyle": {},
+     "actions": {},
+     "configMode": "basic",
+     "displayTimewindow": true,
+     "margin": "0px",
+     "borderRadius": "0px",
+     "widgetCss": "",
+     "pageSize": 1024,
+     "noDataDisplayMessage": "",
+     "showTitleIcon": false,
+     "titleTooltip": "",
+     "titleFont": {
+      "size": 12,
+      "sizeUnit": "px",
+      "family": null,
+      "weight": null,
+      "style": null,
+      "lineHeight": "1.6"
+     },
+     "titleIcon": "",
+     "iconColor": "rgba(0, 0, 0, 0.87)",
+     "iconSize": "14px",
+     "timewindowStyle": {
+      "showIcon": true,
+      "iconSize": "14px",
+      "icon": "query_builder",
+      "iconPosition": "left",
+      "font": {
+       "size": 12,
+       "sizeUnit": "px",
+       "family": null,
+       "weight": null,
+       "style": null,
+       "lineHeight": "1"
+      },
+      "color": null
+     }
+    },
+    "row": 3,
+    "col": 20,
+    "id": "c241330b-01a9-e71f-de8a-774bcf36d58b"
+   },
+   "47229389-571a-a876-6c30-7511b2b9437a": {
+    "typeFullFqn": "system.cards.value_card",
+    "type": "latest",
+    "sizeX": 4,
+    "sizeY": 3,
+    "config": {
+     "datasources": [
+      {
+       "type": "entity",
+       "entityAliasId": "8a5cff6c-da2a-524c-b0fc-c8525228ecca",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "state",
+         "type": "timeseries",
+         "label": "Izlazna rampa",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.8058192518328079,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      }
+     ],
+     "timewindow": {
+      "realtime": {
+       "timewindowMs": 60000
+      }
+     },
+     "showTitle": false,
+     "backgroundColor": "rgba(0, 0, 0, 0)",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "0px",
+     "settings": {
+      "labelPosition": "top",
+      "layout": "square",
+      "showLabel": true,
+      "labelFont": {
+       "family": "Roboto",
+       "size": 16,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "labelColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.87)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "showIcon": true,
+      "iconSize": 40,
+      "iconSizeUnit": "px",
+      "icon": "fence",
+      "iconColor": {
+       "type": "function",
+       "color": "#5469FF",
+       "colorFunction": "var c = {OPEN: '#2e7d32', OPENING: '#f9a825', CLOSING: '#f9a825', CLOSED: '#c62828', ERROR: '#6a1b9a'}[value];\nreturn c || 'rgba(0,0,0,0.54)';"
+      },
+      "valueFont": {
+       "family": "Roboto",
+       "size": 52,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "valueColor": {
+       "type": "function",
+       "color": "rgba(0, 0, 0, 0.87)",
+       "colorFunction": "var c = {OPEN: '#2e7d32', OPENING: '#f9a825', CLOSING: '#f9a825', CLOSED: '#c62828', ERROR: '#6a1b9a'}[value];\nreturn c || 'rgba(0,0,0,0.54)';"
+      },
+      "showDate": true,
+      "dateFormat": {
+       "format": null,
+       "lastUpdateAgo": true,
+       "custom": false
+      },
+      "dateFont": {
+       "family": "Roboto",
+       "size": 12,
+       "sizeUnit": "px",
+       "style": "normal",
+       "weight": "500"
+      },
+      "dateColor": {
+       "type": "constant",
+       "color": "rgba(0, 0, 0, 0.38)",
+       "colorFunction": "var temperature = value;\nif (typeof temperature !== undefined) {\n  var percent = (temperature + 60)/120 * 100;\n  return tinycolor.mix('blue', 'red', percent).toHexString();\n}\nreturn 'blue';"
+      },
+      "background": {
+       "type": "color",
+       "color": "#fff",
+       "overlay": {
+        "enabled": false,
+        "color": "rgba(255,255,255,0.72)",
+        "blur": 3
+       }
+      }
+     },
+     "title": "Izlazna rampa",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "units": "",
+     "decimals": null,
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "widgetStyle": {},
+     "actions": {},
+     "configMode": "basic",
+     "displayTimewindow": true,
+     "margin": "0px",
+     "borderRadius": "0px",
+     "widgetCss": "",
+     "pageSize": 1024,
+     "noDataDisplayMessage": "",
+     "showTitleIcon": false,
+     "titleTooltip": "",
+     "titleFont": {
+      "size": 12,
+      "sizeUnit": "px",
+      "family": null,
+      "weight": null,
+      "style": null,
+      "lineHeight": "1.6"
+     },
+     "titleIcon": "",
+     "iconColor": "rgba(0, 0, 0, 0.87)",
+     "iconSize": "14px",
+     "timewindowStyle": {
+      "showIcon": true,
+      "iconSize": "14px",
+      "icon": "query_builder",
+      "iconPosition": "left",
+      "font": {
+       "size": 12,
+       "sizeUnit": "px",
+       "family": null,
+       "weight": null,
+       "style": null,
+       "lineHeight": "1"
+      },
+      "color": null
+     }
+    },
+    "row": 6,
+    "col": 20,
+    "id": "47229389-571a-a876-6c30-7511b2b9437a"
+   },
+   "c37459ee-f50b-ea63-371e-cd7b27cd8130": {
+    "typeFullFqn": "system.control_widgets.rpcbutton",
+    "type": "rpc",
+    "sizeX": 4,
+    "sizeY": 1,
+    "config": {
+     "targetDeviceAliases": [
+      "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace"
+     ],
+     "showTitle": false,
+     "backgroundColor": "#e6e7e8",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "0px",
+     "settings": {
+      "requestTimeout": 5000,
+      "oneWayElseTwoWay": false,
+      "buttonText": "Otvori ulaz",
+      "styleButton": {
+       "isRaised": true,
+       "isPrimary": true
+      },
+      "methodName": "open",
+      "methodParams": "{}"
+     },
+     "title": "Otvori ulaz",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "widgetStyle": {},
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "actions": {},
+     "targetDevice": {
+      "type": "entity",
+      "entityAliasId": "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace"
+     }
+    },
+    "row": 6,
+    "col": 16,
+    "id": "c37459ee-f50b-ea63-371e-cd7b27cd8130"
+   },
+   "6142ea7d-17be-3111-1a2a-73ed562b0f79": {
+    "typeFullFqn": "system.control_widgets.rpcbutton",
+    "type": "rpc",
+    "sizeX": 4,
+    "sizeY": 1,
+    "config": {
+     "targetDeviceAliases": [
+      "8a5cff6c-da2a-524c-b0fc-c8525228ecca"
+     ],
+     "showTitle": false,
+     "backgroundColor": "#e6e7e8",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "0px",
+     "settings": {
+      "requestTimeout": 5000,
+      "oneWayElseTwoWay": false,
+      "buttonText": "Otvori izlaz",
+      "styleButton": {
+       "isRaised": true,
+       "isPrimary": true
+      },
+      "methodName": "open",
+      "methodParams": "{}"
+     },
+     "title": "Otvori izlaz",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "widgetStyle": {},
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "actions": {},
+     "targetDevice": {
+      "type": "entity",
+      "entityAliasId": "8a5cff6c-da2a-524c-b0fc-c8525228ecca"
+     }
+    },
+    "row": 7,
+    "col": 16,
+    "id": "6142ea7d-17be-3111-1a2a-73ed562b0f79"
+   },
+   "580d7b71-d8f5-6413-5be6-128e18c26797": {
+    "typeFullFqn": "system.control_widgets.rpcbutton",
+    "type": "rpc",
+    "sizeX": 4,
+    "sizeY": 1,
+    "config": {
+     "targetDeviceAliases": [
+      "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+     ],
+     "showTitle": false,
+     "backgroundColor": "#e6e7e8",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "0px",
+     "settings": {
+      "requestTimeout": 5000,
+      "oneWayElseTwoWay": false,
+      "buttonText": "Ručno odobri ulaz",
+      "styleButton": {
+       "isRaised": true,
+       "isPrimary": true
+      },
+      "methodName": "approveEntry",
+      "methodParams": "{}"
+     },
+     "title": "Odobri ulaz",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "widgetStyle": {},
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "actions": {},
+     "targetDevice": {
+      "type": "entity",
+      "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+     }
+    },
+    "row": 8,
+    "col": 16,
+    "id": "580d7b71-d8f5-6413-5be6-128e18c26797"
+   },
+   "11ce5dd2-b45e-d1f0-3139-d32c93cd59bf": {
+    "typeFullFqn": "system.cards.timeseries_table",
+    "type": "timeseries",
+    "sizeX": 14,
+    "sizeY": 7,
+    "config": {
+     "datasources": [
+      {
+       "type": "entity",
+       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "decisionDirection",
+         "type": "timeseries",
+         "label": "Smjer",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.9731157639793706,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        },
+        {
+         "name": "decisionPlate",
+         "type": "timeseries",
+         "label": "Registracija",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.3785343772083535,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        },
+        {
+         "name": "decision",
+         "type": "timeseries",
+         "label": "Odluka",
+         "color": "#2196f3",
+         "settings": {
+          "useCellStyleFunction": true,
+          "cellStyleFunction": "var c = {FREE: '#2e7d32', OCCUPIED: '#c62828', UNKNOWN: '#757575', OPEN: '#2e7d32', OPENING: '#f9a825',\n CLOSING: '#f9a825', CLOSED: '#c62828', ERROR: '#6a1b9a', GRANTED: '#2e7d32', DENIED: '#c62828',\n RETRY: '#f9a825', MANUAL_REQUIRED: '#6a1b9a'}[value];\nreturn c ? {color: '#fff', background: c, fontWeight: 500, borderRadius: '4px'} : {};"
+         },
+         "_hash": 0.552040631273227,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        },
+        {
+         "name": "decisionReason",
+         "type": "timeseries",
+         "label": "Razlog",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.8294046642529949,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        },
+        {
+         "name": "decisionConfidence",
+         "type": "timeseries",
+         "label": "Pouzdanost",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.6185197523642461,
+         "units": null,
+         "decimals": 2,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        },
+        {
+         "name": "decisionManual",
+         "type": "timeseries",
+         "label": "Ručno",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.8617069003107772,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      }
+     ],
+     "timewindow": {
+      "realtime": {
+       "interval": 1000,
+       "timewindowMs": 3600000,
+       "realtimeType": 0
+      },
+      "aggregation": {
+       "type": "NONE",
+       "limit": 500
+      }
+     },
+     "showTitle": true,
+     "backgroundColor": "rgb(255, 255, 255)",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "8px",
+     "settings": {
+      "showTimestamp": true,
+      "displayPagination": true,
+      "defaultPageSize": 8,
+      "defaultSortOrder": "-0",
+      "hideEmptyLines": true,
+      "showMilliseconds": false
+     },
+     "title": "Odluke pristupa (zadnji sat)",
+     "dropShadow": true,
+     "enableFullscreen": true,
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400,
+      "padding": "5px 10px 5px 10px"
+     },
+     "useDashboardTimewindow": false,
+     "showLegend": false,
+     "widgetStyle": {},
+     "actions": {},
+     "showTitleIcon": false,
+     "iconColor": "rgba(0, 0, 0, 0.87)",
+     "iconSize": "24px",
+     "displayTimewindow": true,
+     "configMode": "basic"
+    },
+    "row": 9,
+    "col": 0,
+    "id": "11ce5dd2-b45e-d1f0-3139-d32c93cd59bf"
+   },
+   "c5e7ce8a-3a57-8a8e-a948-8d990bbb2599": {
+    "typeFullFqn": "system.alarm_widgets.alarms_table",
+    "type": "alarm",
+    "sizeX": 10,
+    "sizeY": 6,
+    "config": {
+     "timewindow": {
+      "realtime": {
+       "interval": 1000,
+       "timewindowMs": 604800000,
+       "realtimeType": 0
+      },
+      "aggregation": {
+       "type": "NONE",
+       "limit": 200
+      }
+     },
+     "showTitle": true,
+     "backgroundColor": "rgb(255, 255, 255)",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "4px",
+     "settings": {
+      "enableSelection": true,
+      "enableSearch": true,
+      "displayDetails": true,
+      "allowAcknowledgment": true,
+      "allowClear": true,
+      "allowAssign": true,
+      "displayActivity": true,
+      "displayPagination": true,
+      "defaultPageSize": 6,
+      "defaultSortOrder": "-createdTime",
+      "enableSelectColumnDisplay": true,
+      "enableStickyAction": false,
+      "enableFilter": true,
+      "entitiesTitle": null,
+      "alarmsTitle": "Alarmi"
+     },
+     "title": "Alarmi",
+     "dropShadow": true,
+     "enableFullscreen": true,
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400,
+      "padding": "5px 10px 5px 10px"
+     },
+     "useDashboardTimewindow": false,
+     "showLegend": false,
+     "alarmSource": {
+      "type": "entity",
+      "dataKeys": [
+       {
+        "name": "createdTime",
+        "type": "alarm",
+        "label": "Created time",
+        "color": "#2196f3",
+        "settings": {
+         "useCellStyleFunction": false,
+         "cellStyleFunction": "",
+         "useCellContentFunction": false,
+         "cellContentFunction": ""
+        },
+        "_hash": 0.021092237451093787
+       },
+       {
+        "name": "originator",
+        "type": "alarm",
+        "label": "Originator",
+        "color": "#4caf50",
+        "settings": {
+         "useCellStyleFunction": false,
+         "cellStyleFunction": "",
+         "useCellContentFunction": false,
+         "cellContentFunction": ""
+        },
+        "_hash": 0.2780007688856758
+       },
+       {
+        "name": "type",
+        "type": "alarm",
+        "label": "Type",
+        "color": "#f44336",
+        "settings": {
+         "useCellStyleFunction": false,
+         "cellStyleFunction": "",
+         "useCellContentFunction": false,
+         "cellContentFunction": ""
+        },
+        "_hash": 0.7323586880398418
+       },
+       {
+        "name": "severity",
+        "type": "alarm",
+        "label": "Severity",
+        "color": "#ffc107",
+        "settings": {
+         "useCellStyleFunction": false,
+         "useCellContentFunction": false
+        },
+        "_hash": 0.09927019860088193
+       },
+       {
+        "name": "status",
+        "type": "alarm",
+        "label": "Status",
+        "color": "#607d8b",
+        "settings": {
+         "useCellStyleFunction": false,
+         "cellStyleFunction": "",
+         "useCellContentFunction": false,
+         "cellContentFunction": ""
+        },
+        "_hash": 0.6588418951443418
+       },
+       {
+        "name": "assignee",
+        "type": "alarm",
+        "label": "Assignee",
+        "color": "#9c27b0",
+        "settings": {},
+        "_hash": 0.5008441077416634
+       }
+      ],
+      "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
+      "name": "alarms"
+     },
+     "alarmSearchStatus": "ANY",
+     "alarmsPollingInterval": 5,
+     "showTitleIcon": false,
+     "titleIcon": "warning",
+     "iconColor": "rgba(0, 0, 0, 0.87)",
+     "iconSize": "24px",
+     "titleTooltip": "",
+     "widgetStyle": {},
+     "displayTimewindow": true,
+     "actions": {},
+     "alarmStatusList": [],
+     "alarmSeverityList": [],
+     "alarmTypeList": [],
+     "searchPropagatedAlarms": false,
+     "configMode": "basic",
+     "alarmFilterConfig": {
+      "statusList": [],
+      "severityList": [],
+      "typeList": [],
+      "searchPropagatedAlarms": true
+     },
+     "alarmsTitle": "Alarmi"
+    },
+    "row": 9,
+    "col": 14,
+    "id": "c5e7ce8a-3a57-8a8e-a948-8d990bbb2599"
+   },
+   "0b1f9163-ce9f-f57f-43b7-a3a69a8dca03": {
+    "typeFullFqn": "system.control_widgets.rpcbutton",
+    "type": "rpc",
+    "sizeX": 5,
+    "sizeY": 1,
+    "config": {
+     "targetDeviceAliases": [
+      "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+     ],
+     "showTitle": false,
+     "backgroundColor": "#e6e7e8",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "0px",
+     "settings": {
+      "requestTimeout": 5000,
+      "oneWayElseTwoWay": false,
+      "buttonText": "Ručno odobri izlaz",
+      "styleButton": {
+       "isRaised": true,
+       "isPrimary": true
+      },
+      "methodName": "approveExit",
+      "methodParams": "{}"
+     },
+     "title": "Odobri izlaz",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "widgetStyle": {},
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "actions": {},
+     "targetDevice": {
+      "type": "entity",
+      "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+     }
+    },
+    "row": 15,
+    "col": 14,
+    "id": "0b1f9163-ce9f-f57f-43b7-a3a69a8dca03"
+   },
+   "1ff49b78-8946-3e85-759c-de66bacfb3d0": {
+    "typeFullFqn": "system.control_widgets.rpcbutton",
+    "type": "rpc",
+    "sizeX": 5,
+    "sizeY": 1,
+    "config": {
+     "targetDeviceAliases": [
+      "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+     ],
+     "showTitle": false,
+     "backgroundColor": "#e6e7e8",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "0px",
+     "settings": {
+      "requestTimeout": 5000,
+      "oneWayElseTwoWay": false,
+      "buttonText": "Odbij vozilo na ulazu",
+      "styleButton": {
+       "isRaised": true,
+       "isPrimary": false
+      },
+      "methodName": "deny",
+      "methodParams": "{}"
+     },
+     "title": "Odbij",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "widgetStyle": {},
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "actions": {},
+     "targetDevice": {
+      "type": "entity",
+      "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+     }
+    },
+    "row": 15,
+    "col": 19,
+    "id": "1ff49b78-8946-3e85-759c-de66bacfb3d0"
+   }
+  },
+  "states": {
+   "default": {
+    "name": "Garaža - nadzor",
+    "root": true,
+    "layouts": {
+     "main": {
+      "widgets": {
+       "972a8469-1641-9f82-8b9d-2434e465e150": {
+        "sizeX": 16,
+        "sizeY": 9,
+        "row": 0,
+        "col": 0
+       },
+       "3b8faa18-37f8-a88b-17fc-695a07a0ca6e": {
+        "sizeX": 4,
+        "sizeY": 3,
+        "row": 0,
+        "col": 16
+       },
+       "b74d0fb1-32e7-0629-8fad-c1a606cb0fb3": {
+        "sizeX": 4,
+        "sizeY": 3,
+        "row": 0,
+        "col": 20
+       },
+       "72ff5d2a-386e-cbe0-6b65-a6a48b8148f6": {
+        "sizeX": 4,
+        "sizeY": 3,
+        "row": 3,
+        "col": 16
+       },
+       "c241330b-01a9-e71f-de8a-774bcf36d58b": {
+        "sizeX": 4,
+        "sizeY": 3,
+        "row": 3,
+        "col": 20
+       },
+       "47229389-571a-a876-6c30-7511b2b9437a": {
+        "sizeX": 4,
+        "sizeY": 3,
+        "row": 6,
+        "col": 20
+       },
+       "c37459ee-f50b-ea63-371e-cd7b27cd8130": {
+        "sizeX": 4,
+        "sizeY": 1,
+        "row": 6,
+        "col": 16
+       },
+       "6142ea7d-17be-3111-1a2a-73ed562b0f79": {
+        "sizeX": 4,
+        "sizeY": 1,
+        "row": 7,
+        "col": 16
+       },
+       "580d7b71-d8f5-6413-5be6-128e18c26797": {
+        "sizeX": 4,
+        "sizeY": 1,
+        "row": 8,
+        "col": 16
+       },
+       "11ce5dd2-b45e-d1f0-3139-d32c93cd59bf": {
+        "sizeX": 14,
+        "sizeY": 7,
+        "row": 9,
+        "col": 0
+       },
+       "c5e7ce8a-3a57-8a8e-a948-8d990bbb2599": {
+        "sizeX": 10,
+        "sizeY": 6,
+        "row": 9,
+        "col": 14
+       },
+       "0b1f9163-ce9f-f57f-43b7-a3a69a8dca03": {
+        "sizeX": 5,
+        "sizeY": 1,
+        "row": 15,
+        "col": 14
+       },
+       "1ff49b78-8946-3e85-759c-de66bacfb3d0": {
+        "sizeX": 5,
+        "sizeY": 1,
+        "row": 15,
+        "col": 19
+       }
+      },
+      "gridSettings": {
+       "backgroundColor": "#eceff1",
+       "columns": 24,
+       "margin": 10,
+       "outerMargin": true,
+       "backgroundSizeMode": "100%",
+       "autoFillHeight": false,
+       "mobileAutoFillHeight": false,
+       "mobileRowHeight": 70,
+       "layoutType": "default"
+      }
+     }
+    }
+   }
+  },
+  "entityAliases": {
+   "5048f48a-6a7f-5222-ac5b-95ab025e5c5b": {
+    "alias": "Parkirna mjesta",
+    "filter": {
+     "type": "deviceType",
+     "resolveMultiple": true,
+     "deviceTypes": [
+      "ParkingSpot"
+     ],
+     "deviceType": "ParkingSpot",
+     "deviceNameFilter": ""
+    },
+    "id": "5048f48a-6a7f-5222-ac5b-95ab025e5c5b"
+   },
+   "e145c489-a634-52b8-9ab6-8976486cd04f": {
+    "alias": "Rampe",
+    "filter": {
+     "type": "deviceType",
+     "resolveMultiple": true,
+     "deviceTypes": [
+      "Gate"
+     ],
+     "deviceType": "Gate",
+     "deviceNameFilter": ""
+    },
+    "id": "e145c489-a634-52b8-9ab6-8976486cd04f"
+   },
+   "de2be91f-87f7-57ce-b966-68a104c1e8eb": {
+    "alias": "Kamere",
+    "filter": {
+     "type": "deviceType",
+     "resolveMultiple": true,
+     "deviceTypes": [
+      "ALPR"
+     ],
+     "deviceType": "ALPR",
+     "deviceNameFilter": ""
+    },
+    "id": "de2be91f-87f7-57ce-b966-68a104c1e8eb"
+   },
+   "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd": {
+    "alias": "Edge",
+    "filter": {
+     "type": "entityName",
+     "resolveMultiple": false,
+     "entityType": "DEVICE",
+     "entityNameFilter": "Garage-Edge"
+    },
+    "id": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+   },
+   "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace": {
+    "alias": "Ulazna rampa",
+    "filter": {
+     "type": "entityName",
+     "resolveMultiple": false,
+     "entityType": "DEVICE",
+     "entityNameFilter": "EntranceGate"
+    },
+    "id": "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace"
+   },
+   "8a5cff6c-da2a-524c-b0fc-c8525228ecca": {
+    "alias": "Izlazna rampa",
+    "filter": {
+     "type": "entityName",
+     "resolveMultiple": false,
+     "entityType": "DEVICE",
+     "entityNameFilter": "ExitGate"
+    },
+    "id": "8a5cff6c-da2a-524c-b0fc-c8525228ecca"
+   },
+   "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc": {
+    "alias": "Garaža",
+    "filter": {
+     "type": "entityName",
+     "resolveMultiple": false,
+     "entityType": "ASSET",
+     "entityNameFilter": "Garage"
+    },
+    "id": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc"
+   },
+   "875b4e87-979d-59e2-a4b0-4490e0cb2d9d": {
+    "alias": "Kontroleri",
+    "filter": {
+     "type": "deviceType",
+     "resolveMultiple": true,
+     "deviceTypes": [
+      "Controller"
+     ],
+     "deviceType": "Controller",
+     "deviceNameFilter": ""
+    },
+    "id": "875b4e87-979d-59e2-a4b0-4490e0cb2d9d"
+   }
+  },
+  "filters": {},
+  "timewindow": {
+   "displayValue": "",
+   "hideInterval": false,
+   "hideAggregation": false,
+   "selectedTab": 0,
+   "realtime": {
+    "realtimeType": 0,
+    "interval": 1000,
+    "timewindowMs": 3600000
+   },
+   "aggregation": {
+    "type": "NONE",
+    "limit": 25000
+   }
+  },
+  "settings": {
+   "stateControllerId": "entity",
+   "showTitle": true,
+   "showDashboardsSelect": true,
+   "showEntitiesSelect": false,
+   "showDashboardTimewindow": true,
+   "showDashboardExport": true,
+   "toolbarAlwaysOpen": true
+  }
+ },
+ "name": "Garaža - nadzor"
+}

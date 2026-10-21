@@ -1,0 +1,10 @@
+{
+  "deviceId": "esp32-spots",
+  "deviceType": "SPOT_SENSORS",
+  "uptimeS": 3600,
+  "fwVersion": "0.1.0",
+  "rssi": -61,
+  "freeHeap": 182000,
+  "ip": "192.168.1.50",
+  "timestamp": "2026-10-19T08:30:00Z"
+}

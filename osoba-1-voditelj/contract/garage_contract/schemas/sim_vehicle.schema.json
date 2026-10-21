@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "sim_vehicle",
+  "title": "SIMULATION: plate in front of the simulated camera",
+  "type": "object",
+  "required": ["plate"],
+  "properties": {
+    "plate": {"type": ["string", "null"], "description": "null = no vehicle"},
+    "quality": {"enum": ["good", "poor", "unreadable"]}
+  }
+}

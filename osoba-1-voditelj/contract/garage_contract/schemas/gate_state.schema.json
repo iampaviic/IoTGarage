@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "gate_state",
+  "title": "Gate state / command acknowledgement",
+  "description": "Topic garage/gate/{gate}/state (retained). Published on every state change, on vehicle presence change, as the answer to every command and periodically.",
+  "type": "object",
+  "required": ["gate", "state", "vehiclePresent", "requestId", "success", "timestamp"],
+  "properties": {
+    "gate": {"enum": ["ENTRANCE", "EXIT"]},
+    "state": {"enum": ["CLOSED", "OPENING", "OPEN", "CLOSING", "ERROR"]},
+    "vehiclePresent": {"type": "boolean", "description": "IR sensor at the barrier line"},
+    "requestId": {"type": ["string", "null"], "description": "requestId of the command this message answers, otherwise null"},
+    "success": {"type": "boolean"},
+    "reason": {"type": ["string", "null"], "description": "why a command failed: VEHICLE_PRESENT, ERROR_STATE, INVALID_COMMAND, DUPLICATE ..."},
+    "source": {"enum": ["MQTT", "BUTTON", "AUTO_CLOSE", "SAFETY", "SERIAL", "BOOT", "PERIODIC", "SENSOR"]},
+    "deviceId": {"type": "string"},
+    "timestamp": {"type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"}
+  }
+}

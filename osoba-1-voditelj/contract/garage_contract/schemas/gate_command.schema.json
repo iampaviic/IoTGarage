@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "gate_command",
+  "title": "Gate command",
+  "description": "Topic garage/gate/{gate}/command. Never retained. The gate answers on garage/gate/{gate}/state with the same requestId.",
+  "type": "object",
+  "required": ["requestId", "command"],
+  "properties": {
+    "requestId": {"type": "string", "minLength": 1, "maxLength": 40},
+    "command": {"enum": ["OPEN", "CLOSE", "RESET"]},
+    "reason": {"type": "string", "description": "AUTHORIZED_ENTRY, AUTHORIZED_EXIT, MANUAL, TEST, ..."},
+    "plate": {"type": ["string", "null"]},
+    "timestamp": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"}
+  }
+}

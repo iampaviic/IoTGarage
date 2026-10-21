@@ -1,0 +1,11 @@
+Id	Description	Qty	Unit	Designators
+1	Cable, 2 wires	0.3	m	S-PWR
+2	Cable, 3 wires	0.6	m	S-LED
+3	Cable, 4 wires	3.6	m	S-P01, S-P02, S-P03, S-P04, S-P05, S-P06
+4	Connector, 5 V / 4 A adapter (zajednicko), 2 pins	1		NAPAJANJE
+5	Connector, ESP32 DevKit V1 (cvor senzora), 16 pins	1		ESP32-S
+6	Connector, HC-SR04, 4 pins	6		P01, P02, P03, P04, P05, P06
+7	Connector, WS2812B x 6 (330 Ohm u DATA, 1000 uF na 5V), 3 pins	1		LED-TRAKA
+8	Connector, djelitelj 1k/2k, 3 pins	6		DJ-P01, DJ-P02, DJ-P03, DJ-P04, DJ-P05, DJ-P06
+9	Wire, BK	0.3	m	S-P01-DJ, S-P02-DJ, S-P03-DJ, S-P04-DJ, S-P05-DJ, S-P06-DJ
+10	Wire, GN	0.3	m	S-P01-DJ, S-P02-DJ, S-P03-DJ, S-P04-DJ, S-P05-DJ, S-P06-DJ

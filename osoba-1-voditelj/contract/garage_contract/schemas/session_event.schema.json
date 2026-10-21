@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "session_event",
+  "title": "Parking session lifecycle event",
+  "description": "Topic garage/session/event. Published by access control after the session database was updated.",
+  "type": "object",
+  "required": ["eventType", "sessionId", "plate", "entryTime", "timestamp"],
+  "properties": {
+    "eventType": {"enum": ["SESSION_OPENED", "SESSION_CLOSED", "SESSION_CANCELLED"]},
+    "sessionId": {"type": "string"},
+    "plate": {"type": "string"},
+    "entryTime": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"},
+    "exitTime": {"type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"},
+    "durationS": {"type": ["integer", "null"], "minimum": 0},
+    "price": {"type": ["number", "null"], "minimum": 0},
+    "currency": {"type": "string"},
+    "entryMode": {"enum": ["AUTO", "MANUAL"]},
+    "exitMode": {"enum": ["AUTO", "MANUAL", null]},
+    "entryConfidence": {"type": ["number", "null"]},
+    "exitConfidence": {"type": ["number", "null"]},
+    "timestamp": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"}
+  }
+}

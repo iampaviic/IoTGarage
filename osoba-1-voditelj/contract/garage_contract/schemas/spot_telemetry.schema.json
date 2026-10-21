@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "spot_telemetry",
+  "title": "Parking spot state",
+  "description": "Topic garage/parking/spot/{spotId}/telemetry (retained). Published by the sensor ESP32 on change, every heartbeat period and after reconnect.",
+  "type": "object",
+  "required": ["spotId", "state", "occupied", "sensorStatus", "timestamp"],
+  "properties": {
+    "spotId": {"type": "string", "pattern": "^P\\d{2}$"},
+    "state": {"enum": ["FREE", "OCCUPIED", "UNKNOWN"]},
+    "occupied": {"type": ["boolean", "null"], "description": "null when state is UNKNOWN"},
+    "distanceCm": {"type": ["number", "null"], "minimum": 0},
+    "sensorStatus": {"enum": ["OK", "TIMEOUT", "OUT_OF_RANGE", "UNSTABLE", "SIMULATED", "OFFLINE"]},
+    "deviceId": {"type": "string"},
+    "uptimeMs": {"type": "integer", "minimum": 0},
+    "timestamp": {"type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$", "description": "null if the device has no NTP time yet; consumers then use receive time"}
+  },
+  "allOf": [
+    {"if": {"properties": {"state": {"const": "FREE"}}}, "then": {"properties": {"occupied": {"const": false}}}},
+    {"if": {"properties": {"state": {"const": "OCCUPIED"}}}, "then": {"properties": {"occupied": {"const": true}}}},
+    {"if": {"properties": {"state": {"const": "UNKNOWN"}}}, "then": {"properties": {"occupied": {"const": null}}}}
+  ]
+}

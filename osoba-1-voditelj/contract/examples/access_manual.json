@@ -1,0 +1,9 @@
+{
+  "requestId": "man-0001",
+  "action": "APPROVE_ENTRY",
+  "gate": "ENTRANCE",
+  "plate": "ZG1234AB",
+  "operator": "dezurni",
+  "note": "Plocica prljava, provjereno vizualno",
+  "timestamp": "2026-10-19T08:32:00Z"
+}

@@ -1,0 +1,11 @@
+{
+  "gate": "ENTRANCE",
+  "state": "OPEN",
+  "vehiclePresent": true,
+  "requestId": "req-1024",
+  "success": true,
+  "reason": null,
+  "source": "MQTT",
+  "deviceId": "esp32-gates",
+  "timestamp": "2026-10-19T08:31:14Z"
+}

@@ -1,0 +1,9 @@
+# Camera override for the edge computer: maps the USB camera into the edge container.
+# Kept separate so the base file also starts on machines without /dev/video0 (simulation).
+#   docker compose -f docker-compose.edge.yml -f docker-compose.camera.yml up -d --build
+services:
+  edge:
+    environment:
+      ALPR_SOURCE: camera
+    devices:
+      - /dev/video0:/dev/video0      # USB camera; add /dev/video2 for a second camera

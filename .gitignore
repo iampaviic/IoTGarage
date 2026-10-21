@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+build/
+dist/
+
+# PlatformIO / firmware
+.pio/
+.vscode/.browse*
+.vscode/c_cpp_properties.json
+.vscode/launch.json
+**/include/secrets.h
+
+# Runtime data (never commit real plates, photos or databases)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+data/
+runtime/
+captures/
+osoba-5-alpr/dataset/real/
+osoba-5-alpr/dataset/synthetic/
+osoba-6-ocr-edge/edge.yaml
+osoba-7-thingsboard/bridge/buffer*.db
+osoba-7-thingsboard/.env
+
+# Generated reports that are re-created by scripts
+osoba-5-alpr/rezultati/debug/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
+osoba-2-maketa/nacrt/tlocrt_A4.pdf
+osoba-2-maketa/elektronika/wireviz/*.png
