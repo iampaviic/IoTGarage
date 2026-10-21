@@ -1,0 +1,14 @@
+{
+  "decisionId": "dec-51c2e0",
+  "direction": "ENTRY",
+  "plate": "ZG1234AB",
+  "confidence": 0.89,
+  "decision": "GRANTED",
+  "reason": "AUTHORIZED",
+  "gateRequestId": "req-1024",
+  "sessionId": "S-20261019-083112-4F2A",
+  "freeSpots": 4,
+  "manual": false,
+  "operator": null,
+  "timestamp": "2026-10-19T08:31:13Z"
+}

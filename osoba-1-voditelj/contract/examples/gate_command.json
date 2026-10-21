@@ -1,0 +1,7 @@
+{
+  "requestId": "req-1024",
+  "command": "OPEN",
+  "reason": "AUTHORIZED_ENTRY",
+  "plate": "ZG1234AB",
+  "timestamp": "2026-10-19T08:31:13Z"
+}

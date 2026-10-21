@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "alpr_event",
+  "title": "Plate reading result",
+  "description": "Topic garage/alpr/{gate}/event. Published by the ALPR service for every trigger. ALPR never decides about the gate.",
+  "type": "object",
+  "required": ["requestId", "cameraId", "direction", "status", "plate", "detectionConfidence", "ocrConfidence", "accepted", "timestamp"],
+  "properties": {
+    "requestId": {"type": "string"},
+    "cameraId": {"type": "string"},
+    "direction": {"enum": ["ENTRY", "EXIT"]},
+    "status": {"enum": ["OK", "NO_PLATE", "LOW_CONFIDENCE", "INVALID_FORMAT", "CAMERA_ERROR"]},
+    "plate": {"type": ["string", "null"], "pattern": "^[A-Z0-9]{4,10}$", "description": "normalised, no spaces or dashes, e.g. ZG1234AB"},
+    "rawText": {"type": ["string", "null"]},
+    "detectionConfidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "ocrConfidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "accepted": {"type": "boolean", "description": "plate has valid format and ocrConfidence >= accept threshold"},
+    "processingMs": {"type": "integer", "minimum": 0},
+    "consecutiveFailures": {"type": "integer", "minimum": 0},
+    "timestamp": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"}
+  }
+}

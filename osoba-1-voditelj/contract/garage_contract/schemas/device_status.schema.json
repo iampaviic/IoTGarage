@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "device_status",
+  "title": "Device online/offline (MQTT Last Will)",
+  "description": "Topic garage/system/status/{deviceId} (retained). online=true after connect; the broker publishes online=false (Last Will) when the device disappears.",
+  "type": "object",
+  "required": ["deviceId", "online"],
+  "properties": {
+    "deviceId": {"type": "string"},
+    "online": {"type": "boolean"},
+    "timestamp": {"type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"}
+  }
+}

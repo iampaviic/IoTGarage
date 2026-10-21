@@ -1,0 +1,15 @@
+{
+  "eventType": "SESSION_CLOSED",
+  "sessionId": "S-20261019-083112-4F2A",
+  "plate": "ZG1234AB",
+  "entryTime": "2026-10-19T08:31:13Z",
+  "exitTime": "2026-10-19T09:48:40Z",
+  "durationS": 4647,
+  "price": 3.0,
+  "currency": "EUR",
+  "entryMode": "AUTO",
+  "exitMode": "AUTO",
+  "entryConfidence": 0.89,
+  "exitConfidence": 0.92,
+  "timestamp": "2026-10-19T09:48:40Z"
+}

@@ -1,0 +1,14 @@
+{
+  "requestId": "trg-entrance-7f3a9c",
+  "cameraId": "entrance-camera",
+  "direction": "ENTRY",
+  "status": "OK",
+  "plate": "ZG1234AB",
+  "rawText": "ZG 1234-AB",
+  "detectionConfidence": 0.94,
+  "ocrConfidence": 0.89,
+  "accepted": true,
+  "processingMs": 412,
+  "consecutiveFailures": 0,
+  "timestamp": "2026-10-19T08:31:12Z"
+}

@@ -1,0 +1,9 @@
+{
+  "type": "GATE_NO_ACK",
+  "severity": "MAJOR",
+  "source": "access-control",
+  "gate": "ENTRANCE",
+  "message": "Gate did not confirm command req-1024 within 3 s",
+  "active": true,
+  "timestamp": "2026-10-19T08:31:16Z"
+}

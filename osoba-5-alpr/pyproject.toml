@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plate-detector"
+version = "0.1.0"
+description = "IoT Garage: licence plate detection (OpenCV) and synthetic plate generator"
+requires-python = ">=3.8"
+# OpenCV is an *extra* because the right package differs per machine:
+#   pip install -e ".[headless]"  edge device / server / CI (no windows)
+#   pip install -e ".[gui]"       laptop: capture_dataset.py and label_tool.py open windows
+#   pip install -e .              Jetson Nano: use the system OpenCV (python3-opencv)
+dependencies = [
+    "numpy>=1.19",
+    "Pillow>=8.0",
+]
+
+[project.optional-dependencies]
+headless = ["opencv-python-headless>=4.5"]
+gui = ["opencv-python>=4.5"]
+
+[tool.setuptools]
+packages = ["plate_detector"]
+
+[tool.setuptools.package-data]
+plate_detector = ["fonts/*"]

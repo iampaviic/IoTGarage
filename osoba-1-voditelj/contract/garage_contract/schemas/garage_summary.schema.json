@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "garage_summary",
+  "title": "Garage occupancy summary",
+  "description": "Topic garage/summary (retained). Published by access control whenever a spot or session changes. UNKNOWN spots are never counted as free.",
+  "type": "object",
+  "required": ["totalSpots", "freeSpots", "occupiedSpots", "unknownSpots", "occupancyPct", "activeSessions", "full", "timestamp"],
+  "properties": {
+    "totalSpots": {"type": "integer", "minimum": 0},
+    "freeSpots": {"type": "integer", "minimum": 0},
+    "occupiedSpots": {"type": "integer", "minimum": 0},
+    "unknownSpots": {"type": "integer", "minimum": 0},
+    "occupancyPct": {"type": "number", "minimum": 0, "maximum": 100},
+    "activeSessions": {"type": "integer", "minimum": 0},
+    "full": {"type": "boolean"},
+    "timestamp": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"}
+  }
+}

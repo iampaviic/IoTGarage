@@ -1,0 +1,10 @@
+{
+  "totalSpots": 6,
+  "freeSpots": 4,
+  "occupiedSpots": 1,
+  "unknownSpots": 1,
+  "occupancyPct": 16.7,
+  "activeSessions": 1,
+  "full": false,
+  "timestamp": "2026-10-19T08:33:00Z"
+}

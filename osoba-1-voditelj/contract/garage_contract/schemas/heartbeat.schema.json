@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "heartbeat",
+  "title": "Device heartbeat",
+  "description": "Topic garage/system/heartbeat. Every device/service publishes one every 30 s.",
+  "type": "object",
+  "required": ["deviceId", "deviceType", "uptimeS"],
+  "properties": {
+    "deviceId": {"type": "string"},
+    "deviceType": {"enum": ["SPOT_SENSORS", "GATE_CONTROLLER", "ALPR", "ACCESS_CONTROL", "TB_BRIDGE", "SIMULATOR"]},
+    "uptimeS": {"type": "integer", "minimum": 0},
+    "fwVersion": {"type": "string"},
+    "rssi": {"type": ["integer", "null"]},
+    "freeHeap": {"type": ["integer", "null"]},
+    "ip": {"type": ["string", "null"]},
+    "timestamp": {"type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,6})?Z$"}
+  }
+}
