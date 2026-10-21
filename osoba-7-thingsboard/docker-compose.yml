@@ -1,0 +1,37 @@
+# ThingsBoard Community Edition for development and the demo (osoba 7).
+#
+#   docker compose up -d            first start installs the database (~2 min)
+#   docker compose logs -f thingsboard
+#   open http://localhost:8080      tenant@thingsboard.org / tenant   (change the password!)
+#   docker compose down             stop - data stays in the named volumes
+#
+# Data (devices, dashboards, telemetry history) lives in the volumes tb-data and
+# tb-logs, so restarting or recreating the container never loses configuration
+# or history (project criterion). Only `docker compose down -v` deletes it.
+#
+# Ports: 8080 web UI + REST API, 1884 MQTT device API of ThingsBoard
+# (1883 stays free for Mosquitto on the same machine).
+services:
+  thingsboard:
+    image: thingsboard/tb-postgres:4.2.1.1
+    container_name: garage-thingsboard
+    restart: unless-stopped
+    ports:
+      - "8080:9090"
+      - "1884:1883"
+    environment:
+      TB_QUEUE_TYPE: in-memory
+      # load demo users (tenant@thingsboard.org / tenant) on the first start
+      LOAD_DEMO: "true"
+      # keep 30 days of telemetry (privacy: no unlimited history of plates)
+      SQL_TTL_TS_TS_KEY_VALUE_TTL: "2592000"
+      JAVA_OPTS: "-Xms512M -Xmx1536M"
+    volumes:
+      - tb-data:/data
+      - tb-logs:/var/log/thingsboard
+
+volumes:
+  tb-data:
+    name: garage-tb-data
+  tb-logs:
+    name: garage-tb-logs
