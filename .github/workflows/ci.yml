@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  python:
+    name: Python tests (py${{ matrix.python }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.8", "3.12"]   # 3.8 = oldest Python we support on the Jetson Nano
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: System packages
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr mosquitto
+      - name: Install
+        run: pip install -r requirements-dev.txt
+      - name: Tests (unit + end-to-end simulation)
+        run: pytest -q
+
+  firmware:
+    name: ESP32 firmware build + native unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: pio-${{ hashFiles('**/platformio.ini') }}
+      - run: pip install platformio
+      - name: Spot sensors - unit tests
+        run: pio test -e native -d osoba-3-senzori/firmware
+      - name: Spot sensors - build
+        run: pio run -e esp32dev -d osoba-3-senzori/firmware
+      - name: Gates - unit tests
+        run: pio test -e native -d osoba-4-rampe/firmware
+      - name: Gates - build
+        run: pio run -e esp32dev -d osoba-4-rampe/firmware
+
+  cad:
+    name: 3D parts compile (OpenSCAD)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y openscad
+      - name: Render every part
+        run: |
+          cd osoba-2-maketa/3d
+          for f in *.scad; do openscad -o "/tmp/${f%.scad}.stl" "$f"; done

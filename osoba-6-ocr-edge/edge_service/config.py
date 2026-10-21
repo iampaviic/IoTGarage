@@ -47,9 +47,11 @@ class AlprConfig:
     height: int = 720
     images_dir: Optional[str] = None
     frames_per_trigger: int = 3
+    # default: ONE camera that is moved between the entrance and the exit mount
+    # (see osoba-2-maketa/nacrt-makete.md); with two cameras set `camera` per gate
     gates: Dict[str, GateCameraConfig] = field(default_factory=lambda: {
-        "entrance": GateCameraConfig("entrance-camera", (0.0, 0.0, 0.5, 1.0)),
-        "exit": GateCameraConfig("exit-camera", (0.5, 0.0, 1.0, 1.0)),
+        "entrance": GateCameraConfig("entrance-camera"),
+        "exit": GateCameraConfig("exit-camera"),
     })
 
 

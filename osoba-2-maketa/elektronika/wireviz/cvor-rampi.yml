@@ -1,0 +1,124 @@
+connectors:
+  ESP32-R:
+    type: ESP32 DevKit V1 (cvor rampi)
+    pinlabels: [5V, GND, 3V3, GPIO13, GPIO34, GPIO25, GPIO26, GPIO18, GPIO14, GPIO35, GPIO27, GPIO33, GPIO19, GPIO23]
+  NAPAJANJE:
+    type: 5 V / 4 A adapter (zajednicko)
+    pinlabels: [+5V, GND]
+  SERVO-UL:
+    type: SG90 (ulaz)
+    pinlabels: [PWM, +5V, GND]
+  IR-UL:
+    type: FC-51 (ulaz) - napajati s 3.3 V!
+    pinlabels: [VCC, GND, OUT]
+  SVJ-UL:
+    type: LED crvena+zelena s 220 Ohm (ulaz)
+    pinlabels: [CRVENA, ZELENA, GND]
+  TIPKA-UL:
+    type: tipkalo rucno otvaranje (ulaz)
+    pinlabels: [A, B]
+  SERVO-IZ:
+    type: SG90 (izlaz)
+    pinlabels: [PWM, +5V, GND]
+  IR-IZ:
+    type: FC-51 (izlaz) - napajati s 3.3 V!
+    pinlabels: [VCC, GND, OUT]
+  SVJ-IZ:
+    type: LED crvena+zelena s 220 Ohm (izlaz)
+    pinlabels: [CRVENA, ZELENA, GND]
+  TIPKA-IZ:
+    type: tipkalo rucno otvaranje (izlaz)
+    pinlabels: [A, B]
+  ZUJALICA:
+    type: aktivna zujalica 3.3 V (opcionalno)
+    pinlabels: [+, '-']
+cables:
+  R-UL-SERVO:
+    wirecount: 3
+    colors: [OG, RD, BN]
+    length: 0.4
+  R-UL-IR:
+    wirecount: 3
+    colors: [RD, BK, YE]
+    length: 0.4
+  R-UL-SVJ:
+    wirecount: 3
+    colors: [RD, GN, BK]
+    length: 0.4
+  R-UL-TIPKA:
+    wirecount: 2
+    colors: [WH, BK]
+    length: 0.4
+  R-IZ-SERVO:
+    wirecount: 3
+    colors: [OG, RD, BN]
+    length: 0.4
+  R-IZ-IR:
+    wirecount: 3
+    colors: [RD, BK, YE]
+    length: 0.4
+  R-IZ-SVJ:
+    wirecount: 3
+    colors: [RD, GN, BK]
+    length: 0.4
+  R-IZ-TIPKA:
+    wirecount: 2
+    colors: [WH, BK]
+    length: 0.4
+  R-PWR:
+    wirecount: 2
+    colors: [RD, BK]
+    length: 0.3
+  R-ZUJ:
+    wirecount: 2
+    colors: [RD, BK]
+    length: 0.2
+connections:
+  -
+    - ESP32-R: [GPIO13]
+    - R-UL-SERVO: [1]
+    - SERVO-UL: [PWM]
+  -
+    - NAPAJANJE: [1, 2]
+    - R-UL-SERVO: [2, 3]
+    - SERVO-UL: [+5V, GND]
+  -
+    - ESP32-R: [3V3, GND, GPIO34]
+    - R-UL-IR: [1, 2, 3]
+    - IR-UL: [VCC, GND, OUT]
+  -
+    - ESP32-R: [GPIO25, GPIO26, GND]
+    - R-UL-SVJ: [1, 2, 3]
+    - SVJ-UL: [CRVENA, ZELENA, GND]
+  -
+    - ESP32-R: [GPIO18, GND]
+    - R-UL-TIPKA: [1, 2]
+    - TIPKA-UL: [A, B]
+  -
+    - ESP32-R: [GPIO14]
+    - R-IZ-SERVO: [1]
+    - SERVO-IZ: [PWM]
+  -
+    - NAPAJANJE: [1, 2]
+    - R-IZ-SERVO: [2, 3]
+    - SERVO-IZ: [+5V, GND]
+  -
+    - ESP32-R: [3V3, GND, GPIO35]
+    - R-IZ-IR: [1, 2, 3]
+    - IR-IZ: [VCC, GND, OUT]
+  -
+    - ESP32-R: [GPIO27, GPIO33, GND]
+    - R-IZ-SVJ: [1, 2, 3]
+    - SVJ-IZ: [CRVENA, ZELENA, GND]
+  -
+    - ESP32-R: [GPIO19, GND]
+    - R-IZ-TIPKA: [1, 2]
+    - TIPKA-IZ: [A, B]
+  -
+    - NAPAJANJE: [1, 2]
+    - R-PWR: [1, 2]
+    - ESP32-R: [5V, GND]
+  -
+    - ESP32-R: [GPIO23, GND]
+    - R-ZUJ: [1, 2]
+    - ZUJALICA: [+, '-']

@@ -32,14 +32,19 @@ alpr:
   height: 720
   images_dir: null         # for source: images
   frames_per_trigger: 3    # frames analysed per trigger, the best reading wins
-  gates:                   # one camera for both lanes: each gate looks at its own part of the frame
+  gates:
+    # Variant B (one camera): the same camera is moved between the entrance and the
+    # exit mount, so both gates read the whole frame.
+    # Variant A (recommended, two cameras): give each gate its own `camera`.
+    # `roi` limits the search to part of the frame: [x0, y0, x1, y1] as fractions.
     entrance:
       camera_id: entrance-camera
-      roi: [0.0, 0.0, 0.5, 1.0]     # x0, y0, x1, y1 as fractions of the frame
+      roi: null
+      # camera: "0"
     exit:
       camera_id: exit-camera
-      roi: [0.5, 0.0, 1.0, 1.0]
-      # camera: "1"                 # uncomment if the exit gets its own camera
+      roi: null
+      # camera: "1"
 
 privacy:
   save_crops: false        # store plate crops (never full frames) for debugging

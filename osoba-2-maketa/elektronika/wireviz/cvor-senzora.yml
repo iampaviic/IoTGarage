@@ -1,0 +1,230 @@
+connectors:
+  ESP32-S:
+    type: ESP32 DevKit V1 (cvor senzora)
+    pinlabels: [5V, GND, 3V3, GPIO23, GPIO22, GPIO21, GPIO19, GPIO18, GPIO5, GPIO36, GPIO39, GPIO34, GPIO35, GPIO32, GPIO33, GPIO25]
+  NAPAJANJE:
+    type: 5 V / 4 A adapter (zajednicko)
+    pinlabels: [+5V, GND]
+  P01:
+    type: HC-SR04
+    pinlabels: [VCC, TRIG, ECHO, GND]
+  DJ-P01:
+    type: djelitelj 1k/2k
+    notes: ECHO 5 V u 3.3 V
+    pinlabels: [ULAZ 5V, IZLAZ 3V3, GND]
+  P02:
+    type: HC-SR04
+    pinlabels: [VCC, TRIG, ECHO, GND]
+  DJ-P02:
+    type: djelitelj 1k/2k
+    notes: ECHO 5 V u 3.3 V
+    pinlabels: [ULAZ 5V, IZLAZ 3V3, GND]
+  P03:
+    type: HC-SR04
+    pinlabels: [VCC, TRIG, ECHO, GND]
+  DJ-P03:
+    type: djelitelj 1k/2k
+    notes: ECHO 5 V u 3.3 V
+    pinlabels: [ULAZ 5V, IZLAZ 3V3, GND]
+  P04:
+    type: HC-SR04
+    pinlabels: [VCC, TRIG, ECHO, GND]
+  DJ-P04:
+    type: djelitelj 1k/2k
+    notes: ECHO 5 V u 3.3 V
+    pinlabels: [ULAZ 5V, IZLAZ 3V3, GND]
+  P05:
+    type: HC-SR04
+    pinlabels: [VCC, TRIG, ECHO, GND]
+  DJ-P05:
+    type: djelitelj 1k/2k
+    notes: ECHO 5 V u 3.3 V
+    pinlabels: [ULAZ 5V, IZLAZ 3V3, GND]
+  P06:
+    type: HC-SR04
+    pinlabels: [VCC, TRIG, ECHO, GND]
+  DJ-P06:
+    type: djelitelj 1k/2k
+    notes: ECHO 5 V u 3.3 V
+    pinlabels: [ULAZ 5V, IZLAZ 3V3, GND]
+  LED-TRAKA:
+    type: WS2812B x 6 (330 Ohm u DATA, 1000 uF na 5V)
+    pinlabels: [+5V, DIN, GND]
+cables:
+  S-P01:
+    wirecount: 4
+    colors: [RD, YE, GN, BK]
+    length: 0.6
+    notes: oznaka S-P01 na oba kraja
+  S-P01-DJ:
+    wirecount: 2
+    colors: [GN, BK]
+    length: 0.05
+    category: bundle
+  S-P02:
+    wirecount: 4
+    colors: [RD, YE, GN, BK]
+    length: 0.6
+    notes: oznaka S-P02 na oba kraja
+  S-P02-DJ:
+    wirecount: 2
+    colors: [GN, BK]
+    length: 0.05
+    category: bundle
+  S-P03:
+    wirecount: 4
+    colors: [RD, YE, GN, BK]
+    length: 0.6
+    notes: oznaka S-P03 na oba kraja
+  S-P03-DJ:
+    wirecount: 2
+    colors: [GN, BK]
+    length: 0.05
+    category: bundle
+  S-P04:
+    wirecount: 4
+    colors: [RD, YE, GN, BK]
+    length: 0.6
+    notes: oznaka S-P04 na oba kraja
+  S-P04-DJ:
+    wirecount: 2
+    colors: [GN, BK]
+    length: 0.05
+    category: bundle
+  S-P05:
+    wirecount: 4
+    colors: [RD, YE, GN, BK]
+    length: 0.6
+    notes: oznaka S-P05 na oba kraja
+  S-P05-DJ:
+    wirecount: 2
+    colors: [GN, BK]
+    length: 0.05
+    category: bundle
+  S-P06:
+    wirecount: 4
+    colors: [RD, YE, GN, BK]
+    length: 0.6
+    notes: oznaka S-P06 na oba kraja
+  S-P06-DJ:
+    wirecount: 2
+    colors: [GN, BK]
+    length: 0.05
+    category: bundle
+  S-LED:
+    wirecount: 3
+    colors: [RD, WH, BK]
+    length: 0.6
+  S-PWR:
+    wirecount: 2
+    colors: [RD, BK]
+    length: 0.3
+connections:
+  -
+    - NAPAJANJE: [1, 2]
+    - S-P01: [1, 4]
+    - P01: [VCC, GND]
+  -
+    - ESP32-S: [GPIO23]
+    - S-P01: [2]
+    - P01: [TRIG]
+  -
+    - P01: [ECHO]
+    - S-P01: [3]
+    - DJ-P01: [ULAZ 5V]
+  -
+    - DJ-P01: [IZLAZ 3V3, GND]
+    - S-P01-DJ: [1, 2]
+    - ESP32-S: [GPIO36, GND]
+  -
+    - NAPAJANJE: [1, 2]
+    - S-P02: [1, 4]
+    - P02: [VCC, GND]
+  -
+    - ESP32-S: [GPIO22]
+    - S-P02: [2]
+    - P02: [TRIG]
+  -
+    - P02: [ECHO]
+    - S-P02: [3]
+    - DJ-P02: [ULAZ 5V]
+  -
+    - DJ-P02: [IZLAZ 3V3, GND]
+    - S-P02-DJ: [1, 2]
+    - ESP32-S: [GPIO39, GND]
+  -
+    - NAPAJANJE: [1, 2]
+    - S-P03: [1, 4]
+    - P03: [VCC, GND]
+  -
+    - ESP32-S: [GPIO21]
+    - S-P03: [2]
+    - P03: [TRIG]
+  -
+    - P03: [ECHO]
+    - S-P03: [3]
+    - DJ-P03: [ULAZ 5V]
+  -
+    - DJ-P03: [IZLAZ 3V3, GND]
+    - S-P03-DJ: [1, 2]
+    - ESP32-S: [GPIO34, GND]
+  -
+    - NAPAJANJE: [1, 2]
+    - S-P04: [1, 4]
+    - P04: [VCC, GND]
+  -
+    - ESP32-S: [GPIO19]
+    - S-P04: [2]
+    - P04: [TRIG]
+  -
+    - P04: [ECHO]
+    - S-P04: [3]
+    - DJ-P04: [ULAZ 5V]
+  -
+    - DJ-P04: [IZLAZ 3V3, GND]
+    - S-P04-DJ: [1, 2]
+    - ESP32-S: [GPIO35, GND]
+  -
+    - NAPAJANJE: [1, 2]
+    - S-P05: [1, 4]
+    - P05: [VCC, GND]
+  -
+    - ESP32-S: [GPIO18]
+    - S-P05: [2]
+    - P05: [TRIG]
+  -
+    - P05: [ECHO]
+    - S-P05: [3]
+    - DJ-P05: [ULAZ 5V]
+  -
+    - DJ-P05: [IZLAZ 3V3, GND]
+    - S-P05-DJ: [1, 2]
+    - ESP32-S: [GPIO32, GND]
+  -
+    - NAPAJANJE: [1, 2]
+    - S-P06: [1, 4]
+    - P06: [VCC, GND]
+  -
+    - ESP32-S: [GPIO5]
+    - S-P06: [2]
+    - P06: [TRIG]
+  -
+    - P06: [ECHO]
+    - S-P06: [3]
+    - DJ-P06: [ULAZ 5V]
+  -
+    - DJ-P06: [IZLAZ 3V3, GND]
+    - S-P06-DJ: [1, 2]
+    - ESP32-S: [GPIO33, GND]
+  -
+    - NAPAJANJE: [1, 2]
+    - S-PWR: [1, 2]
+    - ESP32-S: [5V, GND]
+  -
+    - NAPAJANJE: [1, 2]
+    - S-LED: [1, 3]
+    - LED-TRAKA: [+5V, GND]
+  -
+    - ESP32-S: [GPIO25]
+    - S-LED: [2]
+    - LED-TRAKA: [DIN]
