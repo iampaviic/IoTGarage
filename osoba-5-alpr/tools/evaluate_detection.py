@@ -93,7 +93,7 @@ def main(argv=None) -> int:
     lines = [
         "# Detekcija pločica - %s" % name,
         "",
-        "- skup: `%s`, slika: %d (s pločicom %d, bez pločice %d)" % (args.dataset, len(samples), positives, fp + tn),
+        "- skup: `%s`, slika: %d (s pločicom %d, bez pločice %d)" % (name, len(samples), positives, fp + tn),
         "- kriterij: IoU >= %.2f, min. confidence %.2f" % (args.iou, args.min_confidence),
         "- datum: %s" % time.strftime("%Y-%m-%d %H:%M"),
         "",
@@ -113,7 +113,8 @@ def main(argv=None) -> int:
     ]
     for cond, (ok, total) in sorted(by_condition.items()):
         lines.append("| %s | %d | %d | %.0f %% |" % (cond, ok, total, 100.0 * ok / total if total else 0))
-    lines += ["", "## Neuspjesi", "", "Slike s ucrtanom oznakom (zeleno) i detekcijom (crveno): `%s`" % args.debug_dir, ""]
+    debug_rel = os.path.relpath(args.debug_dir, os.path.dirname(os.path.abspath(report)))
+    lines += ["", "## Neuspjesi", "", "Slike s ucrtanom oznakom (zeleno) i detekcijom (crveno): `%s`" % debug_rel, ""]
     for s, r, why in failures[:50]:
         lines.append("- `%s` %s - %s (conf %.2f)" % (s.file, s.plate or "(bez pločice)", why, r.confidence))
     os.makedirs(os.path.dirname(os.path.abspath(report)), exist_ok=True)

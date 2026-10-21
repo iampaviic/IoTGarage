@@ -1,7 +1,7 @@
 # Točnost OCR-a - hard
 
-- skup: `../osoba-5-alpr/dataset/synthetic/hard` (150 slika s pločicom), motori: template, tesseract
-- pragovi: prihvati >= 0.85, ponovi >= 0.60; datum 2026-10-21 09:14
+- skup: `hard` (150 slika s pločicom), motori: template, tesseract
+- pragovi: prihvati >= 0.85, ponovi >= 0.60; datum 2026-10-21 09:59
 
 | metrika | vrijednost |
 |---|---|
@@ -11,7 +11,7 @@
 | ručna intervencija (MANUAL) | 35.3 % |
 | pločica nije pronađena | 2.0 % |
 | **POGREŠNO prihvaćeno** (mora biti 0) | **0** |
-| vrijeme detekcija + OCR (medijan) | 612 ms |
+| vrijeme detekcija + OCR (medijan) | 583 ms |
 
 ## Po registraciji
 

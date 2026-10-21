@@ -1,15 +1,15 @@
 # Detekcija pločica - hard
 
-- skup: `dataset/synthetic/hard`, slika: 165 (s pločicom 150, bez pločice 15)
+- skup: `hard`, slika: 165 (s pločicom 150, bez pločice 15)
 - kriterij: IoU >= 0.50, min. confidence 0.50
-- datum: 2026-10-21 09:11
+- datum: 2026-10-21 09:56
 
 | metrika | vrijednost |
 |---|---|
 | **uspješnost detekcije** | **95.3 %** (143 / 150) |
 | lažno pozitivni (slike bez pločice) | 0 / 15 |
 | srednji IoU točnih detekcija | 0.926 |
-| vrijeme obrade (medijan / p95) | 41 ms / 64 ms |
+| vrijeme obrade (medijan / p95) | 37 ms / 54 ms |
 | kriterij projekta (>= 90 %) | ZADOVOLJEN |
 
 ## Po uvjetima snimanja (osvjetljenje / kut / udaljenost)
@@ -20,7 +20,7 @@
 
 ## Neuspjesi
 
-Slike s ucrtanom oznakom (zeleno) i detekcijom (crveno): `/home/user/IoTGarage/osoba-5-alpr/tools/../rezultati/debug`
+Slike s ucrtanom oznakom (zeleno) i detekcijom (crveno): `debug`
 
 - `0012.jpg` KR2136F - missed (conf 0.21)
 - `0018.jpg` VK531G - wrong place (IoU 0.00) (conf 0.68)

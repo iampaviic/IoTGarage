@@ -75,7 +75,7 @@ def main(argv=None) -> int:
     n = len(samples) or 1
     lines = [
         "# Točnost OCR-a - %s" % name, "",
-        "- skup: `%s` (%d slika s pločicom), motori: %s" % (args.dataset, len(samples), ", ".join(reader.engine_names)),
+        "- skup: `%s` (%d slika s pločicom), motori: %s" % (name, len(samples), ", ".join(reader.engine_names)),
         "- pragovi: prihvati >= %.2f, ponovi >= %.2f; datum %s" % (args.accept, args.retry, time.strftime("%Y-%m-%d %H:%M")),
         "", "| metrika | vrijednost |", "|---|---|",
         "| točno pročitano (bilo koja razina) | %.1f %% (%d/%d) |" % (100.0 * exact / n, exact, len(samples)),

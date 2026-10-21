@@ -1,7 +1,7 @@
 # Točnost OCR-a - controlled
 
-- skup: `../osoba-5-alpr/dataset/synthetic/controlled` (150 slika s pločicom), motori: template, tesseract
-- pragovi: prihvati >= 0.85, ponovi >= 0.60; datum 2026-10-21 09:12
+- skup: `controlled` (150 slika s pločicom), motori: template, tesseract
+- pragovi: prihvati >= 0.85, ponovi >= 0.60; datum 2026-10-21 09:58
 
 | metrika | vrijednost |
 |---|---|
@@ -11,7 +11,7 @@
 | ručna intervencija (MANUAL) | 10.7 % |
 | pločica nije pronađena | 0.0 % |
 | **POGREŠNO prihvaćeno** (mora biti 0) | **0** |
-| vrijeme detekcija + OCR (medijan) | 590 ms |
+| vrijeme detekcija + OCR (medijan) | 578 ms |
 
 ## Po registraciji
 
