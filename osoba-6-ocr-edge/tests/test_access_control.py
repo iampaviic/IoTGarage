@@ -53,10 +53,10 @@ class Harness:
             "gate": gate.upper(), "state": state, "vehiclePresent": present, "requestId": request_id,
             "success": success, "timestamp": None})
 
-    def alpr(self, gate, plate, conf, status="OK"):
+    def alpr(self, gate, plate, conf, status="OK", request_id=None):
         trig = self.last("garage/alpr/%s/trigger" % gate)
         self.ctrl.on_alpr_event("garage/alpr/%s/event" % gate, {
-            "requestId": trig["requestId"] if trig else "manual", "cameraId": gate + "-camera",
+            "requestId": request_id or (trig["requestId"] if trig else "manual"), "cameraId": gate + "-camera",
             "direction": "ENTRY" if gate == "entrance" else "EXIT", "status": status, "plate": plate,
             "detectionConfidence": 0.9, "ocrConfidence": conf, "accepted": conf >= 0.85,
             "timestamp": "2026-10-19T08:00:00Z"})
@@ -210,6 +210,30 @@ def test_gate_without_ack_is_resent_then_alarm(h):
                                               "timestamp": "2026-10-19T08:00:00Z"})
     h.ack_last_command("entrance")
     assert h.last("garage/system/alert")["active"] is False
+
+
+def test_duplicate_alpr_answer_is_ignored(h):
+    """QoS 1 may deliver the same ALPR event twice: the second copy must not produce a second decision."""
+    h.gate("entrance", "CLOSED", True)
+    h.alpr("entrance", "ZG1234AB", 0.93)
+    first = h.last("garage/alpr/entrance/trigger")["requestId"]
+    decisions = len(h.all("garage/access/decision"))
+    h.alpr("entrance", "ZG1234AB", 0.93, request_id=first)
+    assert len(h.all("garage/access/decision")) == decisions
+    assert h.last("garage/access/decision")["decision"] == "GRANTED"
+
+
+def test_late_answer_to_previous_attempt_is_ignored(h):
+    h.gate("entrance", "CLOSED", True)
+    h.alpr("entrance", "ZG1234AB", 0.75)                 # attempt 1 -> RETRY
+    old = h.all("garage/alpr/entrance/trigger")[0]["requestId"]
+    h.advance(1)                                           # attempt 2 triggered with a new requestId
+    new = h.last("garage/alpr/entrance/trigger")["requestId"]
+    assert new != old
+    h.alpr("entrance", "ZG1234AB", 0.95, request_id=old)  # late duplicate of attempt 1
+    assert h.last("garage/gate/entrance/command") is None
+    h.alpr("entrance", "ZG1234AB", 0.95)                  # real answer to attempt 2
+    assert h.last("garage/access/decision")["decision"] == "GRANTED"
 
 
 def test_alpr_timeout_counts_as_camera_error(h):

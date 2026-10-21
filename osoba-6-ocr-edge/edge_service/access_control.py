@@ -148,6 +148,8 @@ class AccessController:
         return rid
 
     def _trigger_alpr(self, tx: Transaction, reason: str) -> None:
+        if tx.attempt > 1:  # every attempt gets its own requestId, so a late answer to an old one is ignored
+            tx.trigger_id = self._id("trg-" + tx.gate)
         tx.awaiting_alpr = True
         tx.waiting_since = self.clock()
         self.publish(topics.alpr_trigger(tx.gate), {
@@ -243,8 +245,10 @@ class AccessController:
             # trigger sent by a tool (or no gate controller connected yet): treat as a new vehicle
             tx = Transaction(gate=gate, trigger_id=msg.get("requestId", "?"), started=self.clock())
             self.transactions[gate] = tx
-        elif msg.get("requestId") != tx.trigger_id:
-            log.info("ignoring stale ALPR event %s (waiting for %s)", msg.get("requestId"), tx.trigger_id)
+        elif msg.get("requestId") != tx.trigger_id or not tx.awaiting_alpr:
+            # stale answer, or a QoS 1 duplicate of an answer that was already decided on
+            log.info("ignoring ALPR event %s (waiting for %s: %s)", msg.get("requestId"), tx.trigger_id,
+                     tx.awaiting_alpr)
             return
         tx.awaiting_alpr = False
         alpr = AlprInfo(status=msg.get("status", "NO_PLATE"), plate=msg.get("plate"),

@@ -112,7 +112,7 @@ sequenceDiagram
 
 | uređaj | što pokreće | kako |
 |---|---|---|
-| Raspberry Pi **ili** Jetson Nano (edge) | Mosquitto, `edge_service all`, `tb_bridge` | Docker (`osoba-6-ocr-edge/deploy/docker-compose.edge.yml`) ili nativno (`install_native.sh`) |
+| Raspberry Pi **ili** Jetson Nano (edge) | Mosquitto, `edge_service all`, `tb_bridge` | Docker (`osoba-6-ocr-edge/deploy/docker-compose.edge.yml` + `docker-compose.camera.yml`) ili nativno (`install_native.sh`) |
 | laptop (ili drugi uređaj s ≥ 4 GB RAM) | ThingsBoard CE | `osoba-7-thingsboard/docker-compose.yml` |
 | 2x ESP32 | firmware senzora i rampi | PlatformIO |
 | laptop bez hardvera (razvoj) | sve od gore + simulatori | `python osoba-1-voditelj/integracija/simulacija.py --broker` |

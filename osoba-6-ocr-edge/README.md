@@ -72,7 +72,8 @@ python -m edge_service manual open --gate exit
 **Docker (preporuka, radi jednako na oba):**
 ```bash
 cd osoba-6-ocr-edge/deploy
-docker compose -f docker-compose.edge.yml up -d --build     # mosquitto + edge + tb-bridge
+docker compose -f docker-compose.edge.yml -f docker-compose.camera.yml up -d --build   # mosquitto + edge + tb-bridge, USB kamera
+docker compose -f docker-compose.edge.yml up -d --build                                # bez kamere (sintetske slike), npr. na laptopu
 ```
 **Nativno (Raspberry Pi OS / Ubuntu, Python ≥ 3.8):** `bash osoba-6-ocr-edge/deploy/install_native.sh`, zatim systemd
 servisi iz `deploy/`. **Jetson Nano** (JetPack 4.x ima Python 3.6): koristi Docker ili `sudo apt install python3.8 python3.8-venv`

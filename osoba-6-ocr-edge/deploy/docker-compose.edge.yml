@@ -1,6 +1,9 @@
 # Everything that runs on the edge computer (Raspberry Pi or Jetson Nano).
 #
 #   cd osoba-6-ocr-edge/deploy
+#   # with the USB camera (Raspberry Pi / Jetson):
+#   docker compose -f docker-compose.edge.yml -f docker-compose.camera.yml up -d --build
+#   # without a camera (laptop, CI): synthetic camera frames
 #   docker compose -f docker-compose.edge.yml up -d --build
 #   docker compose -f docker-compose.edge.yml logs -f edge
 #
@@ -28,13 +31,12 @@ services:
       MQTT_HOST: mosquitto
       GARAGE_SPOTS: "6"
       PRICING_PROFILE: demo
-      # ALPR_SOURCE: sim          # uncomment to test without a camera
+      # sim = synthetic frames; docker-compose.camera.yml switches to the USB camera
+      ALPR_SOURCE: ${ALPR_SOURCE:-sim}
     volumes:
       - edge-data:/data
       - ../edge.example.yaml:/config/edge.yaml:ro    # replace with your edge.yaml
     command: ["python", "-m", "edge_service", "--config", "/config/edge.yaml", "all"]
-    devices:
-      - /dev/video0:/dev/video0      # USB camera; add /dev/video2 for a second camera
 
   tb-bridge:
     image: iot-garage-edge
