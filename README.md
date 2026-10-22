@@ -11,7 +11,7 @@ ThingsBoardu i mobilnoj aplikaciji.
 
 ## Sadržaj repozitorija
 
-Struktura slijedi [upute nastavnika](OSTALO/upute-nastavnika-gitlab.txt); svaka mapa ima `README.TXT` s opisom.
+Struktura slijedi [upute nastavnika](OSTALO/upute-nastavnika-gitlab.txt); svaka mapa ima `README.md` s opisom.
 
 | mapa | sadržaj |
 |---|---|
