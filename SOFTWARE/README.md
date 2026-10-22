@@ -1,6 +1,6 @@
 # SOFTWARE – izvorni programski kod
 
-Instalacija i pokretanje: [INSTALL.TXT](INSTALL.TXT). Svaka podmapa ima `README.md` s detaljnim uputama za taj
+Instalacija i pokretanje: [INSTALL.md](INSTALL.md). Svaka podmapa ima `README.md` s detaljnim uputama za taj
 dio sustava (tko je zadužen, kako se koristi, što još treba napraviti). Kod je na engleskom, upute na hrvatskom.
 
 | mapa | sadržaj |
@@ -21,7 +21,7 @@ dio sustava (tko je zadužen, kako se koristi, što još treba napraviti). Kod j
 
 ## Prevođenje
 
-- **Python:** nije potrebno (`pip install`, vidi [INSTALL.TXT](INSTALL.TXT)).
+- **Python:** nije potrebno (`pip install`, vidi [INSTALL.md](INSTALL.md)).
 - **Firmware:** PlatformIO, uobičajene naredbe (isto za `rampe/firmware`); ovisnosti (PubSubClient, ArduinoJson, …)
   PlatformIO preuzima sam prema `platformio.ini`:
 

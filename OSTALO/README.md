@@ -5,5 +5,5 @@
   *Literatura*
 - `literatura/` – (dodaje se po potrebi) PDF-ovi preuzeti s mreže ili dobiveni od nastavnika: datasheetovi,
   članci, specifikacije
-- [upute-nastavnika-gitlab.txt](upute-nastavnika-gitlab.txt) – upute nastavnika za arhiviranje projekta na
+- [upute-nastavnika-gitlab.md](upute-nastavnika-gitlab.md) – upute nastavnika za arhiviranje projekta na
   GitLabu (struktura ovog repozitorija slijedi te upute)

@@ -11,12 +11,12 @@ ThingsBoardu i mobilnoj aplikaciji.
 
 ## Sadržaj repozitorija
 
-Struktura slijedi [upute nastavnika](OSTALO/upute-nastavnika-gitlab.txt); svaka mapa ima `README.md` s opisom.
+Struktura slijedi [upute nastavnika](OSTALO/upute-nastavnika-gitlab.md); svaka mapa ima `README.md` s opisom.
 
 | mapa | sadržaj |
 |---|---|
 | [PROJEKT](PROJEKT) | [prijedlog i plan projekta](PROJEKT/plan-projekta) (DOCX + PDF), [završna dokumentacija](PROJEKT/dokumentacija), [arhitektura i MQTT ugovor](PROJEKT/sustav), [plan rada, rizici, odluke](PROJEKT/upravljanje), [nacrt makete](PROJEKT/maketa), [testiranje](PROJEKT/testiranje) |
-| [SOFTWARE](SOFTWARE) | sav kod – firmware, edge servis, baza, ThingsBoard, simulacija, 3D dijelovi; [instalacija](SOFTWARE/INSTALL.TXT) |
+| [SOFTWARE](SOFTWARE) | sav kod – firmware, edge servis, baza, ThingsBoard, simulacija, 3D dijelovi; [instalacija](SOFTWARE/INSTALL.md) |
 | [PREZENTACIJA](PREZENTACIJA) | [demo scenarij](PREZENTACIJA/demo-scenarij.md), završna prezentacija |
 | [OSTALO](OSTALO) | [literatura i poveznice](OSTALO/literatura.md), upute nastavnika |
 
@@ -96,7 +96,7 @@ python alpr/tools/generate_plates.py --out tablice                 # pločice za
 parking-sessions --db data/garage.db list --active                 # tko je u garaži
 ```
 
-Firmware, edge računalo i sve varijable konfiguracije: [SOFTWARE/INSTALL.TXT](SOFTWARE/INSTALL.TXT).
+Firmware, edge računalo i sve varijable konfiguracije: [SOFTWARE/INSTALL.md](SOFTWARE/INSTALL.md).
 
 ## Struktura i pravila
 
