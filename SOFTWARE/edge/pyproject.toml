@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "garage-edge"
+version = "0.1.0"
+description = "IoT Garage: plate OCR, ALPR service and local access control (edge computer)"
+requires-python = ">=3.8"
+# local packages (install them first, see the root README):
+#   garage-contract (SOFTWARE/ugovor), plate-detector (SOFTWARE/alpr),
+#   parking-sessions (SOFTWARE/baza)
+dependencies = [
+    "numpy>=1.19",
+    "pytesseract>=0.3.8",
+    "PyYAML>=5.1",
+]
+
+[project.scripts]
+garage-edge = "edge_service.__main__:main"
+
+[tool.setuptools]
+packages = ["plate_ocr", "edge_service"]

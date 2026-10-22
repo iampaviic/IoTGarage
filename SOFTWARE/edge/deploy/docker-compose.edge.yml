@@ -1,0 +1,56 @@
+# Everything that runs on the edge computer (Raspberry Pi or Jetson Nano).
+#
+#   cd SOFTWARE/edge/deploy
+#   # with the USB camera (Raspberry Pi / Jetson):
+#   docker compose -f docker-compose.edge.yml -f docker-compose.camera.yml up -d --build
+#   # without a camera (laptop, CI): synthetic camera frames
+#   docker compose -f docker-compose.edge.yml up -d --build
+#   docker compose -f docker-compose.edge.yml logs -f edge
+#
+# ThingsBoard itself runs on a laptop/server (SOFTWARE/thingsboard/docker-compose.yml);
+# set TB_HOST below to that machine. Without ThingsBoard the garage keeps working,
+# the bridge just buffers data in /data/tb-buffer.db.
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ../../integracija/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - mosquitto-data:/mosquitto/data
+
+  edge:
+    build:
+      context: ../..
+      dockerfile: edge/deploy/Dockerfile
+    image: iot-garage-edge
+    restart: unless-stopped
+    depends_on: [mosquitto]
+    environment:
+      MQTT_HOST: mosquitto
+      GARAGE_SPOTS: "6"
+      PRICING_PROFILE: demo
+      # sim = synthetic frames; docker-compose.camera.yml switches to the USB camera
+      ALPR_SOURCE: ${ALPR_SOURCE:-sim}
+    volumes:
+      - edge-data:/data
+      - ../edge.example.yaml:/config/edge.yaml:ro    # replace with your edge.yaml
+    command: ["python", "-m", "edge_service", "--config", "/config/edge.yaml", "all"]
+
+  tb-bridge:
+    image: iot-garage-edge
+    restart: unless-stopped
+    depends_on: [mosquitto, edge]
+    environment:
+      MQTT_HOST: mosquitto
+      TB_HOST: 192.168.1.20          # computer running ThingsBoard
+      TB_MQTT_PORT: "1884"
+      TB_GATEWAY_TOKEN: garage-edge-gateway-token
+    volumes:
+      - edge-data:/data
+    command: ["python", "-m", "tb_bridge"]
+
+volumes:
+  mosquitto-data:
+  edge-data:

@@ -23,19 +23,19 @@ dist/
 data/
 runtime/
 captures/
-osoba-5-alpr/dataset/real/
-osoba-5-alpr/dataset/synthetic/
-osoba-6-ocr-edge/edge.yaml
-osoba-7-thingsboard/bridge/buffer*.db
-osoba-7-thingsboard/.env
+SOFTWARE/alpr/dataset/real/
+SOFTWARE/alpr/dataset/synthetic/
+SOFTWARE/edge/edge.yaml
+SOFTWARE/thingsboard/bridge/buffer*.db
+SOFTWARE/thingsboard/.env
 
 # Generated reports that are re-created by scripts
-osoba-5-alpr/rezultati/debug/
+SOFTWARE/alpr/rezultati/debug/
 
 # OS / editors
 .DS_Store
 Thumbs.db
 .idea/
 *.swp
-osoba-2-maketa/nacrt/tlocrt_A4.pdf
-osoba-2-maketa/elektronika/wireviz/*.png
+SOFTWARE/maketa/nacrt/tlocrt_A4.pdf
+SOFTWARE/maketa/elektronika/wireviz/*.png

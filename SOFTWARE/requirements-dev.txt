@@ -1,0 +1,11 @@
+# Everything for development and tests on a laptop (Python >= 3.8). Run from the SOFTWARE directory:
+#   python -m venv .venv && . .venv/bin/activate      (Windows: .venv\Scripts\activate)
+#   pip install -r requirements-dev.txt
+# System packages: tesseract-ocr and mosquitto (apt / brew / Windows installers), see INSTALL.TXT
+-e ugovor
+-e alpr[headless]
+-e baza
+-e edge
+-e thingsboard/bridge
+pytest>=7
+pyserial>=3.5
