@@ -1,7 +1,11 @@
 # SOFTWARE – izvorni programski kod
 
-Instalacija i pokretanje: [INSTALL.md](INSTALL.md). Svaka podmapa ima `README.md` s detaljnim uputama za taj
-dio sustava (tko je zadužen, kako se koristi, što još treba napraviti). Kod je na engleskom, upute na hrvatskom.
+<!-- gitlab:od-tjedna=4 -->
+Instalacija i pokretanje: [INSTALL.md](INSTALL.md).
+<!-- /gitlab -->
+
+Svaka podmapa ima `README.md` s detaljnim uputama za taj dio sustava (tko je zadužen, kako se koristi, što još
+treba napraviti). Kod je na engleskom, upute na hrvatskom.
 
 | mapa | sadržaj |
 |---|---|
@@ -21,7 +25,8 @@ dio sustava (tko je zadužen, kako se koristi, što još treba napraviti). Kod j
 
 ## Prevođenje
 
-- **Python:** nije potrebno (`pip install`, vidi [INSTALL.md](INSTALL.md)).
+- **Python:** nije potrebno – pakete instalira `pip install -r requirements-dev.txt`.
+<!-- gitlab:od-tjedna=2 -->
 - **Firmware:** PlatformIO, uobičajene naredbe (isto za `rampe/firmware`); ovisnosti (PubSubClient, ArduinoJson, …)
   PlatformIO preuzima sam prema `platformio.ini`:
 
@@ -32,3 +37,4 @@ dio sustava (tko je zadužen, kako se koristi, što još treba napraviti). Kod j
   ```
 
 - **3D dijelovi:** `openscad -o dio.stl dio.scad` (gotovi STL-ovi su u `maketa/3d/stl/`).
+<!-- /gitlab -->

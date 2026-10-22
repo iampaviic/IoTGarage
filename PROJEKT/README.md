@@ -13,10 +13,15 @@ Dijagrami u `.md` datotekama su Mermaid kod unutar samog teksta.
 | [testiranje/](testiranje) | [testni plan](testiranje/testni-plan.md), [testni zapisnik](testiranje/testni-zapisnik.md), [sigurnosni testovi rampi](testiranje/sigurnosni-testovi-rampi.md), [tablica pragova senzora](testiranje/tablica-pragova.md), [ograničenja ALPR-a](testiranje/ogranicenja-alpr.md) |
 | [slike/](slike) | snimke zaslona ThingsBoard dashboarda (originali) |
 
+<!-- gitlab:od-tjedna=2 -->
 3D modeli, tlocrt i dijagrami ožičenja su izvorni kod i nalaze se u [SOFTWARE/maketa](../SOFTWARE/maketa).
+<!-- /gitlab -->
+<!-- gitlab:od-tjedna=5 -->
 Izvještaje o točnosti ALPR-a i OCR-a generiraju alati u [SOFTWARE/alpr/rezultati](../SOFTWARE/alpr/rezultati) i
 [SOFTWARE/edge/rezultati](../SOFTWARE/edge/rezultati).
+<!-- /gitlab -->
 
+<!-- gitlab:od-tjedna=6 -->
 ## Sastavljanje rada
 
 Završna dokumentacija sastoji se od više datoteka. Prije predaje se sastavlja u jednu DOCX i jednu PDF datoteku
@@ -30,3 +35,4 @@ pandoc 0*.md -o IoT-Garaza-dokumentacija.pdf      # treba LaTeX
 Obje datoteke spremiti u `PROJEKT/dokumentacija/`. Mermaid dijagrame prije toga izvesti u PNG (npr.
 [mermaid.live](https://mermaid.live)) i spremiti originale u `PROJEKT/slike/`. Ako se neka `.md` datoteka izvan
 `dokumentacija/` prilaže radu, i nju pretvoriti u PDF istom naredbom.
+<!-- /gitlab -->
