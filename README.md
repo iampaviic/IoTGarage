@@ -8,18 +8,20 @@ ThingsBoardu.
 
 ## Tim i folderi
 
-Svaka osoba ima svoj folder s **README-om: što je već napravljeno, kako se koristi i što još treba napraviti**.
+Svaka uloga ima svoj folder s **README-om: tko je zadužen, što je već napravljeno, kako se koristi i što još treba napraviti**.
 
-| | uloga | folder | pripremljeno |
-|---|---|---|---|
-| 1 | voditelj, arhitektura, integracija | [osoba-1-voditelj](osoba-1-voditelj) | arhitektura, **komunikacijski ugovor kao kod** (JSON sheme + Python paket), zahtjevi, rizici, odluke, plan rada, demo scenarij, **simulacija cijelog sustava** + e2e testovi |
-| 2 | maketa, napajanje, ožičenje | [osoba-2-maketa](osoba-2-maketa) | tlocrt 1:1, kalkulator položaja kamere, 7 parametarskih 3D dijelova (STL), dijagrami ožičenja, popis komponenti, proračun napajanja |
-| 3 | senzori mjesta, firmware | [osoba-3-senzori](osoba-3-senzori) | ESP32 firmware (6× HC-SR04, filtar, MQTT, reconnect, LWT), unit testovi, simulator, alati za kalibraciju i test 20× |
-| 4 | rampe, aktuatori | [osoba-4-rampe](osoba-4-rampe) | ESP32 firmware (2 rampe, stroj stanja, sigurnost, tipke), unit testovi, simulator, sigurnosni testovi |
-| 5 | ALPR – detekcija pločice | [osoba-5-alpr](osoba-5-alpr) | OpenCV detektor, ispravak perspektive, **pločice za ispis**, sintetski skup, alati za snimanje/označavanje/mjerenje |
-| 6 | OCR, edge servis | [osoba-6-ocr-edge](osoba-6-ocr-edge) | dvostruki OCR s glasanjem, HR format, ALPR servis, **access control** (odluke, sesije, rampe, alarmi), Docker za Raspberry Pi/Jetson |
-| 7 | ThingsBoard | [osoba-7-thingsboard](osoba-7-thingsboard) | docker-compose, provisioning jednom naredbom, bridge s međuspremnikom, **2 dashboarda**, 7 pravila alarma, RPC gumbi |
-| 8 | baza, testovi, dokumentacija | [osoba-8-baza-testovi](osoba-8-baza-testovi) | SQLite sesije + naplata + CLI, testni plan (~60 slučajeva), testni zapisnik, kostur dokumentacije, korisničke upute |
+| | uloga | tko | folder | pripremljeno |
+|---|---|---|---|---|
+| 1 | voditelj, arhitektura, integracija | Patrik | [osoba-1-voditelj](osoba-1-voditelj) | arhitektura, **komunikacijski ugovor kao kod** (JSON sheme + Python paket), zahtjevi, rizici, odluke, plan rada, demo scenarij, **simulacija cijelog sustava** + e2e testovi |
+| 2 | maketa, napajanje, ožičenje | Patrik, Lovro Gale | [osoba-2-maketa](osoba-2-maketa) | tlocrt 1:1, kalkulator položaja kamere, 7 parametarskih 3D dijelova (STL), dijagrami ožičenja, popis komponenti, proračun napajanja |
+| 3 | senzori mjesta, firmware | Toma Burgund (+ Lovro Gale) | [osoba-3-senzori](osoba-3-senzori) | ESP32 firmware (6× HC-SR04, filtar, MQTT, reconnect, LWT), unit testovi, simulator, alati za kalibraciju i test 20× |
+| 4 | rampe, aktuatori, lokalna kontrola pristupa | Luka Oslić | [osoba-4-rampe](osoba-4-rampe) | ESP32 firmware (2 rampe, stroj stanja, sigurnost, tipke), unit testovi, simulator, sigurnosni testovi |
+| 5 | ALPR – detekcija pločice | Sven Matić | [osoba-5-alpr](osoba-5-alpr) | OpenCV detektor, ispravak perspektive, **pločice za ispis**, sintetski skup, alati za snimanje/označavanje/mjerenje |
+| 6 | OCR, edge servis | Lukas Davorija (+ Luka Oslić za access control) | [osoba-6-ocr-edge](osoba-6-ocr-edge) | dvostruki OCR s glasanjem, HR format, ALPR servis, **access control** (odluke, sesije, rampe, alarmi), Docker za Raspberry Pi/Jetson |
+| 7 | ThingsBoard | Anja, Leo Hreljanović (analitika) | [osoba-7-thingsboard](osoba-7-thingsboard) | docker-compose, provisioning jednom naredbom, bridge s međuspremnikom, **2 dashboarda**, 7 pravila alarma, RPC gumbi |
+| 8 | baza, testovi, GitHub | Lovro Gale | [osoba-8-baza-testovi](osoba-8-baza-testovi) | SQLite sesije + naplata + CLI, testni plan (~60 slučajeva), testni zapisnik, kostur dokumentacije, korisničke upute |
+
+Leo Hreljanović uz to izrađuje **mobilnu aplikaciju za analitiku garaže** (zauzetost, ulasci po satu, prosječno trajanje, povijest sesija), koja podatke čita iz ThingsBoarda preko REST API-ja.
 
 **Što je provjereno:** 143 automatska testa prolaze; cijeli sustav radi u simulaciji (0 poruka koje krše
 ugovor); oba firmwarea se prevode za ESP32; ThingsBoard dashboardi, alarmi, RPC, međuspremnik pri ispadu i

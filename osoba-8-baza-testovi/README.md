@@ -1,5 +1,7 @@
 # Osoba 8 – baza, aplikacijska logika, testiranje i dokumentacija
 
+**Zadužen:** Lovro Gale – baza, testovi i GitHub (repozitorij, CI, ploča zadataka); pomaže Tomi sa senzorima i Patriku s ožičenjem makete.
+
 Ti si vlasnik **podataka** (parkirne sesije), **testova** i **dokaza da sustav radi**.
 
 ## Što je već napravljeno

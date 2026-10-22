@@ -1,5 +1,7 @@
 # Osoba 5 – ALPR: detekcija registarske pločice
 
+**Zadužen:** Sven Matić. Zamjena: Lukas Davorija.
+
 Tvoj modul pronalazi **gdje** je pločica na slici, ispravlja perspektivu i vraća izrezanu pločicu.
 **Ne** čita znakove i **ne** odlučuje je li registracija valjana (to radi osoba 6).
 

@@ -1,5 +1,7 @@
 # Osoba 7 – ThingsBoard, MQTT, digitalni blizanac i dashboard
 
+**Zaduženi:** Anja (vlasnica – instalacija, provisioning, bridge, nadzorni dashboard, alarmi i obavijesti) i Leo Hreljanović (analitički dashboard i pristup podacima za mobilnu aplikaciju za analitiku garaže, koja podatke čita preko ThingsBoard REST API-ja).
+
 ThingsBoard je **digitalni blizanac, nadzor i analitika** – nikad jedina komponenta potrebna za otvaranje rampe.
 
 ## Što je već napravljeno (i isprobano na ThingsBoard CE 4.2.1)

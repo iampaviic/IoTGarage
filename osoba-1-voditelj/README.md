@@ -1,5 +1,7 @@
 # Osoba 1 – voditelj projekta i sistemski arhitekt
 
+**Zadužen:** Patrik – voditelj projekta; uz to vodi izradu makete ([osoba-2-maketa](../osoba-2-maketa)) i objedinjuje završnu dokumentaciju.
+
 Tvoj posao je da svi znaju **što njihov podsustav prima, što šalje, kojim protokolom i što se događa
 kad nešto drugo ne radi** – i da se dijelovi spajaju svaki tjedan, ne tek na kraju.
 
