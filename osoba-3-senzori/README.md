@@ -1,5 +1,7 @@
 # Osoba 3 – senzori parkirnih mjesta i firmware
 
+**Zaduženi:** Toma Burgund (vlasnik) i Lovro Gale (pomoć).
+
 ## Što je već napravljeno
 
 | | sadržaj |

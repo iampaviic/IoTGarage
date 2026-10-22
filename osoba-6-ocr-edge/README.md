@@ -1,5 +1,7 @@
 # Osoba 6 – OCR, obrada registracije i edge servis
 
+**Zaduženi:** Lukas Davorija (OCR, ALPR servis, edge računalo) i Luka Oslić (pravila odluke i access control – `edge_service/decisions.py`, `edge_service/access_control.py`). Zamjena za ALPR: Sven Matić.
+
 Ti čitaš i validiraš registraciju te **donosiš lokalnu odluku** o ulasku/izlasku. Tvoj servis je "mozak" edge računala.
 
 ## Što je već napravljeno

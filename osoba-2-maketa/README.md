@@ -1,5 +1,7 @@
 # Osoba 2 – fizička maketa i elektronika napajanja
 
+**Zaduženi:** Patrik (vlasnik, tjedni 1–3) i Lovro Gale (napajanje i ožičenje). Svaki član sam montira i spaja svoj hardver na maketu.
+
 Maketu moraš izraditi ti – ali sve što se može nacrtati, izračunati i isprintati unaprijed je ovdje.
 
 ## Što je već napravljeno

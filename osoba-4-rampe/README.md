@@ -1,5 +1,7 @@
 # Osoba 4 – rampe, aktuatori i lokalna kontrola pristupa
 
+**Zadužen:** Luka Oslić – rampe i aktuatori, a s Lukasom i pravila lokalne kontrole pristupa (`decisions.py` i `access_control.py` u [osoba-6-ocr-edge/edge_service](../osoba-6-ocr-edge/edge_service)). Zamjena: Lukas Davorija.
+
 Rampa **izvršava** naredbe i čuva sigurnost (ne zatvara se na vozilo); **ne odlučuje** smije li vozilo ući –
 to radi access control na edge računalu (osoba 6).
 
