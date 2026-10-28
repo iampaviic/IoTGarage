@@ -14,15 +14,15 @@ ponovno očitava, izračunava se trajanje i cijena te se zatvara parkirna sesija
 ```mermaid
 flowchart LR
   subgraph Maketa
-    S1[HC-SR04 x6<br/>iznad mjesta] --> ESPS[ESP32<br/>čvor senzora]
-    LED[WS2812 LED<br/>po mjestu] --- ESPS
+    S1[UZV senzor x6<br/>iznad mjesta] --> ESPS[ESP32<br/>čvor senzora]
+    LED[LED<br/>po mjestu] --- ESPS
     IR[IR senzori<br/>na crti rampe] --> ESPR[ESP32<br/>čvor rampi]
     BTN[tipke za ručno<br/>otvaranje] --> ESPR
-    ESPR --> SERVO[2x SG90<br/>rampe + LED]
+    ESPR --> SERVO[2x servo motor<br/>rampe + LED]
     CAM[USB kamera<br/>ulaz / izlaz]
   end
 
-  subgraph Edge["Edge računalo (Raspberry Pi ili Jetson Nano)"]
+  subgraph Edge["Edge računalo"]
     MQ[(Mosquitto<br/>MQTT broker)]
     ALPR[ALPR servis<br/>detekcija + OCR]
     AC[Access control<br/>odluke, rampe]
@@ -34,6 +34,10 @@ flowchart LR
     TB[ThingsBoard CE<br/>dashboard, alarmi]
   end
 
+  subgraph Mobitel
+    APP[Mobilna aplikacija<br/>analitika garaže]
+  end
+
   ESPS -- MQTT Wi-Fi --> MQ
   ESPR <-- MQTT Wi-Fi --> MQ
   CAM -- USB --> ALPR
@@ -43,6 +47,7 @@ flowchart LR
   BR <--> MQ
   BR -- MQTT gateway API --> TB
   TB -- RPC gumbi --> BR
+  TB -- REST API --> APP
 ```
 
 **Ključna ideja:** ulazak i izlazak rade lokalno i bez ThingsBoarda. ThingsBoard je digitalni blizanac,
