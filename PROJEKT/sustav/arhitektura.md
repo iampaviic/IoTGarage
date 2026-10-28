@@ -23,7 +23,7 @@ flowchart LR
   end
 
   subgraph Edge["Edge računalo"]
-    MQ[(Mosquitto<br/>MQTT broker)]
+    MQ[(MQTT broker)]
     ALPR[ALPR servis<br/>detekcija + OCR]
     AC[Access control<br/>odluke, rampe]
     DB[(SQLite<br/>parkirne sesije)]
@@ -57,8 +57,8 @@ nadzor i analitika – nikada jedina komponenta potrebna za otvaranje rampe.
 
 | komponenta | gdje radi | vlasnik | kod |
 |---|---|---|---|
-| čvor senzora (ESP32 + 6x HC-SR04 + LED traka) | maketa | osoba 3 | `SOFTWARE/senzori/firmware` |
-| čvor rampi (ESP32 + 2x SG90 + 2x IR + LED + tipke) | maketa | osoba 4 | `SOFTWARE/rampe/firmware` |
+| čvor senzora (ESP32 + 6x UZV senzor + LED) | maketa | osoba 3 | `SOFTWARE/senzori/firmware` |
+| čvor rampi (ESP32 + 2x servo motor + 2x IR senzor + LED + tipke) | maketa | osoba 4 | `SOFTWARE/rampe/firmware` |
 | maketa, napajanje, ožičenje, nosači | maketa | osoba 2 | `SOFTWARE/maketa` |
 | detekcija pločice (OpenCV) | edge | osoba 5 | `SOFTWARE/alpr/plate_detector` |
 | OCR + validacija + ALPR servis + access control | edge | osoba 6 | `SOFTWARE/edge` |
@@ -117,20 +117,20 @@ sequenceDiagram
 
 | uređaj | što pokreće | kako |
 |---|---|---|
-| Raspberry Pi **ili** Jetson Nano (edge) | Mosquitto, `edge_service all`, `tb_bridge` | Docker (`SOFTWARE/edge/deploy/docker-compose.edge.yml` + `docker-compose.camera.yml`) ili nativno (`install_native.sh`) |
+| edge računalo | MQTT broker, `edge_service all`, `tb_bridge` | Docker (`SOFTWARE/edge/deploy/docker-compose.edge.yml` + `docker-compose.camera.yml`) ili nativno (`install_native.sh`) |
 | laptop (ili drugi uređaj s ≥ 4 GB RAM) | ThingsBoard CE | `SOFTWARE/thingsboard/docker-compose.yml` |
 | 2x ESP32 | firmware senzora i rampi | PlatformIO |
 | laptop bez hardvera (razvoj) | sve od gore + simulatori | `python SOFTWARE/integracija/simulacija.py --broker` |
 
-Preporuka: **Raspberry Pi kao edge računalo** (noviji OS, Python 3.11, jednostavnije), Jetson Nano kao rezerva
-ili za kasniji neuronski detektor pločica (GPU). Kod radi na oba – vidi [odluke.md](../upravljanje/odluke.md) D-004.
+Edge računalo može biti bilo koje Linux računalo s Dockerom ili Pythonom ≥ 3.8; odabir je zabilježen u
+[odluke.md](../upravljanje/odluke.md) (D-004).
 
 ## 7. Što ako podsustav nije dostupan (degradirani rad)
 
 | ispadne | posljedica | ponašanje sustava |
 |---|---|---|
 | ThingsBoard ili mreža prema njemu | nema dashboarda | ulaz/izlaz rade normalno; bridge sprema podatke u `tb-buffer.db` i šalje ih s izvornim vremenom kad se veza vrati (testirano) |
-| Mosquitto / edge računalo | nema automatskih odluka | rampe i dalje rade lokalno: tipka za ručno otvaranje, automatsko zatvaranje, sigurnosno ponovno otvaranje |
+| MQTT broker / edge računalo | nema automatskih odluka | rampe i dalje rade lokalno: tipka za ručno otvaranje, automatsko zatvaranje, sigurnosno ponovno otvaranje |
 | ALPR (kamera, OCR) | nema čitanja | 3 pokušaja → `MANUAL_REQUIRED` + alarm; operater odobrava gumbom na dashboardu ili CLI-jem; razlog se bilježi |
 | ESP32 senzora | nema stanja mjesta | Last Will → mjesta postaju `UNKNOWN` (nikad "slobodno"), alarm "Uređaj nije dostupan" |
 | jedan senzor | jedno mjesto nepoznato | firmware nakon 5 neuspjelih mjerenja javlja `UNKNOWN`/`TIMEOUT`; ne broji se kao slobodno |
@@ -143,4 +143,4 @@ ili za kasniji neuronski detektor pločica (GPU). Kod radi na oba – vidi [odlu
 - Samo **izmišljene registracije** (generator: `SOFTWARE/alpr/tools/generate_plates.py`).
 - Slike se ne spremaju; opcionalno samo izrezana pločica (`privacy.save_crops`) uz automatsko brisanje.
 - Sesije i događaji brišu se nakon N dana (`parking-sessions purge --days 30`), ThingsBoard čuva telemetriju 30 dana.
-- Za završnu demonstraciju: lozinka na Mosquittu, tajni token gatewaya, promijenjena lozinka ThingsBoarda.
+- Za završnu demonstraciju: lozinka na MQTT brokeru, tajni token gatewaya, promijenjena lozinka ThingsBoarda.
