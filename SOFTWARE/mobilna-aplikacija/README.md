@@ -20,5 +20,5 @@ u [planu projekta](../../PROJEKT/plan-projekta)).
 
 - [ ] odabrati tehnologiju (npr. Flutter ili React Native) i ovdje opisati kako se projekt otvara i pokreće
 - [ ] dizajn ekrana i dohvat podataka (9.11. – 6.12.2026.)
-- [ ] prva verzija s ključnim brojkama do KT5 (20. 12. 2026.), nakon KT6 (17. 1. 2027.) samo popravci
+- [ ] prva verzija s ključnim brojkama do KT5 (11. 1. 2027.), nakon KT6 (17. 1. 2027.) samo popravci
 - [ ] izvrsna verzija (APK) u [izvrsne-verzije](../izvrsne-verzije) na kraju projekta

@@ -7,14 +7,26 @@ Ovaj popis se lako prenese u GitHub Projects (jedna kartica po retku, oznaka = o
 
 Projekt traje od **19.10.2026.** do roka za predaju **29.1.2027.** (15 tjedana, T1–T15).
 
-| faza | tjedni | datumi | kontrolna točka |
+| faza | tjedni | datumi |
+|---|---|---|
+| 1 – definicija i dokaz izvedivosti | T1–T2 | 19.10. – 1.11.2026. |
+| 2 – samostalni podsustavi | T3–T7 | 2.11. – 6.12.2026. |
+| 3 – integracija | T8–T9 | 7.12. – 20.12.2026. |
+| blagdanska stanka (rezerva) | T10–T11 | 21.12.2026. – 3.1.2027. |
+| 4 – stabilizacija i testiranje | T12–T13 | 4.1. – 17.1.2027. |
+| 5 – dokumentacija, prezentacija i predaja | T14–T15 | 18.1. – 29.1.2027. |
+
+Kontrolne točke (dogovor tima, plan projekta v1.3):
+
+| | kontrolna točka | planirano | ostvareno |
 |---|---|---|---|
-| 1 – definicija i dokaz izvedivosti | T1–T2 | 19.10. – 1.11.2026. | KT1 arhitektura, ugovor, plan (25.10.) · KT2 dokaz izvedivosti (1.11.) |
-| 2 – samostalni podsustavi | T3–T7 | 2.11. – 6.12.2026. | KT3 komponente i baza makete (15.11.) · KT4 podsustavi na hardveru (6.12.) |
-| 3 – integracija | T8–T9 | 7.12. – 20.12.2026. | KT5 integracija s hardverom, MVP aplikacije (20.12.) |
-| blagdanska stanka (rezerva) | T10–T11 | 21.12.2026. – 3.1.2027. | – |
-| 4 – stabilizacija i testiranje | T12–T13 | 4.1. – 17.1.2027. | KT6 svi testni scenariji, rezervni video (17.1.) |
-| 5 – dokumentacija, prezentacija i predaja | T14–T15 | 18.1. – 29.1.2027. | KT7 predaja na GitLab (29.1.) |
+| KT1 | arhitektura, plan i repozitorij | 28.10.2026. | 27.10.2026. ✅ |
+| KT2 | dokaz izvedivosti (1 senzor, 1 servo, ThingsBoard, ALPR na stvarnoj fotografiji), nacrt makete | 10.11.2026. | |
+| KT3 | baza makete izrađena | 23.11.2026. | |
+| KT4 | podsustavi rade na hardveru (senzori 20/20, sigurnosni testovi rampi, detekcija ≥ 90 %) | 23.12.2026. | |
+| KT5 | integracija s hardverom završena; MVP mobilne aplikacije | 11.1.2027. | |
+| KT6 | svi testni scenariji prolaze, demo video snimljen | 17.1.2027. | |
+| KT7 | završna dokumentacija i prezentacija; projekt predan na GitLab | 29.1.2027. | |
 
 ## Faza 1 – definicija i dokaz izvedivosti (T1–T2, 19.10. – 1.11.2026.)
 
