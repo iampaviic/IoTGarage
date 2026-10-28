@@ -31,19 +31,19 @@ groups = [
         ("Baza, mjesta, mostovi, 3D ispis, montaža", "2.11", "29.11"),
         ("Napajanje i ožičenje", "16.11", "6.12")]),
     ("3 Senzori mjesta – Toma, Lovro", [
-        ("Firmware, kalibracija, MQTT, test 20×", "26.10", "6.12")]),
+        ("Firmware, kalibracija, MQTT, test 20×", "2.11", "6.12")]),
     ("4 Rampe i kontrola pristupa – Luka", [
-        ("Firmware, montaža, sigurnosni testovi, pravila", "26.10", "6.12")]),
+        ("Firmware, montaža, sigurnosni testovi, pravila", "2.11", "6.12")]),
     ("5 ALPR – detekcija – Sven", [
-        ("Kamera, pločice, ≥ 100 fotografija, mjerenje", "26.10", "6.12")]),
+        ("Kamera, pločice, ≥ 100 fotografija, mjerenje", "2.11", "6.12")]),
     ("6 OCR i edge servis – Lukas", [
         ("OCR na stvarnim slikama, edge na Raspberry Pi", "9.11", "6.12")]),
     ("7 ThingsBoard – Anja, Leo", [
-        ("Instalacija, entiteti, bridge", "26.10", "15.11"),
+        ("Instalacija, entiteti, bridge", "2.11", "15.11"),
         ("Nadzorni dashboard, alarmi, obavijesti", "9.11", "6.12"),
         ("Analitički dashboard i API za aplikaciju (Leo)", "16.11", "6.12")]),
     ("8 Baza, testovi, GitHub – Lovro", [
-        ("Model sesija i pravilo naplate", "26.10", "8.11"),
+        ("Model sesija i pravilo naplate", "2.11", "8.11"),
         ("Testni plan, izvođenje i zapisnik testova", "9.11", "17.1"),
         ("Korisničke upute", "4.1", "24.1")]),
     ("9 Integracija i završetak – svi", [
