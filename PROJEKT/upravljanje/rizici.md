@@ -18,3 +18,5 @@ Vjerojatnost (V) i utjecaj (U): 1 = nizak, 3 = visok. Prioritet = V × U. Pregle
 | R-12 | Kvar na dan demonstracije | 2 | 3 | 6 | rezervni video, rezervni ESP32 i kabeli, `simulacija.py` kao plan B, kontrolna lista | 1 | otvoren |
 | R-13 | Stvarne registracije u repozitoriju / izvještaju | 1 | 3 | 3 | samo generirane pločice, `.gitignore` za `dataset/real`, pregled PR-ova | 5, 8 | otvoren |
 | R-14 | NTP nije dostupan bez interneta → vrijeme ESP32 nepoznato | 2 | 1 | 2 | ESP32 šalje `null`, edge koristi vrijeme primitka; chrony na edge računalu | 3, 4 | riješen (D-011) |
+| R-15 | Mobilna aplikacija odvlači vrijeme od glavnog sustava ili ne bude gotova | 2 | 1 | 2 | aplikacija samo čita ThingsBoard (REST API), garaža ne ovisi o njoj; MVP do KT5, nakon KT6 samo popravci; analitički dashboard kao rezerva | 7 (Leo) | otvoren |
+| R-16 | Blagdani, kolokviji i ispiti (prosinac – siječanj) smanjuju vrijeme za rad | 3 | 2 | 6 | integracija završava prije blagdana (KT5, 20.12.); blagdanska stanka je rezerva; u siječnju samo testiranje i dokumentacija; termini nedostupnosti u planu projekta | 1 | otvoren |

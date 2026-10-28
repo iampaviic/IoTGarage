@@ -49,7 +49,7 @@ s točnim vremenom (bridge ih je čuvao).
 
 ## Rezervni video
 
-Snimiti cijeli glavni scenarij + grešku A u tjednu 5 (mobitel na stativu + snimka zaslona dashboarda),
+Snimiti cijeli glavni scenarij + grešku A u fazi 4, do KT6 (17.1.2027.) (mobitel na stativu + snimka zaslona dashboarda),
 montirati jedno do drugog. Trajanje ≤ 4 min.
 
 ## Šest kriterija uspjeha (pokazati eksplicitno)

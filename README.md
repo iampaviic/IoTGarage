@@ -3,6 +3,7 @@
 - **Projekt:** IoT Garaža, ak. god. 2026/27
 - **Puni naziv projekta:** Pametna parkirna garaža s automatskim prepoznavanjem registarskih oznaka (ALPR),
   lokalnim (edge) upravljanjem ulaskom i izlaskom te digitalnim blizancem u platformi ThingsBoard
+- **Trajanje:** 19.10.2026. – 29.1.2027. (rok za predaju)
 - **Datum prezentacije:** _upisati_
 
 Pametna garaža na maketi: kamera čita registraciju, **edge računalo lokalno odlučuje** o ulasku, rampa se
@@ -39,7 +40,7 @@ Svaki dio sustava ima svoju mapu s **README-om: tko je zadužen, što je već na
 
 Leo Hreljanović uz to izrađuje **[mobilnu aplikaciju za analitiku garaže](SOFTWARE/mobilna-aplikacija)** (zauzetost, ulasci po satu, prosječno trajanje, povijest sesija), koja podatke čita iz ThingsBoarda preko REST API-ja.
 
-<!-- gitlab:od-tjedna=5 -->
+<!-- gitlab:od-tjedna=12 -->
 **Stanje:** rezultati svih testova (automatskih, u simulaciji i na maketi) vode se u
 [testnom zapisniku](PROJEKT/testiranje/testni-zapisnik.md).
 <!-- /gitlab -->
@@ -65,7 +66,7 @@ flowchart LR
 Detalji: [arhitektura](PROJEKT/sustav/arhitektura.md) · [MQTT teme i poruke](PROJEKT/sustav/komunikacijski-ugovor.md) ·
 [odluke](PROJEKT/upravljanje/odluke.md) · [demo scenarij](PREZENTACIJA/demo-scenarij.md)
 
-<!-- gitlab:do-tjedna=3
+<!-- gitlab:do-tjedna=7
 ## Brzi start
 
 ```bash
@@ -77,7 +78,7 @@ pytest
 
 Upute za pojedine dijelove sustava su u `README.md` datotekama mapa u [SOFTWARE](SOFTWARE).
 -->
-<!-- gitlab:od-tjedna=4 -->
+<!-- gitlab:od-tjedna=8 -->
 ## Brzi start – cijeli sustav bez hardvera (5 minuta)
 
 Treba: Python ≥ 3.8, [Tesseract OCR](https://tesseract-ocr.github.io/tessdoc/Installation.html) i
@@ -109,6 +110,8 @@ python alpr/tools/generate_plates.py --out tablice                 # pločice za
 parking-sessions --db data/garage.db list --active                 # tko je u garaži
 ```
 
+<!-- /gitlab -->
+<!-- gitlab:od-tjedna=9 -->
 Firmware, edge računalo i sve varijable konfiguracije: [SOFTWARE/INSTALL.md](SOFTWARE/INSTALL.md).
 <!-- /gitlab -->
 
@@ -122,7 +125,7 @@ Firmware, edge računalo i sve varijable konfiguracije: [SOFTWARE/INSTALL.md](SO
   Python testovi (3.8 i 3.12) + e2e simulacija, prevođenje i unit testovi oba firmwarea, renderiranje 3D dijelova.
 - Službeni GitLab repozitorij puni se tjedan po tjedan: [.gitlab-tjedni](.gitlab-tjedni/README.md).
 <!-- /gitlab -->
-<!-- gitlab:do-tjedna=6
+<!-- gitlab:do-tjedna=15
 - Prije svakog commita: `pytest` u mapi `SOFTWARE` mora proći.
 -->
 - Ne komitati: `secrets.h`, `edge.yaml`, baze `*.db`, stvarne fotografije.

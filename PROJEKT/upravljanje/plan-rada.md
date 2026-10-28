@@ -3,7 +3,20 @@
 Oznake: ✅ već pripremljeno u repozitoriju (provjeriti i preuzeti), ⬜ posao za člana tima.
 Ovaj popis se lako prenese u GitHub Projects (jedna kartica po retku, oznaka = osoba, milestone = faza).
 
-## Faza 1 – definicija i dokaz izvedivosti (tjedan 1)
+## Vremenski okvir
+
+Projekt traje od **19.10.2026.** do roka za predaju **29.1.2027.** (15 tjedana, T1–T15).
+
+| faza | tjedni | datumi | kontrolna točka |
+|---|---|---|---|
+| 1 – definicija i dokaz izvedivosti | T1–T2 | 19.10. – 1.11.2026. | KT1 arhitektura, ugovor, plan (25.10.) · KT2 dokaz izvedivosti (1.11.) |
+| 2 – samostalni podsustavi | T3–T7 | 2.11. – 6.12.2026. | KT3 komponente i baza makete (15.11.) · KT4 podsustavi na hardveru (6.12.) |
+| 3 – integracija | T8–T9 | 7.12. – 20.12.2026. | KT5 integracija s hardverom, MVP aplikacije (20.12.) |
+| blagdanska stanka (rezerva) | T10–T11 | 21.12.2026. – 3.1.2027. | – |
+| 4 – stabilizacija i testiranje | T12–T13 | 4.1. – 17.1.2027. | KT6 svi testni scenariji, rezervni video (17.1.) |
+| 5 – dokumentacija, prezentacija i predaja | T14–T15 | 18.1. – 29.1.2027. | KT7 predaja na GitLab (29.1.) |
+
+## Faza 1 – definicija i dokaz izvedivosti (T1–T2, 19.10. – 1.11.2026.)
 
 | osoba | zadatak |
 |---|---|
@@ -16,7 +29,7 @@ Ovaj popis se lako prenese u GitHub Projects (jedna kartica po retku, oznaka = o
 | 7 | ✅ docker-compose, provisioning, bridge, dva dashboarda, alarmi · ⬜ pokrenuti ThingsBoard na laptopu, `provision.py`, promijeniti lozinku |
 | 8 | ✅ baza sesija, naplata, CLI, generator, testovi, testni plan, kostur dokumentacije · ⬜ pročitati testni plan, dogovoriti pravilo naplate s timom |
 
-## Faza 2 – samostalni podsustavi (tjedni 2–3)
+## Faza 2 – samostalni podsustavi (T3–T7, 2.11. – 6.12.2026.)
 
 | osoba | zadatak |
 |---|---|
@@ -28,17 +41,22 @@ Ovaj popis se lako prenese u GitHub Projects (jedna kartica po retku, oznaka = o
 | 7 | ⬜ dashboardi s pravim podacima, prilagodba izgleda · ⬜ obavijesti na alarm (Notification center) · ⬜ izvoz dashboarda u repo |
 | 8 | ⬜ provesti testove TC-B*, TC-I* u simulaciji i zapisati u `testni-zapisnik.md` · ⬜ prikupljati materijale za dokumentaciju |
 
-## Faza 3 – integracija (tjedan 4)
+## Faza 3 – integracija (T8–T9, 7.12. – 20.12.2026.)
 
 ⬜ Koraci 1–10 iz [plan-integracije.md](plan-integracije.md) **s hardverom**, po redu; svaki prolaz zapisuje osoba 8.
 
-## Faza 4 – stabilizacija i testiranje (tjedan 5)
+## Blagdanska stanka (T10–T11, 21.12.2026. – 3.1.2027.)
+
+Rezerva za zaostatke iz faza 2 i 3; nema planiranih zadataka.
+
+## Faza 4 – stabilizacija i testiranje (T12–T13, 4.1. – 17.1.2027.)
 
 ⬜ Svi scenariji iz testnog plana (prazna/puna garaža, nepoznata/nečitljiva pločica, prekid Wi-Fi, prekid
 ThingsBoarda, restart ESP32 i edge računala, vozilo predugo ispod rampe, ulazak bez izlaska, izlazak bez sesije)
 · ⬜ rezervni video · ⬜ zamrzavanje značajki (samo popravci).
 
-## Faza 5 – prezentacija i dokumentacija (tjedan 6)
+## Faza 5 – dokumentacija, prezentacija i predaja (T14–T15, 18.1. – 29.1.2027.)
 
 ⬜ dokumentacija iz `PROJEKT/dokumentacija` · ⬜ slajdovi (arhitektura, rezultati ALPR i senzora,
-dashboard, sesija iz baze, ograničenja) · ⬜ generalna proba demo scenarija ×2.
+dashboard, sesija iz baze, ograničenja) · ⬜ generalna proba demo scenarija ×2 · ⬜ arhiviranje na GitLabu
+prema [uputama nastavnika](../../OSTALO/upute-nastavnika-gitlab.md), najkasnije **29.1.2027.**

@@ -8,14 +8,25 @@ commitova pokazuje put od ideje do gotovog proizvoda. Ova mapa se ne kopira na G
 
 ## Raspored
 
-| tjedan | faza | što ulazi |
-|---|---|---|
-| 1 | ideja, plan, arhitektura | README, `OSTALO`, plan projekta, arhitektura, MQTT ugovor, zahtjevi, plan rada, rizici, odluke, `SOFTWARE/ugovor` |
-| 2 | podsustavi I | maketa (`PROJEKT/maketa`, `SOFTWARE/maketa`), senzori, rampe, baza sesija + model podataka |
-| 3 | podsustavi II | ALPR, OCR i edge servis, ThingsBoard + snimke dashboarda, mobilna aplikacija |
-| 4 | integracija | simulacija cijelog sustava + e2e testovi, postavljanje na edge (`edge/deploy`), `INSTALL.md`, plan integracije, testni plan |
-| 5 | testiranje | testni zapisnik, sigurnosni testovi, pragovi senzora, ograničenja i rezultati ALPR-a/OCR-a, izvršne verzije |
-| 6 | dokumentacija, obrana | završna dokumentacija, `PREZENTACIJA` |
+Projekt traje od 19.10.2026. do roka za predaju **29.1.2027.** (15 tjedana). Svaki dio ulazi u tjednu kad se na
+njemu radi prema gantogramu iz plana projekta:
+
+| tjedan | datumi | faza | što ulazi |
+|---|---|---|---|
+| 1 | 19.10. – 25.10. | 1 – definicija | README, `OSTALO`, plan projekta, arhitektura, MQTT ugovor, zahtjevi, plan rada, rizici, odluke, `SOFTWARE/ugovor` |
+| 2 | 26.10. – 1.11. | 1 – definicija | maketa: `PROJEKT/maketa` (nacrt, komponente, sheme), `SOFTWARE/maketa` (tlocrt, 3D dijelovi, ožičenje) |
+| 3 | 2.11. – 8.11. | 2 – podsustavi | `SOFTWARE/senzori`, `SOFTWARE/rampe` |
+| 4 | 9.11. – 15.11. | 2 – podsustavi | `SOFTWARE/baza` + model podataka, `SOFTWARE/thingsboard` + entiteti i alarmi |
+| 5 | 16.11. – 22.11. | 2 – podsustavi | `SOFTWARE/alpr` |
+| 6 | 23.11. – 29.11. | 2 – podsustavi | `SOFTWARE/edge` (OCR, kontrola pristupa) |
+| 7 | 30.11. – 6.12. | 2 – podsustavi | `SOFTWARE/mobilna-aplikacija`, snimke dashboarda |
+| 8 | 7.12. – 13.12. | 3 – integracija | `SOFTWARE/integracija` (simulacija + e2e testovi), plan integracije, testni plan |
+| 9 | 14.12. – 20.12. | 3 – integracija | `SOFTWARE/edge/deploy`, `SOFTWARE/INSTALL.md` |
+| 10–11 | 21.12. – 3.1. | blagdanska stanka | ništa novo iz rasporeda – samo ono što tim napravi |
+| 12 | 4.1. – 10.1. | 4 – testiranje | testni zapisnik, sigurnosni testovi rampi, pragovi senzora, ograničenja ALPR-a |
+| 13 | 11.1. – 17.1. | 4 – testiranje | rezultati mjerenja ALPR-a i OCR-a |
+| 14 | 18.1. – 24.1. | 5 – dokumentacija | `PROJEKT/dokumentacija` |
+| 15 | 25.1. – 29.1. | 5 – predaja | `PREZENTACIJA`, izvršne verzije; predaja do 29.1.2027. |
 
 Pregledne datoteke (`README.md`, `PROJEKT/README.md`, `SOFTWARE/README.md`, `requirements-dev.txt`, `pytest.ini`)
 alat svaki tjedan ponovno sastavi tako da spominju samo ono što već postoji – svaka tjedna verzija se može
@@ -35,7 +46,8 @@ ispiše ih; ako ih treba zamijeniti našima, pokreni tjedan 1 s `--prisili`.
 Iz ovog repozitorija (najnovija verzija grane `main`):
 
 ```bash
-python .gitlab-tjedni/tjedni_commit.py 3 --gitlab ../IoTGarage-gitlab --test
+python .gitlab-tjedni/tjedni_commit.py --gitlab ../IoTGarage-gitlab --test      # tekući tjedan prema datumu
+python .gitlab-tjedni/tjedni_commit.py 3 --gitlab ../IoTGarage-gitlab --test    # ili zadani tjedan
 ```
 
 1. Alat kopira dio za taj tjedan (i sve iz prethodnih tjedana što još nedostaje), osvježi pregledne datoteke,
@@ -52,7 +64,7 @@ python .gitlab-tjedni/tjedni_commit.py 3 --gitlab ../IoTGarage-gitlab --test
    `--commit` napravi commit s porukom „Tjedan N: …“ (+ popis promjena + vaša `--poruka`) i oznaku `tjedan-N`.
    Pushanje uvijek radite sami. Može i ručno: `git commit`, `git tag tjedan-3`, `git push --follow-tags`.
 
-Svaka faza ima oznaku (`tjedan-1` … `tjedan-6`), pa se na GitLabu može otvoriti stanje projekta u bilo kojem tjednu.
+Svaki tjedan ima oznaku (`tjedan-1` … `tjedan-15`), pa se na GitLabu može otvoriti stanje projekta u bilo kojem tjednu.
 
 ## Izmjene tima i izmjene u ovom repozitoriju
 
@@ -70,16 +82,16 @@ Svaka faza ima oznaku (`tjedan-1` … `tjedan-6`), pa se na GitLabu može otvori
 Nevidljive HTML oznake određuju što se u kojem tjednu pojavljuje (na GitHubu se ne vide):
 
 ```markdown
-<!-- gitlab:od-tjedna=4 -->
-vidljivo ovdje; na GitLabu tek od 4. tjedna
+<!-- gitlab:od-tjedna=8 -->
+vidljivo ovdje; na GitLabu tek od 8. tjedna
 <!-- /gitlab -->
 
 <!-- gitlab:izostavi -->
 samo ovdje (npr. GitHub CI), nikad na GitLabu
 <!-- /gitlab -->
 
-<!-- gitlab:do-tjedna=3
-skriveno ovdje; na GitLabu samo do 3. tjedna (npr. kraći "Brzi start")
+<!-- gitlab:do-tjedna=7
+skriveno ovdje; na GitLabu samo do 7. tjedna (npr. kraći "Brzi start")
 -->
 ```
 

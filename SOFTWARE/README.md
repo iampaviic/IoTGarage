@@ -1,6 +1,6 @@
 # SOFTWARE – izvorni programski kod
 
-<!-- gitlab:od-tjedna=4 -->
+<!-- gitlab:od-tjedna=9 -->
 Instalacija i pokretanje: [INSTALL.md](INSTALL.md).
 <!-- /gitlab -->
 
@@ -26,7 +26,7 @@ treba napraviti). Kod je na engleskom, upute na hrvatskom.
 ## Prevođenje
 
 - **Python:** nije potrebno – pakete instalira `pip install -r requirements-dev.txt`.
-<!-- gitlab:od-tjedna=2 -->
+<!-- gitlab:od-tjedna=3 -->
 - **Firmware:** PlatformIO, uobičajene naredbe (isto za `rampe/firmware`); ovisnosti (PubSubClient, ArduinoJson, …)
   PlatformIO preuzima sam prema `platformio.ini`:
 

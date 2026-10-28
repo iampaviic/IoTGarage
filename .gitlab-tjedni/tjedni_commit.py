@@ -6,14 +6,15 @@ repository, rebuilds the overview files (READMEs, requirements-dev.txt, pytest.i
 already exists, optionally runs the tests, and stages everything. The team then adds its own work for the week
 and commits (or uses --commit).
 
-    python .gitlab-tjedni/tjedni_commit.py 1 --gitlab ../IoTGarage-gitlab --test
-    python .gitlab-tjedni/tjedni_commit.py 1 --gitlab ../IoTGarage-gitlab --commit --poruka "..."
+    python .gitlab-tjedni/tjedni_commit.py --gitlab ../IoTGarage-gitlab --test       # current week by date
+    python .gitlab-tjedni/tjedni_commit.py 3 --gitlab ../IoTGarage-gitlab --commit --poruka "..."
 
 Changes the team made in the GitLab clone are kept: when the source changes too, the two are combined with a
 three-way merge (git merge-file); real conflicts are reported and the file is left as the team has it.
 Only the standard library is needed (Python >= 3.8).
 """
 import argparse
+import datetime
 import json
 import os
 import re
@@ -23,7 +24,7 @@ import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from raspored import IZOSTAVI, PRAVILA, TJEDNI, UPRAVLJANE  # noqa: E402
+from raspored import IZOSTAVI, POCETAK, PRAVILA, ROK, TJEDNI, UPRAVLJANE  # noqa: E402
 
 STATE_FILE = "tjedni-stanje-v2.json"  # kept inside the clone's .git directory, never committed
 
@@ -34,6 +35,16 @@ def git(args, cwd, binary=False, check=True):
     if check and p.returncode != 0:
         raise SystemExit("git %s failed:\n%s" % (" ".join(args), p.stderr.decode("utf-8", "replace")))
     return p.stdout if binary else p.stdout.decode("utf-8")
+
+
+def week_dates(week):
+    start = POCETAK + datetime.timedelta(weeks=week - 1)
+    return start, min(start + datetime.timedelta(days=6), ROK)
+
+
+def current_week(today=None):
+    days = ((today or datetime.date.today()) - POCETAK).days
+    return min(max(days // 7 + 1, 1), max(TJEDNI))
 
 
 def week_of(path):
@@ -251,7 +262,8 @@ def run_tests(gitlab):
 # ---------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser(description="Pripremi tjedni commit za službeni GitLab repozitorij.")
-    ap.add_argument("tjedan", type=int, choices=sorted(TJEDNI), help="koji tjedan se priprema (1-6)")
+    ap.add_argument("tjedan", type=int, nargs="?", choices=sorted(TJEDNI),
+                    help="koji tjedan se priprema (1-%d; zadano: tekući tjedan prema datumu)" % max(TJEDNI))
     ap.add_argument("--gitlab", required=True, help="putanja do klona GitLab repozitorija")
     ap.add_argument("--ref", default="HEAD", help="iz koje verzije ovog repozitorija se kopira (zadano: HEAD)")
     ap.add_argument("--test", action="store_true", help="instaliraj pakete i pokreni pytest u GitLab klonu")
@@ -263,7 +275,7 @@ def main():
                     help="tim pobjeđuje: zadrži GitLab verziju ove datoteke i zaključi konflikt (može više puta)")
     args = ap.parse_args()
 
-    week = args.tjedan
+    week = args.tjedan or current_week()
     src = git(["rev-parse", "--show-toplevel"], HERE).strip()
     gitlab = os.path.abspath(args.gitlab)
     if not os.path.isdir(gitlab) or git(["rev-parse", "--is-inside-work-tree"], gitlab, check=False).strip() != "true":
@@ -278,11 +290,18 @@ def main():
         with open(state_path, encoding="utf-8") as f:
             state = json.load(f)
 
+    if week < state.get("tjedan", 0) and not args.prisili:
+        raise SystemExit("U GitLab klonu je već pripremljen tjedan %d; tjedan %d bi vratio pregledne datoteke unatrag."
+                         " Pokreni tjedan %d ili kasniji." % (state["tjedan"], week, state["tjedan"]))
+    state["tjedan"] = max(week, state.get("tjedan", 0))
+
     files = source_files(src, args.ref)
     unassigned = [p for p, _, _ in files if week_of(p) == 0]
 
     phase, title = TJEDNI[week]
-    print("Tjedan %d – %s (izvor: %s @ %s)\n" % (week, phase, src, args.ref))
+    first, last = week_dates(week)
+    print("Tjedan %d (%s – %s) – %s\nizvor: %s @ %s\n" % (week, first.strftime("%d.%m."), last.strftime("%d.%m.%Y."),
+                                                          phase, src, args.ref))
 
     # 1. bring in every file of weeks <= N (catches up a skipped week) and later source changes to them
     added, updated, merged, conflicts, kept, deleted_by_team, removed = [], [], [], [], [], [], []
@@ -399,7 +418,9 @@ def main():
         if not ok:
             raise SystemExit("Testovi ne prolaze – commit nije napravljen.")
         if not staged:
-            raise SystemExit("Nema promjena za commit.")
+            print("\nNema promjena za commit: raspored ovaj tjedan ne donosi novi dio (npr. blagdani), a tim još"
+                  " nije ništa dodao. Dodaj svoj rad u GitLab klon pa pokreni ponovno.")
+            return
         subprocess.run(["git", "commit", "-q", "-F", "-"], cwd=gitlab, input=message.encode("utf-8"), check=True)
         tag = "tjedan-%d" % week
         if git(["tag", "-l", tag], gitlab).strip():

@@ -16,12 +16,12 @@ Dijagrami u `.md` datotekama su Mermaid kod unutar samog teksta.
 <!-- gitlab:od-tjedna=2 -->
 3D modeli, tlocrt i dijagrami ožičenja su izvorni kod i nalaze se u [SOFTWARE/maketa](../SOFTWARE/maketa).
 <!-- /gitlab -->
-<!-- gitlab:od-tjedna=5 -->
+<!-- gitlab:od-tjedna=13 -->
 Izvještaje o točnosti ALPR-a i OCR-a generiraju alati u [SOFTWARE/alpr/rezultati](../SOFTWARE/alpr/rezultati) i
 [SOFTWARE/edge/rezultati](../SOFTWARE/edge/rezultati).
 <!-- /gitlab -->
 
-<!-- gitlab:od-tjedna=6 -->
+<!-- gitlab:od-tjedna=14 -->
 ## Sastavljanje rada
 
 Završna dokumentacija sastoji se od više datoteka. Prije predaje se sastavlja u jednu DOCX i jednu PDF datoteku

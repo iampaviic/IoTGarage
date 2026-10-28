@@ -59,7 +59,7 @@ Rezultat `simulacija.py` (skraćeno):
 3. Dogovoriti termin tjednog integracijskog sastanka; voditi zapisnike u `sastanci/`.
 4. Zaštititi `main` granu na GitHubu (Settings → Branches): obavezan PR + zeleni CI.
 5. Svaki tjedan: jedan korak iz plana integracije s pravim hardverom.
-6. Tjedan 5: organizirati end-to-end test po [demo-scenarij.md](../../PREZENTACIJA/demo-scenarij.md) i snimiti rezervni video.
+6. Faza 4 (4. – 17.1.2027.): organizirati end-to-end test po [demo-scenarij.md](../../PREZENTACIJA/demo-scenarij.md) i snimiti rezervni video.
 
 ## Kriterij završetka (iz plana)
 
