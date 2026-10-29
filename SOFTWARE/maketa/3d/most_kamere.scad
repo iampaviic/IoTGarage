@@ -1,9 +1,11 @@
-// Camera bridge over a lane: two legs + crossbar + tilting camera plate.
-// The lens ends up ~130 mm above the floor, the plate tilts 0-40 deg (M3 screw as hinge).
-// Webcam clip or strap goes through the slots; for a 1/4" tripod thread drill the centre hole to 6.5 mm.
+// Camera bridge over a lane: two legs + crossbar with a hinge block + tilting camera plate.
+// The plate is mounted upside down: its two lugs straddle the hinge block, an M3 screw is the hinge axis and
+// the plate tilts 0-40 deg. With a webcam strapped on the plate the lens ends up ~130 mm above the floor
+// (see sklop/sklop_makete.scad, which computes the tilt). For a 1/4" tripod thread drill the centre hole to 6.5 mm.
 part = "all";              // "leg" | "bar" | "plate" | "all"
 lane_width = 133;
-height = 118;              // top of the crossbar; camera plate adds ~12 mm
+height = 110;              // leg height; the crossbar (6 mm) sits on the legs
+hinge_z = 6;               // hinge axis above the top of the crossbar
 leg = 10; $fn = 32;
 
 module leg() {
@@ -20,9 +22,16 @@ module leg() {
 module bar() {
     span = lane_width + 2 * leg + 10;
     difference() {
-        cube([span, leg, 6]);
+        union() {
+            cube([span, leg, 6]);
+            // hinge block between the plate lugs, rounded (r 4.5) so the tilted plate always clears it
+            translate([span / 2, 0, 0]) hull() {
+                translate([-4.7, 0, 0]) cube([9.4, leg, 7]);
+                translate([-4.7, leg / 2, 6 + hinge_z]) rotate([0, 90, 0]) cylinder(r = 4.5, h = 9.4);
+            }
+        }
         for (x = [leg / 2, span - leg / 2]) translate([x, leg / 2, -1]) cylinder(d = 3.4, h = 8);
-        translate([span / 2, leg / 2, -1]) cylinder(d = 3.4, h = 8);          // hinge screw
+        translate([span / 2 - 6, leg / 2, 6 + hinge_z]) rotate([0, 90, 0]) cylinder(d = 3.4, h = 12);   // hinge screw
     }
 }
 

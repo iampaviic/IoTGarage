@@ -61,3 +61,7 @@ jobs:
         run: |
           cd SOFTWARE/maketa/3d
           for f in *.scad; do openscad -o "/tmp/${f%.scad}.stl" "$f"; done
+      - name: Compile the whole-model assembly
+        run: |
+          openscad -o /tmp/sklop.csg SOFTWARE/maketa/3d/sklop/sklop_makete.scad
+          openscad -o /tmp/komponente.csg SOFTWARE/maketa/3d/sklop/komponente.scad

@@ -20,7 +20,7 @@ Pločice su namjerno **veće od mjerila** (stvarna 520 mm bi u 1:24 bila 22 mm �
 ## 2. Raspored
 
 - **6 mjesta u nizu** uz sjeverni zid; iznad njih **most** (letva/pjenasti PVC) na ~113 mm visine, na koji se
-  odozdo pričvrste HC-SR04 nosači (`3d/nosac_hcsr04.scad`), senzor gleda prema dolje.
+  odozgo pričvrste HC-SR04 nosači (`3d/nosac_hcsr04.scad`); senzor gleda prema dolje kroz dvije rupe Ø 17 mm u mostu.
   Prazno mjesto ≈ 14 cm do poda, auto ≈ 6–7 cm do krova → velika, stabilna razlika.
 - **Prometnica** 200 mm ispred mjesta.
 - **Ulazna i izlazna traka** jedna do druge, između njih **otok** (67 mm) – na njemu ESP32 rampi, kabeli i stupovi rampi.
@@ -29,6 +29,11 @@ Pločice su namjerno **veće od mjerila** (stvarna 520 mm bi u 1:24 bila 22 mm �
   Imaju dvostruku ulogu: "vozilo je stiglo" (pokreće ALPR) i "vozilo je ispod rampe" (zabrana zatvaranja).
 - **Zaustavna crta + graničnik kotača** (`3d/granicnik.scad`) 40 mm ispred rampe → autić uvijek stane na isto mjesto
   → kamera uvijek vidi pločicu na istom mjestu (najvažnije za pouzdan ALPR).
+
+Cijela maketa u 3D-u, sa svim isprintanim dijelovima, senzorima, servima i kamerama:
+[SOFTWARE/maketa/3d/sklop](../../SOFTWARE/maketa/3d/sklop).
+
+![3D sklop makete](../../SOFTWARE/maketa/3d/sklop/slike/sklop_pregled.png)
 
 ## 3. Kamera
 
@@ -52,6 +57,11 @@ pločica u slici                  256 px      visina znakova            31 px
 zraka na crti rampe             46.7 mm iznad poda (ruka rampe 50-58 mm)
 OK  ruka rampe ne zaklanja pogled / kut gledanja / veličina znakova / udaljenost fokusa
 ```
+
+Isto se vidi u 3D sklopu – pogled iz ulazne kamere, ruka rampe prolazi iznad pločice
+(detalji u [3d/sklop](../../SOFTWARE/maketa/3d/sklop#što-je-sklop-provjerio)):
+
+![pogled iz ulazne kamere](../../SOFTWARE/maketa/3d/sklop/slike/pogled_kamere_ulaz.png)
 
 **Varijanta A (preporuka):** dvije USB kamere (svaka ~15–25 €), svaka na svom mostu (`3d/most_kamere.scad`).
 **Varijanta B (imamo jednu kameru):** jedan most kamere koji se *premješta* između dva položaja; na bazu
