@@ -18,41 +18,51 @@ Jednostavnija **varijanta B**, u kojoj sve odluke i podatke preuzima ThingsBoard
 ```mermaid
 flowchart LR
   subgraph Maketa
-    S1[UZV senzor x6<br/>iznad mjesta] --> ESPS[ESP32<br/>čvor senzora]
-    LED[LED<br/>po mjestu] --- ESPS
-    IR[IR senzori<br/>na crti rampe] --> ESPR[ESP32<br/>čvor rampi]
-    BTN[tipke za ručno<br/>otvaranje] --> ESPR
-    ESPR --> SERVO[2x servo motor<br/>rampe + LED]
-    CAM[USB kamera<br/>ulaz / izlaz]
+    S1[UZV senzori x6] --> ESPS[ESP32 senzora]
+    LED[LED po mjestu] --- ESPS
+    IR[IR senzori] --> ESPR[ESP32 rampi]
+    BTN[tipke za otvaranje] --> ESPR
+    ESPR --> SERVO[2x servo + LED]
+    CAM[USB kamere]
   end
 
   subgraph Edge["Edge računalo"]
     MQ[(MQTT broker)]
-    ALPR[ALPR servis<br/>detekcija + OCR]
-    AC[Access control<br/>odluke, rampe]
-    DB[(SQLite<br/>parkirne sesije)]
-    BR[ThingsBoard<br/>bridge + buffer]
+    ALPR["ALPR: detekcija + OCR"]
+    AC[Access control]
+    DB[(SQLite)]
+    BR[ThingsBoard bridge]
   end
 
   subgraph Oblak["Laptop / server"]
-    TB[ThingsBoard CE<br/>dashboard, alarmi]
+    TB[ThingsBoard CE + dashboard]
   end
 
   subgraph Mobitel
-    APP[Mobilna aplikacija<br/>analitika garaže]
+    APP[Mobilna aplikacija]
   end
 
-  ESPS -- MQTT Wi-Fi --> MQ
-  ESPR <-- MQTT Wi-Fi --> MQ
+  ESPS -- MQTT --> MQ
+  ESPR <-- MQTT --> MQ
   CAM -- USB --> ALPR
   ALPR <--> MQ
   AC <--> MQ
   AC --- DB
   BR <--> MQ
-  BR -- MQTT gateway API --> TB
+  BR -- gateway API --> TB
   TB -- RPC gumbi --> BR
   TB -- REST API --> APP
 ```
+
+| blok | uloga |
+|---|---|
+| UZV senzori, ESP32 senzora, LED | šest senzora iznad mjesta; ESP32 preko Wi-Fi-ja i MQTT-a javlja stanje mjesta, LED pokazuje stanje |
+| IR senzori, tipke, ESP32 rampi, servo + LED | IR na crti rampe javlja vozilo, tipke ručno otvaraju rampu, dva servo motora pokreću rampe |
+| USB kamere, ALPR | detekcija pločice i OCR na edge računalu, za ulaz i izlaz |
+| Access control, SQLite | odluke o ulasku i izlasku, naredbe rampama, parkirne sesije i naplata |
+| ThingsBoard bridge | šalje podatke ThingsBoardu (MQTT gateway API) i čuva ih dok veza ne radi |
+| ThingsBoard CE | dashboard, alarmi, gumbi za ručno odobravanje (RPC natrag preko bridgea) |
+| Mobilna aplikacija | čita analitiku iz ThingsBoarda preko REST API-ja |
 
 **Ključna ideja:** ulazak i izlazak rade lokalno i bez ThingsBoarda. ThingsBoard je digitalni blizanac,
 nadzor i analitika – nikada jedina komponenta potrebna za otvaranje rampe.
@@ -85,17 +95,17 @@ sequenceDiagram
   AC->>A: alpr/entrance/trigger {requestId}
   A->>A: do 3 slike: detekcija → OCR → glasanje
   A->>AC: alpr/entrance/event {plate, ocrConfidence}
-  alt confidence ≥ 0.85, slobodno mjesto, nije već unutra
+  alt confidence ≥ 0.85, ima mjesta, nije već unutra
     AC->>DB: otvori sesiju
     AC->>R: gate/entrance/command {OPEN, requestId}
     R->>AC: gate/entrance/state {OPENING, requestId, success}
-    AC-->>TB: access/decision GRANTED, session/event OPENED, summary
+    AC-->>TB: access/decision GRANTED,<br/>session/event OPENED, summary
   else 0.60 – 0.85
     AC->>A: novi trigger (RETRY, do 3 pokušaja)
   else < 0.60 ili 3 neuspjela pokušaja
-    AC-->>TB: access/decision MANUAL_REQUIRED → alarm, gumb "Ručno odobri ulaz"
+    AC-->>TB: access/decision MANUAL_REQUIRED<br/>→ alarm, gumb „Ručno odobri ulaz“
   end
-  V->>R: prolazi (IR slobodan) → rampa se sama zatvara nakon 2 s
+  V->>R: prolazi (IR slobodan) →<br/>rampa se sama zatvara nakon 2 s
 ```
 
 ## 5. Tok izlaska
@@ -111,10 +121,10 @@ sequenceDiagram
   R->>AC: gate/exit/state {vehiclePresent:true}
   AC->>A: alpr/exit/trigger
   A->>AC: alpr/exit/event {plate, ocrConfidence}
-  AC->>DB: pronađi aktivnu sesiju → zatvori, trajanje, cijena
+  AC->>DB: pronađi aktivnu sesiju →<br/>zatvori, trajanje, cijena
   AC->>R: gate/exit/command OPEN
-  AC-->>AC: session/event SESSION_CLOSED {durationS, price}
-  Note over AC: nema aktivne sesije → DENIED NO_ACTIVE_SESSION (ručna intervencija)
+  AC-->>AC: session/event SESSION_CLOSED<br/>{durationS, price}
+  Note over AC: nema aktivne sesije →<br/>DENIED NO_ACTIVE_SESSION<br/>(ručna intervencija)
 ```
 
 ## 6. Raspored (deployment)
@@ -176,41 +186,51 @@ nisu potrebni – njihov posao preuzima ThingsBoard (provjereno u dokumentaciji 
 ```mermaid
 flowchart LR
   subgraph Maketa
-    S1[UZV senzor x6<br/>iznad mjesta] --> ESPS[ESP32<br/>čvor senzora]
-    LED[LED<br/>po mjestu] --- ESPS
-    IR[IR senzori<br/>na crti rampe] --> ESPR[ESP32<br/>čvor rampi]
-    BTN[tipke za ručno<br/>otvaranje] --> ESPR
-    ESPR --> SERVO[2x servo motor<br/>rampe + LED]
-    CAM[USB kamera<br/>ulaz / izlaz]
+    S1[UZV senzori x6] --> ESPS[ESP32 senzora]
+    LED[LED po mjestu] --- ESPS
+    IR[IR senzori] --> ESPR[ESP32 rampi]
+    BTN[tipke za otvaranje] --> ESPR
+    ESPR --> SERVO[2x servo + LED]
+    CAM[USB kamere]
   end
 
-  subgraph Edge["Edge računalo (ili laptop s ThingsBoardom)"]
-    ALPR[ALPR servis<br/>detekcija + OCR]
+  subgraph Edge["Edge računalo"]
+    ALPR["ALPR: detekcija + OCR"]
   end
 
-  subgraph Oblak["Laptop / server – ThingsBoard CE"]
-    MQ[MQTT transport<br/>ugrađeni broker]
-    RE[Rule engine<br/>odluke, naplata, alarmi]
-    TDB[(Baza ThingsBoarda<br/>sesije, telemetrija)]
-    DASH[Dashboardi<br/>+ gumbi za ručno]
+  subgraph TB["ThingsBoard CE"]
+    MQ[MQTT transport]
+    RE[Rule engine]
+    TDB[(Baza)]
+    DASH[Dashboardi]
     API[REST API]
   end
 
   subgraph Mobitel
-    APP[Mobilna aplikacija<br/>analitika garaže]
+    APP[Mobilna aplikacija]
   end
 
-  ESPS -- MQTT telemetrija --> MQ
-  ESPR <-- MQTT telemetrija i RPC --> MQ
+  ESPS -- telemetrija --> MQ
+  ESPR <-- telemetrija, RPC --> MQ
   CAM -- USB --> ALPR
-  ALPR <-- MQTT RPC --> MQ
+  ALPR <-- RPC --> MQ
   MQ <--> RE
   RE --- TDB
   DASH --- TDB
-  DASH -- RPC gumbi --> RE
+  DASH -- ručno odobri --> RE
   API --- TDB
   API --> APP
 ```
+
+| blok | uloga u varijanti B |
+|---|---|
+| maketa (senzori, ESP32, rampe) | isto kao u varijanti A, ali se oba ESP32 spajaju izravno na ThingsBoard (MQTT, *access token* uređaja); ESP32 senzora šalje i broj slobodnih mjesta |
+| ALPR | jedini servis izvan ThingsBoarda: uređaj u ThingsBoardu koji odgovara na RPC `readPlate`; radi na edge računalu ili na laptopu s ThingsBoardom |
+| MQTT transport | ugrađeni MQTT ThingsBoarda (port 1883); nije opći broker |
+| Rule engine | odluke o ulasku i izlasku, naplata, alarmi, RPC naredbe rampama |
+| Baza | telemetrija, atributi i alarmi; parkirne sesije su atributi asseta „Garaža“ |
+| Dashboardi | nadzor, alarmi i gumb za ručno odobravanje, koji ide kroz rule engine |
+| REST API, mobilna aplikacija | aplikacija samo čita analitiku |
 
 **Ključna ideja:** sve odluke donosi ThingsBoard. Bez ThingsBoarda ili mreže ulaz i izlaz **ne rade automatski** –
 rampe se mogu otvoriti samo tipkom na maketi (firmware i dalje sam zatvara rampu i ne spušta je na vozilo).
@@ -224,22 +244,34 @@ sequenceDiagram
   participant TB as ThingsBoard (rule chain)
   participant A as ALPR servis
   participant DB as Baza ThingsBoarda
-  V->>R: dolazi do crte rampe (IR senzor)
-  R->>TB: telemetrija {gate: entrance, vehiclePresent: true}
-  TB->>A: RPC readPlate {gate: entrance} (dvosmjerni)
-  A->>A: do 3 slike: detekcija → OCR → glasanje
-  A-->>TB: odgovor RPC-a {plate, ocrConfidence}
-  TB->>DB: dohvati slobodna mjesta i aktivne sesije (atributi asseta „Garaža“)
-  alt confidence ≥ 0.85, slobodno mjesto, nije već unutra
-    TB->>DB: otvori sesiju (atribut activeSessions), telemetrija accessDecision GRANTED
-    TB->>R: RPC open {gate: entrance}
-    R-->>TB: odgovor RPC-a {state: OPENING}
-  else confidence < 0.85 ili nema slobodnog mjesta
-    TB->>DB: alarm MANUAL_REQUIRED / GARAGE_FULL
-    Note over TB: operater odobrava gumbom na dashboardu → RPC open
+  participant O as Operater (dashboard)
+  V->>R: dolazi do crte rampe (IR)
+  R->>TB: telemetrija vehiclePresent (ulaz)
+  TB->>A: RPC readPlate (ulaz)
+  A->>A: do 3 slike: detekcija,<br/>OCR, glasanje
+  A-->>TB: odgovor: plate, ocrConfidence
+  TB->>DB: čita slobodna mjesta<br/>i aktivne sesije
+  alt pouzdanost ≥ 0,85, ima mjesta, nije već unutra
+    TB->>DB: nova sesija, GRANTED
+    TB->>R: RPC open (ulaz)
+    R-->>TB: odgovor: OPENING
+  else pouzdanost < 0,85 ili ALPR ne odgovori
+    TB->>DB: alarm MANUAL_REQUIRED
+    O->>TB: ručno odobri (registracija)
+    TB->>DB: nova sesija (ručno)
+    TB->>R: RPC open (ulaz)
+  else garaža puna ili vozilo već unutra
+    TB->>DB: DENIED GARAGE_FULL<br/>ili ALREADY_INSIDE
   end
-  V->>R: prolazi (IR slobodan) → rampa se sama zatvara nakon 2 s
+  V->>R: prolazi (IR slobodan)
+  R->>R: zatvara rampu nakon 2 s
 ```
+
+- **Ručno odobravanje:** gumb na dashboardu šalje rampi RPC `approve` s registracijom koju operater potvrdi ili
+  ispravi. Rule chain tu poruku presretne, otvori sesiju i tek onda rampi pošalje `open`. Bez sesije bi isto
+  vozilo na izlazu dobilo `NO_ACTIVE_SESSION`.
+- Ako ALPR ne odgovori na RPC u zadanom vremenu (*timeout*), rule chain to tretira kao nisku pouzdanost.
+- Broj slobodnih mjesta šalje ESP32 senzora; rule chain ga pri svakoj promjeni sprema kao atribut asseta „Garaža“.
 
 ### 9.3 Tok izlaska (varijanta B)
 
@@ -250,22 +282,31 @@ sequenceDiagram
   participant TB as ThingsBoard (rule chain)
   participant A as ALPR servis
   participant DB as Baza ThingsBoarda
-  V->>R: dolazi na izlaz
-  R->>TB: telemetrija {gate: exit, vehiclePresent: true}
-  TB->>A: RPC readPlate {gate: exit}
-  A-->>TB: odgovor RPC-a {plate, ocrConfidence}
-  TB->>DB: pronađi aktivnu sesiju za registraciju
-  alt sesija postoji
-    TB->>TB: skripta: trajanje i cijena (15 min besplatno, 1,50 € po započetom satu, najviše 15 € dnevno)
-    TB->>DB: telemetrija session {plate, durationS, price}, ukloni iz activeSessions
-    TB->>R: RPC open {gate: exit}
-  else nema aktivne sesije
-    TB->>DB: alarm NO_ACTIVE_SESSION (ručna intervencija)
+  participant O as Operater (dashboard)
+  V->>R: dolazi na izlaz (IR)
+  R->>TB: telemetrija vehiclePresent (izlaz)
+  TB->>A: RPC readPlate (izlaz)
+  A-->>TB: odgovor: plate, ocrConfidence
+  TB->>DB: traži aktivnu sesiju
+  alt pouzdanost ≥ 0,85 i sesija postoji
+    TB->>TB: skripta: trajanje i cijena
+    TB->>DB: zatvori sesiju,<br/>spremi trajanje i cijenu
+    TB->>R: RPC open (izlaz)
+    R-->>TB: odgovor: OPENING
+  else pouzdanost < 0,85 ili nema sesije
+    TB->>DB: alarm MANUAL_REQUIRED<br/>ili NO_ACTIVE_SESSION
+    O->>TB: ručno odobri (registracija)
+    TB->>DB: zatvori sesiju ako postoji
+    TB->>R: RPC open (izlaz)
   end
+  V->>R: prolazi (IR slobodan)
+  R->>R: zatvara rampu nakon 2 s
 ```
 
-U varijanti B ponovni pokušaji čitanja (pouzdanost 0,60 – 0,85) ostaju unutar ALPR servisa: on uzme do 3 slike i
-vrati jedan rezultat, a rule chain sve ispod 0,85 šalje na ručno odobrenje. Tako je rule chain jednostavniji.
+- Skripta računa cijenu istim pravilom kao `SOFTWARE/baza`: prvih 15 min besplatno, zatim 1,50 € po započetom
+  satu, najviše 15 € po danu.
+- Ponovni pokušaji čitanja (pouzdanost 0,60 – 0,85) ostaju unutar ALPR servisa: on uzme do 3 slike i vrati jedan
+  rezultat, a rule chain sve ispod 0,85 šalje na ručno odobrenje. Tako je rule chain jednostavniji.
 
 ### 9.4 Usporedba varijanti
 
@@ -286,6 +327,7 @@ vrati jedan rezultat, a rule chain sve ispod 0,85 šalje na ručno odobrenje. Ta
   `v1/devices/me/telemetry` i `v1/devices/me/rpc/request/+` umjesto `garage/...`; čvor senzora šalje i broj
   slobodnih mjesta.
 - **ALPR servis** postaje uređaj u ThingsBoardu koji odgovara na RPC `readPlate`.
+- **Dashboard** dobiva gumb za ručno odobravanje (RPC `approve` s registracijom) koji obrađuje rule chain.
 - **Kontrola pristupa** (`SOFTWARE/edge/edge_service`), **baza** (`SOFTWARE/baza`) i **bridge** (`tb_bridge`) se ne
   koriste; njihova pravila (pragovi, naplata, allow-lista) prelaze u rule chain, koji se izvozi u
   `SOFTWARE/thingsboard/`.
