@@ -22,7 +22,7 @@ flowchart LR
     LED[LED po mjestu] --- ESPS
     IR[IR senzori] --> ESPR[ESP32 rampi]
     BTN[tipke za otvaranje] --> ESPR
-    ESPR --> SERVO[2x servo + LED]
+    SERVO[2x servo + LED] --- ESPR
     CAM[USB kamere]
   end
 
@@ -190,7 +190,7 @@ flowchart LR
     LED[LED po mjestu] --- ESPS
     IR[IR senzori] --> ESPR[ESP32 rampi]
     BTN[tipke za otvaranje] --> ESPR
-    ESPR --> SERVO[2x servo + LED]
+    SERVO[2x servo + LED] --- ESPR
     CAM[USB kamere]
   end
 
