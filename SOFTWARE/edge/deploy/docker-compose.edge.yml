@@ -7,9 +7,10 @@
 #   docker compose -f docker-compose.edge.yml up -d --build
 #   docker compose -f docker-compose.edge.yml logs -f edge
 #
-# ThingsBoard itself runs on a laptop/server (SOFTWARE/thingsboard/docker-compose.yml);
-# set TB_HOST below to that machine. Without ThingsBoard the garage keeps working,
-# the bridge just buffers data in /data/tb-buffer.db.
+# ThingsBoard itself runs on a laptop/server (SOFTWARE/thingsboard/docker-compose.yml).
+# Local settings (ThingsBoard address, gateway token, your edge.yaml) go into .env next to
+# this file: cp .env.example .env - docker compose reads it by itself. Without ThingsBoard
+# the garage keeps working, the bridge just buffers data in /data/tb-buffer.db.
 services:
   mosquitto:
     image: eclipse-mosquitto:2
@@ -30,12 +31,12 @@ services:
     environment:
       MQTT_HOST: mosquitto
       GARAGE_SPOTS: "6"
-      PRICING_PROFILE: demo
+      PRICING_PROFILE: ${PRICING_PROFILE:-demo}
       # sim = synthetic frames; docker-compose.camera.yml switches to the USB camera
       ALPR_SOURCE: ${ALPR_SOURCE:-sim}
     volumes:
       - edge-data:/data
-      - ../edge.example.yaml:/config/edge.yaml:ro    # replace with your edge.yaml
+      - ${EDGE_CONFIG:-../edge.example.yaml}:/config/edge.yaml:ro    # EDGE_CONFIG in .env
     command: ["python", "-m", "edge_service", "--config", "/config/edge.yaml", "all"]
 
   tb-bridge:
@@ -44,9 +45,9 @@ services:
     depends_on: [mosquitto, edge]
     environment:
       MQTT_HOST: mosquitto
-      TB_HOST: 192.168.1.20          # computer running ThingsBoard
+      TB_HOST: ${TB_HOST:-192.168.1.20}          # computer running ThingsBoard
       TB_MQTT_PORT: "1884"
-      TB_GATEWAY_TOKEN: garage-edge-gateway-token
+      TB_GATEWAY_TOKEN: ${TB_GATEWAY_TOKEN:-garage-edge-gateway-token}
     volumes:
       - edge-data:/data
     command: ["python", "-m", "tb_bridge"]

@@ -28,6 +28,7 @@ SOFTWARE/alpr/dataset/synthetic/
 SOFTWARE/edge/edge.yaml
 SOFTWARE/thingsboard/bridge/buffer*.db
 SOFTWARE/thingsboard/.env
+SOFTWARE/edge/deploy/.env
 
 # Generated reports that are re-created by scripts
 SOFTWARE/alpr/rezultati/debug/

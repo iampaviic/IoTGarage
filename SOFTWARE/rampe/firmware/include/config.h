@@ -14,8 +14,8 @@ struct GatePins {
     uint8_t ledRedPin;
     uint8_t ledGreenPin;
     uint8_t buttonPin;       // manual open button to GND (INPUT_PULLUP); hold 3 s = RESET
-    uint8_t closedAngle;     // calibrate: barrier horizontal
-    uint8_t openAngle;       // calibrate: barrier vertical
+    uint8_t closedAngle;     // calibrate: arm straight across the lane
+    uint8_t openAngle;       // calibrate: arm turned along the island (the printed arm swings horizontally)
 };
 
 static const GatePins GATES[2] = {

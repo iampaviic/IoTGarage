@@ -55,7 +55,8 @@ Access control očekuje potvrdu u 3 s; inače ponovi naredbu jednom pa podigne a
 4. Serijski: `open e`, `close e`, `reset e`, `status` (`x` = izlaz).
 5. MQTT: `python -m edge_service manual open --gate entrance` ili
    `python -m garage_contract.monitor --pub garage/gate/entrance/command '{"requestId":"t1","command":"OPEN"}'`.
-6. Kalibriraj kutove u `config.h` (`closedAngle`, `openAngle`) da ruka bude vodoravna/okomita.
+6. Kalibriraj kutove u `config.h` (`closedAngle`, `openAngle`): zatvorena ruka stoji ravno preko trake, otvorena je
+   okrenuta uz otok (isprintana ruka se okreće vodoravno, vidi [3D sklop](../maketa/3d/sklop)).
 
 Unit testovi: `pio test -e native -d firmware` i `pytest simulator`.
 

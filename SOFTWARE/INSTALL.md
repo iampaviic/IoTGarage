@@ -68,7 +68,9 @@ Pinovi i pragovi: `include/config.h`; shema spajanja: [PROJEKT/maketa/shema-spaj
 **a) Docker (preporuka):**
 
 ```bash
+cp edge/edge.example.yaml edge/edge.yaml          # prilagoditi (kamera, pragovi)
 cd edge/deploy
+cp .env.example .env                              # upisati TB_HOST = IP računala s ThingsBoardom
 docker compose -f docker-compose.edge.yml -f docker-compose.camera.yml up -d --build
 # bez kamere izostaviti docker-compose.camera.yml - sintetska kamera
 ```
@@ -84,7 +86,8 @@ Skripta instalira Mosquitto i Tesseract, napravi `.venv` u ovoj mapi i kopira `e
 
 **Konfiguracija:** `edge/edge.yaml` (kamera, pragovi pouzdanosti, naplata, privatnost; objašnjenja su u
 `edge.example.yaml`). Varijable okruženja nadjačavaju `edge.yaml`; za Docker se postavljaju u
-`docker-compose.edge.yml`, za nativnu instalaciju u `.service` datotekama:
+`edge/deploy/.env` (predložak `.env.example`: `TB_HOST`, `TB_GATEWAY_TOKEN`, `EDGE_CONFIG`, `PRICING_PROFILE`),
+za nativnu instalaciju u `.service` datotekama:
 
 | varijabla | značenje |
 |---|---|
