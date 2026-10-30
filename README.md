@@ -38,6 +38,11 @@ Svaki dio sustava ima svoju mapu s **README-om: tko je zadužen, što je već na
 | 7 | ThingsBoard | Anja, Leo Hreljanović (analitika) | [SOFTWARE/thingsboard](SOFTWARE/thingsboard) |
 | 8 | baza, testovi, GitHub | Lovro Gale | [SOFTWARE/baza](SOFTWARE/baza) |
 
+<!-- gitlab:izostavi -->
+**Voditelj:** [vodič za voditelja](PROJEKT/upravljanje/vodic-za-voditelja.md) – stanje projekta, pojmovi, postavljanje
+i integracija hardvera korak po korak.
+
+<!-- /gitlab -->
 Leo Hreljanović uz to izrađuje **[mobilnu aplikaciju za analitiku garaže](SOFTWARE/mobilna-aplikacija)** (zauzetost, ulasci po satu, prosječno trajanje, povijest sesija), koja podatke čita iz ThingsBoarda preko REST API-ja.
 
 <!-- gitlab:od-tjedna=12 -->

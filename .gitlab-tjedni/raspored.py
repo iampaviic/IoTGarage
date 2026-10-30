@@ -80,7 +80,7 @@ PRAVILA = [
 ]
 
 # nikad u GitLab: alati za GitHub i ovaj alat
-IZOSTAVI = [".github/", ".gitlab-tjedni/"]
+IZOSTAVI = [".github/", ".gitlab-tjedni/", "PROJEKT/upravljanje/vodic-za-voditelja.md"]  # vodič opisuje i GitHub
 
 # pregledne datoteke koje se svaki tjedan ponovno sastave tako da opisuju samo ono što već postoji
 UPRAVLJANE = [
