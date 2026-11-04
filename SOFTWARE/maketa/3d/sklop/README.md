@@ -2,7 +2,7 @@
 
 Cijela maketa u 3D-u: baza s oznakama, zidovi, most sa 6 HC-SR04 senzora i LED-icama mjesta, rampe sa SG90
 servima, IR senzori, mostovi kamera s USB kamerama, ESP32 čvorovi, tipkala, Raspberry Pi, napajanje i autići
-1:24 s pločicama. Isprintani dijelovi (narančasto) su isti `.scad` dijelovi iz [3d/](..) – sklop ih samo
+1:24 s pločicama. Isprintani dijelovi (narančasto) su isti `.scad` dijelovi iz [3d/](..). Sklop ih samo
 postavlja na mjesto, pa se svaka promjena dijela odmah vidi i u sklopu.
 
 Scena: auto čeka na ulazu (rampa zatvorena, crvena LED), auto izlazi kroz otvorenu izlaznu rampu (zelena LED),
@@ -19,11 +19,11 @@ mjesta P02 i P05 su zauzeta (crvena LED na mostu).
 
 ## Kako otvoriti
 
-- **U pregledniku, bez instalacije:** [sklop_makete.stl](sklop_makete.stl) – GitHub i GitLab STL prikazuju kao
-  3D model koji se može okretati (jednobojno).
-- **U boji:** [sklop_makete.glb](sklop_makete.glb) – Windows 3D Viewer, Blender ili
+- U pregledniku, bez instalacije: [sklop_makete.stl](sklop_makete.stl). GitHub i GitLab STL prikazuju kao
+  jednobojni 3D model koji se može okretati.
+- U boji: [sklop_makete.glb](sklop_makete.glb) u Windows 3D Vieweru, Blenderu ili na
   <https://gltf-viewer.donmccurdy.com> (povuci datoteku u prozor).
-- **Za mijenjanje:** `sklop_makete.scad` u [OpenSCAD-u](https://openscad.org) (F5 = brzi pregled u boji).
+- Za mijenjanje: `sklop_makete.scad` u [OpenSCAD-u](https://openscad.org) (F5 = brzi pregled u boji).
 
 ## Parametri (vrh `sklop_makete.scad`)
 
@@ -59,15 +59,7 @@ grupa boja (tablica `BOJE` u `komponente.scad`) izrenderira zasebno (`-D grupa=.
 
 ## Što je sklop provjerio
 
-- **Kamera vidi pločicu preko ruke rampe.** Sklop iz geometrije izračuna nagib kamere tako da gleda u središte
-  pločice auta koji stoji na zaustavnoj crti (objektiv 129 mm iznad poda i 200 mm iza crte rampe, nagib 24,4°) i
-  iz te točke izrenderira pogled iz kamere: ruka rampe prolazi iznad pločice. Isto pokazuje
-  `alati/kamera_kalkulator.py --cam-behind 200 --cam-height 129 --plate-height 20` (zraka na crti rampe 38 mm,
-  ruka 50–54 mm). OpenSCAD ima uži kut gledanja od prave kamere, pa je taj pogled "zumiran".
-- **Nagibna pločica kamere nije se imala za što uhvatiti** – prečka mosta imala je samo okomitu rupu. U
-  `most_kamere.scad` sada je na sredini prečke **blok šarnira**: ulazi između dviju uški pločice, a M3 vijak je
-  os nagiba. Noge su skraćene sa 118 na 110 mm, pa je objektiv i dalje na ~130 mm.
-- **Nosač HC-SR04 stoji na mostu**, a senzor gleda prema dolje kroz dvije rupe Ø 17 mm u mostu (opis je prije
-  govorio "ispod mosta").
-- Graničnik kotača je postavljen tako da pločica stoji točno na zaustavnoj crti, a autić (~56 mm) prolazi ispod
-  mosta senzora (113 mm) i mosta kamere (prečka na 110 mm).
+Kamera 129 mm iznad poda i 200 mm iza crte rampe, s nagibom 24,4°, vidi pločicu auta na zaustavnoj crti preko ruke
+rampe; isto pokazuje `alati/kamera_kalkulator.py --cam-behind 200 --cam-height 129 --plate-height 20`, a pogled iz
+OpenSCAD-a je "zumiran" jer ima uži kut gledanja od prave kamere. Autić (~56 mm) prolazi ispod mosta senzora (113 mm)
+i mosta kamere (prečka na 110 mm), a graničnik kotača drži pločicu točno na zaustavnoj crti.

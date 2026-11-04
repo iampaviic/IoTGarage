@@ -1,19 +1,19 @@
 # Sastanak YYYY-MM-DD (tjedan N)
 
-Prisutni: osoba 1 ☐ · 2 ☐ · 3 ☐ · 4 ☐ · 5 ☐ · 6 ☐ · 7 ☐ · 8 ☐
+Prisutni: Patrik ☐ · Lovro ☐ · Toma ☐ · Luka ☐ · Sven ☐ · Lukas ☐ · Anja ☐ · Leo ☐
 
 ## 1. Status
 
-| osoba | napravljeno od zadnjeg sastanka | plan do sljedećeg | blokira me |
+| tko | napravljeno od zadnjeg sastanka | plan do sljedećeg | blokira me |
 |---|---|---|---|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
+| Patrik | | | |
+| Lovro | | | |
+| Toma | | | |
+| Luka | | | |
+| Sven | | | |
+| Lukas | | | |
+| Anja | | | |
+| Leo | | | |
 
 ## 2. Demo integracije
 Korak iz plana integracije: … · rezultat: prolaz / pad · bilješke:

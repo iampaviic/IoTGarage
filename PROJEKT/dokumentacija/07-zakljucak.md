@@ -5,7 +5,7 @@ _(šest kriterija uspjeha iz plana – za svaki dokaz: test, mjerenje, slika)_
 
 ## 7.2 Poznata ograničenja
 - OCR je podešen za naš font pločica (predlošci); druge pločice → niža pouzdanost, više ručnih intervencija
-- jedna kamera premješta se između ulaza i izlaza (varijanta B)
+- jedna kamera premješta se između ulaza i izlaza
 - HC-SR04 osjetljiv na kut i jeke; mjesto bez kalibracije može griješiti
 - _(dopuniti rezultatima s makete)_
 

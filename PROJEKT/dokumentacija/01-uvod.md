@@ -10,18 +10,18 @@ prikazuju u ThingsBoardu. Pri izlasku se registracija ponovno očitava, izračun
 parkirne sesije.
 
 Maketa: 6 parkirnih mjesta (mjerilo 1:24), ulazna i izlazna rampa, USB kamera, 2× ESP32, Raspberry Pi kao
-edge računalo, ThingsBoard CE.
+edge računalo, ThingsBoard CE. Mobilna aplikacija prikazuje analitiku garaže i podatke čita iz ThingsBoarda.
 
-Izvan opsega: stvarna naplata, mobilna aplikacija, rad s pravim vozilima.
+Izvan opsega: stvarna naplata, rad s pravim vozilima.
 
 ## 1.3 Tim i uloge
-| osoba | uloga |
+| tko | uloga |
 |---|---|
-| 1 | voditelj projekta, arhitektura, integracija |
-| 2 | fizička maketa, napajanje, ožičenje |
-| 3 | senzori parkirnih mjesta, firmware |
-| 4 | rampe, aktuatori, lokalna kontrola |
-| 5 | ALPR – detekcija pločice |
-| 6 | OCR, edge servis, odluke |
-| 7 | ThingsBoard, dashboardi, alarmi |
-| 8 | baza, testiranje, dokumentacija |
+| Patrik | voditelj projekta, arhitektura, integracija, maketa |
+| Lovro Gale | baza, testiranje, dokumentacija, napajanje i ožičenje |
+| Toma Burgund | senzori parkirnih mjesta, firmware |
+| Luka Oslić | rampe, aktuatori, lokalna kontrola pristupa |
+| Sven Matić | ALPR: detekcija pločice |
+| Lukas Davorija | OCR, edge servis, odluke |
+| Anja | ThingsBoard, dashboardi, alarmi |
+| Leo Hreljanović | mobilna aplikacija, analitički dashboard |

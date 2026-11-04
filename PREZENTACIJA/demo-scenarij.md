@@ -55,8 +55,8 @@ montirati jedno do drugog. Trajanje ≤ 4 min.
 ## Šest kriterija uspjeha (pokazati eksplicitno)
 
 1. Maketa radi pouzdano → koraci 1–13 bez zastoja
-2. Senzori ispravno prikazuju zauzetost → koraci 7, 10 + testni zapis 20x (osoba 3)
-3. ALPR čita testne registracije → korak 3 + tablica točnosti (osobe 5, 6)
+2. Senzori ispravno prikazuju zauzetost → koraci 7, 10 + testni zapis 20x (Toma)
+3. ALPR čita testne registracije → korak 3 + tablica točnosti (Sven, Lukas)
 4. Rampe reagiraju na lokalne odluke → koraci 5, 11 + greška B
 5. ThingsBoard prikazuje stvarno stanje i povijest → koraci 1, 9, 12
 6. Potpuna parkirna sesija → koraci 8, 12, 13

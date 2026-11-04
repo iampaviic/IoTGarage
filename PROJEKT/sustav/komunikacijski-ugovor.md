@@ -1,9 +1,9 @@
 # Komunikacijski ugovor (verzija 1.0)
 
-> **Strojno provjerljiva verzija** ovog dokumenta su JSON sheme u
-> [`contract/garage_contract/schemas/`](../../SOFTWARE/ugovor/garage_contract/schemas) i primjeri u
-> [`contract/examples/`](../../SOFTWARE/ugovor/examples). Python servisi ih uvoze iz paketa `garage_contract`,
-> testovi (i CI) provjeravaju svaku poruku. Ako se dokument i sheme razlikuju, **vrijede sheme**.
+Strojno provjerljiva verzija ovog dokumenta su JSON sheme u
+[`SOFTWARE/ugovor/garage_contract/schemas/`](../../SOFTWARE/ugovor/garage_contract/schemas) i primjeri u
+[`SOFTWARE/ugovor/examples/`](../../SOFTWARE/ugovor/examples). Python servisi ih uvoze iz paketa `garage_contract`,
+a testovi (i CI) provjeravaju svaku poruku. Ako se dokument i sheme razlikuju, vrijede sheme.
 
 ## Opća pravila
 
@@ -84,9 +84,9 @@ jednom (isti `requestId`) pa podiže alarm `GATE_NO_ACK`.
  "entryConfidence": 0.89, "exitConfidence": 0.92, "timestamp": "2026-10-19T09:48:40Z"}
 ```
 
-Svi ostali primjeri: [`contract/examples/`](../../SOFTWARE/ugovor/examples).
+Svi ostali primjeri: [`SOFTWARE/ugovor/examples/`](../../SOFTWARE/ugovor/examples).
 
-## Pravila odlučivanja (access control, osoba 6)
+## Pravila odlučivanja
 
 | ocrConfidence | odluka |
 |---|---|
@@ -107,7 +107,7 @@ python -m garage_contract.monitor --pub garage/gate/entrance/command '{"requestI
 
 ## Kako se ugovor mijenja
 
-1. Prijedlog (issue ili poruka osobi 1) s razlogom.
-2. Osoba 1 mijenja shemu + primjer + ovaj dokument u **jednom** PR-u; CI provjerava sve primjere.
+1. Prijedlog (issue ili poruka Patriku) s razlogom.
+2. Patrik mijenja shemu + primjer + ovaj dokument u **jednom** PR-u; CI provjerava sve primjere.
 3. Unos u [odluke.md](../upravljanje/odluke.md), obavijest na tjednom sastanku.
 4. Nekompatibilna promjena = nova verzija (`CONTRACT_VERSION` u `garage_contract/__init__.py`).

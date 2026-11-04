@@ -9,10 +9,10 @@ Automatski testovi: `pytest` iz mape `SOFTWARE` (CI ih vrti na svakom PR-u).
 | ID | test | tip | koraci / automatski test | očekivano |
 |---|---|---|---|---|
 | TC-C01 | sve poruke poštuju ugovor | A, H | `integracija/tests/test_e2e.py::test_all_messages_follow_the_contract`; na maketi monitor tijekom cijelog demo scenarija | 0 crvenih poruka |
-| TC-C02 | primjer svake poruke odgovara shemi | A | `contract/tests/test_contract.py` | prolaz |
+| TC-C02 | primjer svake poruke odgovara shemi | A | `ugovor/tests/test_contract.py` | prolaz |
 | TC-P01 | privatnost | R | provjeri: samo generirane pločice, `save_crops: false` ili retencija, `purge` radi, TTL u ThingsBoardu | sve ispunjeno |
 
-## Senzori mjesta (osoba 3)
+## Senzori mjesta (Toma)
 
 | ID | test | tip | koraci | očekivano |
 |---|---|---|---|---|
@@ -23,14 +23,14 @@ Automatski testovi: `pytest` iz mape `SOFTWARE` (CI ih vrti na svakom PR-u).
 | TC-S05 | ponovno spajanje Wi-Fi/MQTT | H | ugasi router 30 s pa upali | ESP32 se vrati sam, ponovno objavi sva stanja |
 | TC-S06 | Last Will | H | isključi napajanje ESP32 | `online:false` u ≤ 45 s, mjesta `OFFLINE`, alarm "Uređaj nije dostupan" |
 
-## Rampe (osoba 4) – detalji u [sigurnosnim testovima](sigurnosni-testovi-rampi.md)
+## Rampe (Luka)
 
 | ID | test | tip | očekivano |
 |---|---|---|---|
 | TC-R00 | stroj stanja (C++ i Python) | A | `pio test -e native` 7/7, `pytest rampe/simulator` 6/6 |
-| TC-R01 – TC-R13 | otvaranje, zatvaranje, auto-zatvaranje, ne zatvara na vozilo, sigurnosno otvaranje, tipka, ERROR/reset, dvostruka naredba, nevaljana naredba, ispad MQTT-a, ispad edgea, restart, struja | H | vidi dokument osobe 4 |
+| TC-R01 – TC-R13 | otvaranje, zatvaranje, auto-zatvaranje, ne zatvara na vozilo, sigurnosno otvaranje, tipka, ERROR/reset, dvostruka naredba, nevaljana naredba, ispad MQTT-a, ispad edgea, restart, struja | H | [sigurnosni testovi rampi](sigurnosni-testovi-rampi.md) |
 
-## ALPR i OCR (osobe 5, 6)
+## ALPR i OCR (Sven, Lukas)
 
 | ID | test | tip | koraci | očekivano |
 |---|---|---|---|---|
@@ -42,7 +42,7 @@ Automatski testovi: `pytest` iz mape `SOFTWARE` (CI ih vrti na svakom PR-u).
 | TC-O03 | nikad otvaranje ispod praga | A | `SOFTWARE/edge/tests/test_decisions.py::test_never_opens_below_accept_threshold` | prolaz (sve kombinacije) |
 | TC-O04 | normalizacija (O/0, I/1, grb, ...) | A | `tests/test_ocr.py` | prolaz |
 
-## Baza i sesije (osoba 8)
+## Baza i sesije (Lovro)
 
 | ID | test | tip | automatski test | očekivano |
 |---|---|---|---|---|
@@ -77,7 +77,7 @@ Automatski testovi: `pytest` iz mape `SOFTWARE` (CI ih vrti na svakom PR-u).
 | TC-I16 | **nečitljiva pločica** | A, S, H | e2e `test_unreadable_plate_needs_operator_and_gate_stays_closed`; na maketi prekrij pločicu | `MANUAL_REQUIRED`, rampa zatvorena, alarm |
 | TC-I17 | rampa ne potvrđuje | A, S | `test_gate_without_ack_is_resent_then_alarm`; `gate_simulator.py --no-ack exit` | 1 ponavljanje (isti `requestId`), alarm `GATE_NO_ACK` |
 
-## ThingsBoard (osoba 7)
+## ThingsBoard (Anja)
 
 | ID | test | tip | koraci | očekivano |
 |---|---|---|---|---|

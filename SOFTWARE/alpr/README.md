@@ -1,9 +1,9 @@
-# Osoba 5 – ALPR: detekcija registarske pločice
+# ALPR: detekcija registarske pločice
 
-**Zadužen:** Sven Matić. Zamjena: Lukas Davorija.
+Zadužen: Sven Matić. Zamjena: Lukas Davorija.
 
-Tvoj modul pronalazi **gdje** je pločica na slici, ispravlja perspektivu i vraća izrezanu pločicu.
-**Ne** čita znakove i **ne** odlučuje je li registracija valjana (to radi osoba 6).
+Tvoj modul pronalazi gdje je pločica na slici, ispravlja perspektivu i vraća izrezanu pločicu. Znakove čita i
+valjanost registracije provjerava OCR ([SOFTWARE/edge](../edge), Lukas).
 
 ## Što je već napravljeno
 
@@ -11,9 +11,9 @@ Tvoj modul pronalazi **gdje** je pločica na slici, ispravlja perspektivu i vra�
 |---|---|
 | [plate_detector/detector.py](plate_detector/detector.py) | detektor (OpenCV): 3 nezavisna izvora kandidata, ocjena kandidata, precizno dotjerivanje kutova, ispravak perspektive |
 | [plate_detector/variants.py](plate_detector/variants.py) | varijante za OCR: izvorna, grayscale, pojačani kontrast (CLAHE), threshold (Otsu), adaptivni threshold |
-| [plate_detector/camera.py](plate_detector/camera.py) | USB kamera koja uvijek vraća **najnoviju** sliku (pozadinska nit, MJPG, automatsko ponovno otvaranje) |
+| [plate_detector/camera.py](plate_detector/camera.py) | USB kamera koja uvijek vraća najnoviju sliku (pozadinska nit, MJPG, automatsko ponovno otvaranje) |
 | [plate_detector/synth.py](plate_detector/synth.py) | generator izmišljenih HR pločica i sintetskih scena s poznatim kutovima (za testove i simulaciju) |
-| [tools/generate_plates.py](tools/generate_plates.py) | **pločice za ispis** u točnoj veličini (A4 PDF) → [tablice/plates_A4.pdf](tablice/plates_A4.pdf) |
+| [tools/generate_plates.py](tools/generate_plates.py) | pločice za ispis u točnoj veličini (A4 PDF) → [tablice/plates_A4.pdf](tablice/plates_A4.pdf) |
 | [tools/capture_dataset.py](tools/capture_dataset.py) | snimanje vlastitog skupa fotografija kamerom (s automatskim označavanjem kutova) |
 | [tools/label_tool.py](tools/label_tool.py) | provjera/ručno klikanje 4 kuta pločice |
 | [tools/evaluate_detection.py](tools/evaluate_detection.py) | mjerenje uspješnosti (IoU ≥ 0,5), izvještaj + slike promašaja |
@@ -21,17 +21,17 @@ Tvoj modul pronalazi **gdje** je pločica na slici, ispravlja perspektivu i vra�
 | [tools/make_synthetic_dataset.py](tools/make_synthetic_dataset.py) | sintetski skup s oznakama (dok nema stvarnih fotografija) |
 | [rezultati/](rezultati) | izvještaji mjerenja |
 | [dataset/README.md](dataset/README.md) | kako snimiti i označiti stvarni skup (privatnost!) |
-| [ogranicenja.md](../../PROJEKT/testiranje/ogranicenja-alpr.md) | dokumentirane situacije u kojima detekcija ne radi |
-| [tests/](tests) | 9 unit testova |
+| [ogranicenja-alpr.md](../../PROJEKT/testiranje/ogranicenja-alpr.md) | dokumentirane situacije u kojima detekcija ne radi |
+| [tests/](tests) | unit testovi |
 
 ### Rezultati na sintetskim slikama (stvarne fotografije makete tek treba snimiti)
 
 | skup | uspješnost | lažno pozitivni | vrijeme (medijan) |
 |---|---|---|---|
-| kontrolirani uvjeti (fiksna kamera, ±15° kut, dobro svjetlo) | **100 %** (150/150) | 0/15 | ~35 ms |
-| teški uvjeti (±45° kut, mrak/presvijetlo, zamućenje, šum, JPEG) | **95,3 %** (143/150) | 0/15 | ~37 ms |
+| kontrolirani uvjeti (fiksna kamera, ±15° kut, dobro svjetlo) | 100 % (150/150) | 0/15 | ~35 ms |
+| teški uvjeti (±45° kut, mrak/presvijetlo, zamućenje, šum, JPEG) | 95,3 % (143/150) | 0/15 | ~37 ms |
 
-Kriterij projekta je **≥ 90 % na vlastitim fotografijama makete** – sintetski rezultat je samo pokazatelj.
+Kriterij projekta je ≥ 90 % na vlastitim fotografijama makete; sintetski rezultat je samo pokazatelj.
 
 ## Kako radi
 
@@ -64,18 +64,14 @@ python tools/detect_image.py moja_slika.jpg --out rezultati/probe
 pytest tests
 ```
 
-## Tvoji zadaci
+## Zadaci
 
-- [ ] isprintati pločice (100 %, mat papir), zalijepiti na autiće (držač `SOFTWARE/maketa/3d/drzac_tablice.scad`)
-- [ ] postaviti kameru na fiksan položaj s osobom 2 (`kamera_kalkulator.py`), provjeriti fokus
-- [ ] snimiti stvarni skup (≥ 100 slika): različite registracije, kutovi, svjetlije/tamnije, bliže/dalje – vidi [dataset/README.md](dataset/README.md)
-- [ ] označiti (`label_tool.py`) i izmjeriti (`evaluate_detection.py`) → cilj ≥ 90 %
-- [ ] dopuniti [ogranicenja.md](../../PROJEKT/testiranje/ogranicenja-alpr.md) stvarnim primjerima (slike iz `rezultati/debug/`)
-- [ ] ako stvarni rezultat < 90 %: podesiti `DetectorConfig` / težine ocjene u `detector.py` i ponoviti mjerenje
-
-| isporučivo | status |
-|---|---|
-| modul za detekciju pločice | ✅ `plate_detector` (koristi ga edge servis) |
-| testni skup fotografija | ✅ sintetski, ⬜ stvarni |
-| mjerenje uspješnosti detekcije | ✅ alat + sintetski izvještaji, ⬜ stvarni |
-| dokumentirane situacije u kojima ne radi | ✅ početna verzija, ⬜ dopuniti stvarnim primjerima |
+- ✅ modul za detekciju pločice `plate_detector` (koristi ga edge servis)
+- ✅ sintetski skup slika, alat za mjerenje i sintetski izvještaji
+- ✅ početna verzija [ograničenja](../../PROJEKT/testiranje/ogranicenja-alpr.md)
+- ⬜ isprintati pločice (100 %, mat papir) i zalijepiti ih na autiće (držač `SOFTWARE/maketa/3d/drzac_tablice.scad`)
+- ⬜ s Patrikom postaviti kameru na fiksan položaj (`kamera_kalkulator.py`) i provjeriti fokus
+- ⬜ snimiti stvarni skup od ≥ 100 slika: različite registracije, kutovi, svjetlo, udaljenost ([dataset/README.md](dataset/README.md))
+- ⬜ označiti (`label_tool.py`) i izmjeriti (`evaluate_detection.py`), cilj ≥ 90 %
+- ⬜ dopuniti ograničenja stvarnim primjerima (slike iz `rezultati/debug/`)
+- ⬜ ako je stvarni rezultat < 90 %, podesiti `DetectorConfig` i težine ocjene u `detector.py` pa ponoviti mjerenje

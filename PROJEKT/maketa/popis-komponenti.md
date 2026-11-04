@@ -27,7 +27,7 @@ CSV za tablični kalkulator: [popis-komponenti.csv](popis-komponenti.csv).
 | spajanje | protoboard / perfboard 7x9 cm | 2 | djelitelji, razvod |  |
 | spajanje | termoskupljajuca cijev, vezice, naljepnice za kabele | 1 | oznake kabela |  |
 | edge | Raspberry Pi 4 (imamo) + napajanje USB-C 5 V/3 A + microSD 32 GB | 1 | edge racunalo | Jetson Nano kao rezerva |
-| edge | USB kamera 720p/1080p (imamo 1) | 1 | ALPR | druga kamera = varijanta A |
+| edge | USB kamera 720p/1080p (imamo 1) | 1 | ALPR | druga kamera za ulaz i izlaz bez premještanja |
 | mreza | putni Wi-Fi router (npr. TP-Link) | 1 | vlastita mreza makete | opcionalno, rizik R-07 |
 | maketa | pjenasti PVC (Forex) 5 mm, ~1000 x 700 mm | 1 | baza, zidovi |  |
 | maketa | letvice / PVC trake 10 x 10 mm | 4 | mostovi za senzore i kameru | ili 3D ispis |

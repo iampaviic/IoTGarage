@@ -1,11 +1,8 @@
-# Plan rada po tjednima (backlog)
-
-Oznake: ✅ već pripremljeno u repozitoriju (provjeriti i preuzeti), ⬜ posao za člana tima.
-Ovaj popis se lako prenese u GitHub Projects (jedna kartica po retku, oznaka = osoba, milestone = faza).
+# Plan rada po tjednima
 
 ## Vremenski okvir
 
-Projekt traje od **19.10.2026.** do roka za predaju **29.1.2027.** (15 tjedana, T1–T15).
+Projekt traje od 19.10.2026. do roka za predaju 29.1.2027. (15 tjedana, T1–T15).
 
 | faza | tjedni | datumi |
 |---|---|---|
@@ -32,36 +29,39 @@ Kontrolne točke (dogovor tima, plan projekta v1.3):
 
 ## Faza 1 – definicija i dokaz izvedivosti (T1–T2, 19.10. – 1.11.2026.)
 
-| osoba | zadatak |
+Gotovo: arhitektura, ugovor, zahtjevi, rizici, odluke, plan integracije i demo scenarij; sav softver s testovima i
+simulatorima; tlocrt, kalkulator kamere, 3D dijelovi, sheme spajanja i popis komponenti; testni plan i kostur
+dokumentacije. Otvoreno do KT2 (10.11.):
+
+| tko | zadatak |
 |---|---|
-| 1 | ✅ arhitektura, ugovor, zahtjevi, rizici, odluke, plan integracije, demo scenarij · ⬜ potvrditi odluke D-004 i D-007 s timom · ⬜ otvoriti GitHub Projects ploču iz ovog popisa · ⬜ dogovoriti termin tjednog sastanka |
-| 2 | ✅ tlocrt, kalkulator kamere, 3D dijelovi, sheme spajanja, popis komponenti · ⬜ odabrati mjerilo autića i materijal · ⬜ naručiti/prikupiti komponente · ⬜ **provjeriti minimalni fokus kamere** |
-| 3 | ✅ firmware, filtar s testovima, simulator, alati za kalibraciju i test 20x · ⬜ spojiti JEDAN HC-SR04 (s djeliteljem!) i vidjeti `CAL` mjerenja |
-| 4 | ✅ firmware, stanje rampe s testovima, simulator · ⬜ pomaknuti jedan SG90 s ESP32 (`open e` u serijskom monitoru) |
-| 5 | ✅ detektor, generator pločica, sintetski skup, evaluacija · ⬜ isprintati pločice · ⬜ prve 10 fotografija makete/autića `capture_dataset.py` |
-| 6 | ✅ OCR, edge servis, odluke, testovi · ⬜ `python -m edge_service read` na prvim fotografijama |
-| 7 | ✅ docker-compose, provisioning, bridge, dva dashboarda, alarmi · ⬜ pokrenuti ThingsBoard na laptopu, `provision.py`, promijeniti lozinku |
-| 8 | ✅ baza sesija, naplata, CLI, generator, testovi, testni plan, kostur dokumentacije · ⬜ pročitati testni plan, dogovoriti pravilo naplate s timom |
+| Patrik | ⬜ potvrditi odluke D-004 i D-007 s timom · ⬜ otvoriti GitHub Projects ploču iz ovog popisa · ⬜ dogovoriti termin tjednog sastanka · ⬜ odabrati mjerilo autića i materijal · ⬜ naručiti ili prikupiti komponente · ⬜ provjeriti minimalni fokus kamere |
+| Toma | ⬜ spojiti jedan HC-SR04 (s djeliteljem!) i vidjeti `CAL` mjerenja |
+| Luka | ⬜ pomaknuti jedan SG90 s ESP32 (`open e` u serijskom monitoru) |
+| Sven | ⬜ isprintati pločice · ⬜ prvih 10 fotografija makete i autića (`capture_dataset.py`) |
+| Lukas | ⬜ `python -m edge_service read` na prvim fotografijama |
+| Anja | ⬜ pokrenuti ThingsBoard na laptopu, `provision.py`, promijeniti lozinku |
+| Lovro | ⬜ pročitati testni plan, dogovoriti pravilo naplate s timom |
 
 ## Faza 2 – samostalni podsustavi (T3–T7, 2.11. – 6.12.2026.)
 
-Od 23.11. do 4.12.2026. su međuispiti i na projektu se ne radi. Nakon međuispita (T8–T9, 7.12. – 20.12.) slijede
-napajanje i ožičenje makete, nadzorni i analitički dashboard, tehnologija i dizajn mobilne aplikacije, kalibracija senzora, sigurnosni testovi rampi te
-mjerenja detekcije i OCR-a, sve do KT5 (23.12.).
+Od 23.11. do 4.12.2026. su međuispiti i na projektu se ne radi. Nakon njih (T8–T9, 7.12. – 20.12.) slijede
+napajanje i ožičenje makete, nadzorni i analitički dashboard, tehnologija i dizajn mobilne aplikacije, kalibracija
+senzora, sigurnosni testovi rampi te mjerenja detekcije i OCR-a, sve do KT5 (23.12.).
 
-| osoba | zadatak |
+| tko | zadatak |
 |---|---|
-| 2 | ⬜ izrada baze i mjesta prema `nacrt/tlocrt.svg` · ⬜ most za senzore iznad mjesta · ⬜ 3D ispis nosača i rampi · ⬜ ožičenje prema `elektronika/wireviz/*.svg`, oznake kabela · ⬜ foto-dnevnik |
-| 3 | ⬜ svih 6 senzora na maketi · ⬜ `kalibracija.py` → pragovi u `config.h` i `tablica-pragova.md` · ⬜ MQTT s pravim brokerom · ⬜ LED traka |
-| 4 | ⬜ montaža obje rampe, kalibracija kutova (`closedAngle/openAngle`) · ⬜ IR senzori na crti rampe · ⬜ sigurnosni testovi (`sigurnosni-testovi.md`) |
-| 5 | ⬜ skup ≥ 100 stvarnih fotografija (različite pločice, svjetlo, kut, udaljenost) · ⬜ `label_tool.py` · ⬜ `evaluate_detection.py` ≥ 90 % · ⬜ `ogranicenja.md` |
-| 6 | ⬜ `evaluate_ocr.py` na stvarnom skupu, 0 pogrešno prihvaćenih · ⬜ podesiti težine/pragove ako treba · ⬜ edge na Raspberry Pi (Docker ili nativno) |
-| 7 | ⬜ dashboardi s pravim podacima, prilagodba izgleda · ⬜ obavijesti na alarm (Notification center) · ⬜ izvoz dashboarda u repo |
-| 8 | ⬜ provesti testove TC-B*, TC-I* u simulaciji i zapisati u `testni-zapisnik.md` · ⬜ prikupljati materijale za dokumentaciju |
+| Patrik, Lovro | ⬜ izrada baze i mjesta prema `nacrt/tlocrt.svg` · ⬜ most za senzore iznad mjesta · ⬜ 3D ispis nosača i rampi · ⬜ ožičenje prema `elektronika/wireviz/*.svg`, oznake kabela · ⬜ foto-dnevnik |
+| Toma | ⬜ svih 6 senzora na maketi · ⬜ `kalibracija.py` → pragovi u `config.h` i `tablica-pragova.md` · ⬜ MQTT s pravim brokerom · ⬜ LED traka |
+| Luka | ⬜ montaža obje rampe, kalibracija kutova (`closedAngle/openAngle`) · ⬜ IR senzori na crti rampe · ⬜ sigurnosni testovi (`sigurnosni-testovi-rampi.md`) |
+| Sven | ⬜ skup ≥ 100 stvarnih fotografija (različite pločice, svjetlo, kut, udaljenost) · ⬜ `label_tool.py` · ⬜ `evaluate_detection.py` ≥ 90 % · ⬜ `ogranicenja-alpr.md` |
+| Lukas | ⬜ `evaluate_ocr.py` na stvarnom skupu, 0 pogrešno prihvaćenih · ⬜ podesiti težine/pragove ako treba · ⬜ edge na Raspberry Pi (Docker ili nativno) |
+| Anja | ⬜ dashboardi s pravim podacima, prilagodba izgleda · ⬜ obavijesti na alarm (Notification center) · ⬜ izvoz dashboarda u repo |
+| Lovro | ⬜ provesti testove TC-B*, TC-I* u simulaciji i zapisati u `testni-zapisnik.md` · ⬜ prikupljati materijale za dokumentaciju |
 
 ## Faza 3 – integracija (T8–T9, 7.12. – 20.12.2026.)
 
-⬜ Koraci 1–10 iz [plan-integracije.md](plan-integracije.md) **s hardverom**, po redu; svaki prolaz zapisuje osoba 8.
+⬜ Koraci H0–H11 iz [plan-integracije.md](plan-integracije.md) s hardverom, po redu; svaki prolaz zapisuje Lovro.
 
 ## Blagdanska stanka (T10–T11, 21.12.2026. – 3.1.2027.)
 
@@ -77,4 +77,4 @@ ThingsBoarda, restart ESP32 i edge računala, vozilo predugo ispod rampe, ulazak
 
 ⬜ dokumentacija iz `PROJEKT/dokumentacija` · ⬜ slajdovi (arhitektura, rezultati ALPR i senzora,
 dashboard, sesija iz baze, ograničenja) · ⬜ generalna proba demo scenarija ×2 · ⬜ arhiviranje na GitLabu
-prema [uputama nastavnika](../../OSTALO/upute-nastavnika-gitlab.md), najkasnije **29.1.2027.**
+prema [uputama nastavnika](../../OSTALO/upute-nastavnika-gitlab.md), najkasnije 29.1.2027.

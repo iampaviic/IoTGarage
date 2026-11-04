@@ -22,7 +22,7 @@ spajanje;4-zilni kabel (telefonski / ravni) 5 m;1;0;5;HC-SR04;
 spajanje;protoboard / perfboard 7x9 cm;2;1;1.5;djelitelji, razvod;
 spajanje;termoskupljajuca cijev, vezice, naljepnice za kabele;1;0;6;oznake kabela;
 edge;Raspberry Pi 4 (imamo) + napajanje USB-C 5 V/3 A + microSD 32 GB;1;0;12;edge racunalo;Jetson Nano kao rezerva
-edge;USB kamera 720p/1080p (imamo 1);1;1;20;ALPR;druga kamera = varijanta A; provjeriti minimalni fokus
+edge;USB kamera 720p/1080p (imamo 1);1;1;20;ALPR;druga kamera za ulaz i izlaz bez premještanja; provjeriti minimalni fokus
 mreza;putni Wi-Fi router (npr. TP-Link);1;0;25;vlastita mreza makete;opcionalno, rizik R-07
 maketa;pjenasti PVC (Forex) 5 mm, ~1000 x 700 mm;1;0;20;baza, zidovi;
 maketa;letvice / PVC trake 10 x 10 mm;4;0;1.5;mostovi za senzore i kameru;ili 3D ispis

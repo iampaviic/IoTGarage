@@ -1,19 +1,24 @@
 # Instalacija i pokretanje
 
-Sve naredbe se pokreću iz mape `SOFTWARE` (osim ako piše drugačije). Detaljnije upute:
-[korisničke upute](../PROJEKT/dokumentacija/03-korisnicke-upute.md),
-[tehnička dokumentacija](../PROJEKT/dokumentacija/04-tehnicka-dokumentacija.md) i `README.md` u svakoj podmapi.
+Sve naredbe se pokreću iz mape `SOFTWARE`, osim ako piše drugačije. Detaljnije upute su u
+[korisničkim uputama](../PROJEKT/dokumentacija/03-korisnicke-upute.md),
+[tehničkoj dokumentaciji](../PROJEKT/dokumentacija/04-tehnicka-dokumentacija.md) i `README.md` svake podmape.
 
 ## 1. Preduvjeti
 
-- Python ≥ 3.8, git
-- Tesseract OCR i Mosquitto MQTT broker
-  - Linux: `sudo apt install tesseract-ocr mosquitto`
-  - Windows: instalacijski programi s [tesseract-ocr.github.io](https://tesseract-ocr.github.io/tessdoc/Installation.html)
-    i [mosquitto.org](https://mosquitto.org/download/)
-- Docker (za ThingsBoard, opcionalno za edge računalo)
-- PlatformIO (VS Code ekstenzija ili `pip install platformio`) – firmware
-- opcionalno: OpenSCAD (3D dijelovi), WireViz + Graphviz (sheme ožičenja)
+| program | Windows | Linux (Ubuntu) |
+|---|---|---|
+| git | [git-scm.com](https://git-scm.com/download/win) | `sudo apt install git` |
+| Python ≥ 3.8 (preporuka 3.11 ili 3.12) | [python.org](https://www.python.org/downloads/), u instalaciji označi "Add python.exe to PATH" | `sudo apt install python3 python3-venv` |
+| Tesseract OCR | [UB Mannheim](https://github.com/UB-Mannheim/tesseract/wiki), zatim `C:\Program Files\Tesseract-OCR` dodaj u PATH | `sudo apt install tesseract-ocr` |
+| Mosquitto | [mosquitto.org](https://mosquitto.org/download/), zatim `C:\Program Files\mosquitto` dodaj u PATH | `sudo apt install mosquitto mosquitto-clients` |
+| Docker (ThingsBoard, opcionalno edge) | [Docker Desktop](https://www.docker.com/products/docker-desktop/) (traži WSL 2) | [docs.docker.com/engine/install](https://docs.docker.com/engine/install/ubuntu/) |
+| VS Code + PlatformIO (firmware) | [code.visualstudio.com](https://code.visualstudio.com), zatim *Extensions* → "PlatformIO IDE" | isto, ili `pip install platformio` |
+
+Opcionalno: OpenSCAD (3D dijelovi), WireViz i Graphviz (sheme ožičenja).
+
+PATH na Windowsu: *Start* → "environment variables" → *Path* → *New*. Zatim otvori novi terminal i provjeri
+`git --version`, `python --version`, `tesseract --version` i `docker --version`.
 
 ## 2. Python okruženje i testovi (laptop)
 
@@ -24,32 +29,38 @@ pip install -r requirements-dev.txt
 pytest                             # svi testovi, ~1 min
 ```
 
+Ako Windows PowerShell odbije `activate`, jednom pokreni `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+U svakom novom terminalu ponovno uđi u mapu `SOFTWARE` i aktiviraj `.venv` (u promptu piše `(.venv)`).
+
 ## 3. Cijeli sustav bez hardvera (simulacija)
 
 ```bash
 python integracija/simulacija.py --broker
-python integracija/simulacija.py --broker --interactive
+python integracija/simulacija.py --broker --interactive    # sam upravljaš, upute se ispišu
+python -m garage_contract.monitor                          # u drugom terminalu: sve MQTT poruke
 ```
 
-Pokreće Mosquitto, simulatore senzora i rampi, ALPR sa sintetskom kamerom, kontrolu pristupa i bazu te odigra
-demo scenarij.
+Simulacija pokreće Mosquitto, simulatore senzora i rampi, ALPR sa sintetskom kamerom, kontrolu pristupa i bazu te
+odigra demo scenarij: ulaz, parkiranje, nečitljivu pločicu s ručnim odobrenjem, izlaz bez sesije i izlaz s cijenom.
+Na kraju ispiše cijenu i `poruke koje krše ugovor: 0`.
 
 ## 4. ThingsBoard (laptop ili server s ≥ 4 GB RAM)
 
 ```bash
 cd thingsboard
 docker compose up -d                # prvo pokretanje traje par minuta
-python provision/provision.py       # uređaji, alarmi, dashboardi
+python provision/provision.py       # uređaji, alarmi, dashboardi; smije se pokrenuti više puta
 ```
 
-Web: <http://localhost:8080>, prijava `tenant@thingsboard.org` / `tenant` (**promijeniti lozinku!**).
-Port 1884 = MQTT za most s edge računala. Simulacija s ThingsBoardom: `python integracija/simulacija.py --broker --tb`.
+Web je na <http://localhost:8080>, prijava `tenant@thingsboard.org` / `tenant`. Prije demonstracije promijeni
+lozinku (ikona profila → *Change password*) i od tada `provision.py` pokreći s `--password <nova>`. Port 1884 je
+MQTT za most s edge računala. Simulacija s ThingsBoardom: `python integracija/simulacija.py --broker --tb`.
 
 ## 5. Firmware za ESP32 (čvor senzora i čvor rampi)
 
 Za svaki čvor (`senzori/firmware` i `rampe/firmware`):
 
-1. Kopirati `include/secrets.example.h` u `include/secrets.h` i upisati (`secrets.h` se ne komita):
+1. Kopiraj `include/secrets.example.h` u `include/secrets.h` i upiši vrijednosti (`secrets.h` se ne komita):
 
    | vrijednost | značenje |
    |---|---|
@@ -58,14 +69,16 @@ Za svaki čvor (`senzori/firmware` i `rampe/firmware`):
    | `MQTT_USER`, `MQTT_PASSWORD` | prazno = anonimno |
    | `NTP_SERVER` | izvor vremena |
 
-2. `pio run -d senzori/firmware -t upload`
-3. `pio device monitor -d senzori/firmware` (115200 baud)
+2. `pio run -d senzori/firmware -t upload` prevede firmware i učita ga na ESP32. PlatformIO sam preuzme biblioteke
+   iz `platformio.ini`.
+3. `pio device monitor -d senzori/firmware` otvori serijski monitor (115200 baud).
 
-Pinovi i pragovi: `include/config.h`; shema spajanja: [PROJEKT/maketa/shema-spajanja.md](../PROJEKT/maketa/shema-spajanja.md).
+Unit testovi na računalu, bez pločice: `pio test -e native -d senzori/firmware`. Pinovi i pragovi su u
+`include/config.h`, a shema spajanja u [PROJEKT/maketa/shema-spajanja.md](../PROJEKT/maketa/shema-spajanja.md).
 
 ## 6. Edge računalo (Raspberry Pi ili Jetson Nano)
 
-**a) Docker (preporuka):**
+a) Docker (preporuka):
 
 ```bash
 cp edge/edge.example.yaml edge/edge.yaml          # prilagoditi (kamera, pragovi)
@@ -75,19 +88,21 @@ docker compose -f docker-compose.edge.yml -f docker-compose.camera.yml up -d --b
 # bez kamere izostaviti docker-compose.camera.yml - sintetska kamera
 ```
 
-**b) Nativno (Raspberry Pi OS / Ubuntu, Python ≥ 3.8):**
+b) Nativno (Raspberry Pi OS / Ubuntu, Python ≥ 3.8):
 
 ```bash
 bash edge/deploy/install_native.sh
 ```
 
 Skripta instalira Mosquitto i Tesseract, napravi `.venv` u ovoj mapi i kopira `edge/edge.example.yaml` u
-`edge/edge.yaml`; zatim prema uputama koje ispiše uključiti systemd servise iz `edge/deploy/`.
+`edge/edge.yaml`. Zatim prema uputama koje ispiše uključi systemd servise iz `edge/deploy/`. Jetson Nano
+(JetPack 4.x) ima Python 3.6, pa na njemu koristi Docker ili `sudo apt install python3.8 python3.8-venv` i
+`PYTHON=python3.8 bash edge/deploy/install_native.sh`.
 
-**Konfiguracija:** `edge/edge.yaml` (kamera, pragovi pouzdanosti, naplata, privatnost; objašnjenja su u
-`edge.example.yaml`). Varijable okruženja nadjačavaju `edge.yaml`; za Docker se postavljaju u
-`edge/deploy/.env` (predložak `.env.example`: `TB_HOST`, `TB_GATEWAY_TOKEN`, `EDGE_CONFIG`, `PRICING_PROFILE`),
-za nativnu instalaciju u `.service` datotekama:
+Konfiguracija je u `edge/edge.yaml` (kamera, pragovi pouzdanosti, naplata, privatnost; objašnjenja su u
+`edge.example.yaml`). Varijable okruženja nadjačavaju `edge.yaml`. Za Docker se postavljaju u `edge/deploy/.env`
+(predložak `.env.example`: `TB_HOST`, `TB_GATEWAY_TOKEN`, `EDGE_CONFIG`, `PRICING_PROFILE`), a za nativnu
+instalaciju u `.service` datotekama:
 
 | varijabla | značenje |
 |---|---|
@@ -105,7 +120,8 @@ za nativnu instalaciju u `.service` datotekama:
 ```bash
 python maketa/alati/tlocrt.py --scale 24 --spots 6 --print-tiles
 python maketa/alati/kamera_kalkulator.py
-python maketa/elektronika/generiraj_sheme.py   # treba wireviz
+python maketa/elektronika/generiraj_sheme.py      # treba wireviz
+openscad -o maketa/3d/stl/rampa_sg90.stl maketa/3d/rampa_sg90.scad
 ```
 
-STL dijelovi za 3D ispis: `maketa/3d/stl/`. Popis komponenti i nacrt: [PROJEKT/maketa](../PROJEKT/maketa).
+Gotovi STL dijelovi za 3D ispis su u `maketa/3d/stl/`. Popis komponenti i nacrt su u [PROJEKT/maketa](../PROJEKT/maketa).

@@ -1,7 +1,7 @@
 # Model podataka
 
 SQLite baza na edge računalu (`GARAGE_DB`, zadano `data/garage.db`), shema u
-[sessions/parking_sessions/store.py](../../SOFTWARE/baza/parking_sessions/store.py) (verzija 1).
+[SOFTWARE/baza/parking_sessions/store.py](../../SOFTWARE/baza/parking_sessions/store.py) (verzija 1).
 Sva vremena su tekst **UTC ISO 8601** (`2026-10-19T08:31:12Z`) – čitljivo u bilo kojem SQLite alatu
 (npr. [DB Browser for SQLite](https://sqlitebrowser.org)). Novac u **centima** (cijeli broj, bez grešaka zaokruživanja).
 

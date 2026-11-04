@@ -26,10 +26,10 @@ Svaki provedeni test = jedan redak (ne brisati stare – povijest pokazuje napre
 | 2026-10-21 | TC-T04 | SIM + ThingsBoard | ✅ | RPC `open` na EntranceGate → rampa `OPENING → OPEN`; `approveExit` → `MANUAL_APPROVAL`, sesija zatvorena (pozvano preko REST API-ja, gumb u UI-ju još kliknuti) | Claude |
 | 2026-10-21 | TC-T06 | SIM + ThingsBoard | ✅ | nakon restarta kontejnera: dashboardi postoje, 183 točke povijesti `entry` postoje | Claude |
 | 2026-10-22 | sve automatske | SIM (Python 3.13) | ✅ prolaz | nakon reorganizacije repozitorija po uputama nastavnika: `pytest` iz mape `SOFTWARE` **145 passed** (uklj. e2e); svih 7 3D dijelova se renderira | Claude |
-| | TC-S01, S02, S04–S06 | HW | ⬜ | | osoba 3 |
-| | TC-R01 – R13 | HW | ⬜ | | osoba 4 |
-| | TC-A01, A02 (stvarni skup) | HW | ⬜ | | osoba 5 |
-| | TC-O01, O02 (stvarni skup) | HW | ⬜ | | osoba 6 |
-| | TC-I01 – I16 na maketi | HW | ⬜ | | osoba 8 + svi |
-| | TC-T01, T05 | HW | ⬜ | | osoba 7 |
-| | TC-P01 | – | ⬜ | | osoba 8 |
+| | TC-S01, S02, S04–S06 | HW | ⬜ | | Toma |
+| | TC-R01 – R13 | HW | ⬜ | | Luka |
+| | TC-A01, A02 (stvarni skup) | HW | ⬜ | | Sven |
+| | TC-O01, O02 (stvarni skup) | HW | ⬜ | | Lukas |
+| | TC-I01 – I16 na maketi | HW | ⬜ | | Lovro + svi |
+| | TC-T01, T05 | HW | ⬜ | | Anja |
+| | TC-P01 | – | ⬜ | | Lovro |

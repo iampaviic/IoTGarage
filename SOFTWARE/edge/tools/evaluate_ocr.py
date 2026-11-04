@@ -46,17 +46,15 @@ def main(argv=None) -> int:
     levels = collections.Counter()
     exact = 0
     wrong_accepts = []
-    per_plate = collections.defaultdict(lambda: [0, 0])
     per_cond = collections.defaultdict(lambda: [0, 0])
     times = []
-    rows = []
+    misses = []
     for s in samples:
         img = cv2.imread(image_path(args.dataset, s))
         d = det.detect(img)
         if not d.found:
             levels["NO_DETECTION"] += 1
-            per_plate[s.plate][1] += 1
-            rows.append((s.file, s.plate, "-", 0.0, "NO_DETECTION"))
+            misses.append((s.file, s.plate, "-", 0.0, "NO_DETECTION"))
             continue
         r = reader.read(d.crop, d.variants)
         times.append(d.processing_ms + r.processing_ms)
@@ -65,12 +63,11 @@ def main(argv=None) -> int:
         levels[r.level] += 1
         if r.accepted and not ok:
             wrong_accepts.append((s.file, s.plate, r.plate, r.confidence))
-        per_plate[s.plate][0] += ok
-        per_plate[s.plate][1] += 1
         cond = "%s/%s/%s" % (s.lighting or "-", s.angle or "-", s.distance or "-")
         per_cond[cond][0] += ok
         per_cond[cond][1] += 1
-        rows.append((s.file, s.plate, r.plate or "-", r.confidence, r.level))
+        if not ok:
+            misses.append((s.file, s.plate, r.plate or "-", r.confidence, r.level))
 
     n = len(samples) or 1
     lines = [
@@ -85,16 +82,15 @@ def main(argv=None) -> int:
         "| pločica nije pronađena | %.1f %% |" % (100.0 * levels["NO_DETECTION"] / n),
         "| **POGREŠNO prihvaćeno** (mora biti 0) | **%d** |" % len(wrong_accepts),
         "| vrijeme detekcija + OCR (medijan) | %.0f ms |" % (statistics.median(times) if times else 0),
-        "", "## Po registraciji", "", "| registracija | točno | ukupno |", "|---|---|---|",
     ]
-    lines += ["| %s | %d | %d |" % (p, ok, tot) for p, (ok, tot) in sorted(per_plate.items())]
     lines += ["", "## Po uvjetima snimanja", "", "| uvjeti | točno | ukupno |", "|---|---|---|"]
     lines += ["| %s | %d | %d |" % (c, ok, tot) for c, (ok, tot) in sorted(per_cond.items())]
     if wrong_accepts:
         lines += ["", "## Pogrešno prihvaćeno", ""]
         lines += ["- `%s` stvarno %s, pročitano %s (conf %.2f)" % w for w in wrong_accepts]
-    lines += ["", "## Sva očitanja", "", "| slika | stvarno | pročitano | confidence | razina |", "|---|---|---|---|---|"]
-    lines += ["| %s | %s | %s | %.2f | %s |" % r for r in rows]
+    lines += ["", "## Promašaji (pogrešno pročitano ili pločica nije pronađena)", "",
+              "| slika | stvarno | pročitano | confidence | razina |", "|---|---|---|---|---|"]
+    lines += ["| %s | %s | %s | %.2f | %s |" % m for m in misses]
     os.makedirs(os.path.dirname(os.path.abspath(report)), exist_ok=True)
     with open(report, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")

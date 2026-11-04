@@ -14,7 +14,7 @@ Odluke označene **[PRIJEDLOG]** pripremljene su unaprijed – potvrdite ih ili 
 - **Posljedice:** ThingsBoard uređaj se zove `ParkingSpot-01` (mapira bridge).
 
 ### D-003 Ugovor kao JSON Schema + Python paket
-- **Odluka:** teme i sheme su kod (`contract/garage_contract`), dokument ih opisuje. Svaki test, simulator i servis provjerava poruke.
+- **Odluka:** teme i sheme su kod (`SOFTWARE/ugovor/garage_contract`), dokument ih opisuje. Svaki test, simulator i servis provjerava poruke.
 - **Posljedice:** promjena ugovora = promjena sheme + primjera u jednom PR-u (CI).
 
 ### D-004 [PRIJEDLOG] Raspberry Pi kao edge računalo, Jetson Nano kao rezerva
@@ -23,13 +23,13 @@ Odluke označene **[PRIJEDLOG]** pripremljene su unaprijed – potvrdite ih ili 
 - **Posljedice:** na Jetsonu koristiti Docker image ili `python3.8` iz apt-a.
 
 ### D-005 Dvije ESP32 pločice
-- **Odluka:** jedan ESP32 za 6 senzora + LED traku, drugi za 2 rampe (servo, IR, LED, tipke). Pinovi su u `config.h` oba projekta i u shemi spajanja osobe 2.
+- **Odluka:** jedan ESP32 za 6 senzora + LED traku, drugi za 2 rampe (servo, IR, LED, tipke). Pinovi su u `config.h` oba projekta i u shemi spajanja.
 
 ### D-006 HC-SR04 iznad mjesta, gleda prema dolje
 - **Kontekst:** vodoravno postavljen ultrazvučni senzor u maloj maketi hvata jeke od zidova.
 - **Odluka:** senzor na "mostu" ~11 cm iznad poda: prazno ≈ 14 cm, auto ≈ 6–7 cm. Prag s histerezom, medijan 5, potvrda 3x.
 
-### D-007 Kamera: varijanta A (dvije kamere) ili B (jedna premještana)
+### D-007 Kamera: dvije kamere ili jedna premještana
 - **Kontekst:** jedna kamera ne vidi obje prednje pločice, a ruka rampe može zakloniti pogled.
 - **Odluka:** kamera na mostu iznad trake, 200 mm iza crte rampe, 130 mm visoko, ruka rampe na 50–58 mm (provjereno kalkulatorom). Za početak jedna kamera koja se premješta između dva fiksna nosača; druga kamera (~20 €) ako budžet dopušta.
 - **Posljedice:** `edge.yaml` → `gates.*.camera`; vidi `PROJEKT/maketa/nacrt-makete.md`.
@@ -39,7 +39,7 @@ Odluke označene **[PRIJEDLOG]** pripremljene su unaprijed – potvrdite ih ili 
 - **Posljedice:** pločice tiskane drugim fontom smanjit će pouzdanost – ne mijenjati font bez ponovnog mjerenja.
 
 ### D-009 Pravila odluke i naplate
-- Pragovi 0.85 / 0.60, 3 pokušaja. Naplata: prvih 15 min besplatno, 1,50 € po započetom satu, najviše 15 € po danu. Demo profil: 1 minuta = 1 sat (da se u demonstraciji vidi cijena).
+- Pragovi 0.85 / 0.60 i 3 pokušaja ([komunikacijski ugovor](../sustav/komunikacijski-ugovor.md#pravila-odlučivanja)). Naplata i demo profil (1 minuta = 1 sat): [model-podataka.md](../sustav/model-podataka.md#pravilo-naplate).
 
 ### D-010 SQLite za sesije
 - **Odluka:** SQLite datoteka na edge računalu (bez servera), WAL način; ThingsBoard dobiva samo događaje.
