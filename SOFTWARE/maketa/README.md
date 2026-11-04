@@ -18,7 +18,7 @@ Maketu moraš izraditi ti – ali sve što se može nacrtati, izračunati i ispr
 | [elektronika/wireviz/](elektronika/wireviz) | dijagrami ožičenja oba ESP32 čvora s oznakama kabela (SVG) |
 | [elektronika/proracun-napajanja.md](../../PROJEKT/maketa/proracun-napajanja.md) | proračun struje → adapter 5 V / 4 A |
 | [elektronika/oznake-kabela.md](../../PROJEKT/maketa/oznake-kabela.md) | sustav oznaka i boja kabela |
-| [popis-komponenti.md](../../PROJEKT/maketa/popis-komponenti.md) | popis za kupnju s okvirnim cijenama (~230 €), CSV verzija |
+| [popis-komponenti.md](../../PROJEKT/maketa/popis-komponenti.md) | popis za kupnju, CSV verzija |
 | [foto-dnevnik/](../../PROJEKT/maketa/foto-dnevnik) | pravila i tablica za fotografije faza izrade |
 
 Pločice za autiće generira osoba 5: `python SOFTWARE/alpr/tools/generate_plates.py` → `plates_A4.pdf`

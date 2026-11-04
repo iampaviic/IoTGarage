@@ -137,7 +137,7 @@ laptop (ThingsBoard, razvoj, dashboard na demonstraciji). Sve je spojeno na **is
 | baza i naplata | [model-podataka.md](../sustav/model-podataka.md), [SOFTWARE/baza](../../SOFTWARE/baza) |
 | odluke i rizici | [odluke.md](odluke.md), [rizici.md](rizici.md) |
 | redoslijed integracije | [plan-integracije.md](plan-integracije.md) (10 koraka) |
-| što kupiti | [popis-komponenti.md](../maketa/popis-komponenti.md) (~230 €) |
+| što kupiti | [popis-komponenti.md](../maketa/popis-komponenti.md) |
 | kako spojiti žice | [shema-spajanja.md](../maketa/shema-spajanja.md), dijagrami u [SOFTWARE/maketa/elektronika](../../SOFTWARE/maketa/elektronika) |
 | napajanje | [proracun-napajanja.md](../maketa/proracun-napajanja.md) (adapter 5 V / 4 A) |
 | raspored makete i položaj kamere | [nacrt-makete.md](../maketa/nacrt-makete.md), tlocrt 1:1 u [SOFTWARE/maketa/nacrt](../../SOFTWARE/maketa/nacrt) |
