@@ -81,8 +81,13 @@ def write_file(root, path, data, mode="100644"):
     os.makedirs(os.path.dirname(full), exist_ok=True)
     with open(full, "wb") as f:
         f.write(data)
-    if mode == "100755" and os.name == "posix":
-        os.chmod(full, 0o755)
+    set_mode(full, mode)
+
+
+def set_mode(full, mode):
+    """Git tracks only the executable bit: 100755 or 100644."""
+    if os.name == "posix":
+        os.chmod(full, 0o755 if mode == "100755" else 0o644)
 
 
 def remove_file(root, path):
@@ -331,13 +336,19 @@ def main():
         if not w or w > week or path in UPRAVLJANE:
             continue
         prev = state["copied"].get(path)
+        modes = state.setdefault("modes", {})
         if prev == blob:
             if read_file(gitlab, path) is None:
                 deleted_by_team.append(path)
+            elif modes.setdefault(path, mode) != mode:  # only the executable bit changed in the source
+                set_mode(os.path.join(gitlab, *path.split("/")), mode)
+                updated.append((w, path))
+                modes[path] = mode
             continue
         base = read_blob(src, prev) if prev else None
         if apply(path, read_blob(src, blob), base, mode, w):
             state["copied"][path] = blob
+            modes[path] = mode
 
     # files that were removed from the source after they had been copied
     in_source = {p for p, _, _ in files}
@@ -351,6 +362,7 @@ def main():
         elif current is not None:
             kept.append(path)
         del state["copied"][path]
+        state.get("modes", {}).pop(path, None)
 
     # 2. rebuild the overview files for this week
     def exists(rel):
