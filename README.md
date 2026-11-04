@@ -1,32 +1,55 @@
 # IoT Garaža
 
-Pametna garaža na maketi: kamera čita registraciju, **edge računalo lokalno odlučuje** o ulasku, rampa se
+- **Projekt:** IoT Garaža, ak. god. 2026/27
+- **Puni naziv projekta:** Pametna parkirna garaža s automatskim prepoznavanjem registarskih oznaka (ALPR),
+  lokalnim (edge) upravljanjem ulaskom i izlaskom te digitalnim blizancem u platformi ThingsBoard
+- **Trajanje:** 19.10.2026. – 29.1.2027. (rok za predaju)
+- **Datum prezentacije:** _upisati_
+
+Pametna garaža na maketi: kamera čita registraciju, edge računalo lokalno odlučuje o ulasku, rampa se
 otvara, senzori prate zauzetost mjesta, parkirna sesija se naplaćuje pri izlasku, a sve se prikazuje u
-ThingsBoardu.
+ThingsBoardu i mobilnoj aplikaciji.
 
-![dashboard](osoba-7-thingsboard/slike/dashboard-nadzor.jpg)
+## Sadržaj repozitorija
 
-## Tim i folderi
+Struktura slijedi [upute nastavnika](OSTALO/upute-nastavnika-gitlab.md); svaka mapa ima `README.md` s opisom.
 
-Svaka uloga ima svoj folder s **README-om: tko je zadužen, što je već napravljeno, kako se koristi i što još treba napraviti**.
+| mapa | sadržaj |
+|---|---|
+| [PROJEKT](PROJEKT) | [prijedlog i plan projekta](PROJEKT/plan-projekta) (DOCX + PDF), [završna dokumentacija](PROJEKT/dokumentacija), [arhitektura i MQTT ugovor](PROJEKT/sustav), [plan rada, rizici, odluke](PROJEKT/upravljanje), [nacrt makete](PROJEKT/maketa), [testiranje](PROJEKT/testiranje) |
+| [SOFTWARE](SOFTWARE) | sav kod – firmware, edge servis, baza, ThingsBoard, simulacija, 3D dijelovi; [instalacija](SOFTWARE/INSTALL.md) |
+| [PREZENTACIJA](PREZENTACIJA) | [demo scenarij](PREZENTACIJA/demo-scenarij.md), završna prezentacija |
+| [OSTALO](OSTALO) | [literatura i poveznice](OSTALO/literatura.md), upute nastavnika |
 
-| | uloga | tko | folder | pripremljeno |
-|---|---|---|---|---|
-| 1 | voditelj, arhitektura, integracija | Patrik | [osoba-1-voditelj](osoba-1-voditelj) | arhitektura, **komunikacijski ugovor kao kod** (JSON sheme + Python paket), zahtjevi, rizici, odluke, plan rada, demo scenarij, **simulacija cijelog sustava** + e2e testovi |
-| 2 | maketa, napajanje, ožičenje | Patrik, Lovro Gale | [osoba-2-maketa](osoba-2-maketa) | tlocrt 1:1, kalkulator položaja kamere, 7 parametarskih 3D dijelova (STL), dijagrami ožičenja, popis komponenti, proračun napajanja |
-| 3 | senzori mjesta, firmware | Toma Burgund (+ Lovro Gale) | [osoba-3-senzori](osoba-3-senzori) | ESP32 firmware (6× HC-SR04, filtar, MQTT, reconnect, LWT), unit testovi, simulator, alati za kalibraciju i test 20× |
-| 4 | rampe, aktuatori, lokalna kontrola pristupa | Luka Oslić | [osoba-4-rampe](osoba-4-rampe) | ESP32 firmware (2 rampe, stroj stanja, sigurnost, tipke), unit testovi, simulator, sigurnosni testovi |
-| 5 | ALPR – detekcija pločice | Sven Matić | [osoba-5-alpr](osoba-5-alpr) | OpenCV detektor, ispravak perspektive, **pločice za ispis**, sintetski skup, alati za snimanje/označavanje/mjerenje |
-| 6 | OCR, edge servis | Lukas Davorija (+ Luka Oslić za access control) | [osoba-6-ocr-edge](osoba-6-ocr-edge) | dvostruki OCR s glasanjem, HR format, ALPR servis, **access control** (odluke, sesije, rampe, alarmi), Docker za Raspberry Pi/Jetson |
-| 7 | ThingsBoard | Anja, Leo Hreljanović (analitika) | [osoba-7-thingsboard](osoba-7-thingsboard) | docker-compose, provisioning jednom naredbom, bridge s međuspremnikom, **2 dashboarda**, 7 pravila alarma, RPC gumbi |
-| 8 | baza, testovi, GitHub | Lovro Gale | [osoba-8-baza-testovi](osoba-8-baza-testovi) | SQLite sesije + naplata + CLI, testni plan (~60 slučajeva), testni zapisnik, kostur dokumentacije, korisničke upute |
+![dashboard](PROJEKT/slike/dashboard-nadzor.jpg)
 
-Leo Hreljanović uz to izrađuje **mobilnu aplikaciju za analitiku garaže** (zauzetost, ulasci po satu, prosječno trajanje, povijest sesija), koja podatke čita iz ThingsBoarda preko REST API-ja.
+## Tim
 
-**Što je provjereno:** 143 automatska testa prolaze; cijeli sustav radi u simulaciji (0 poruka koje krše
-ugovor); oba firmwarea se prevode za ESP32; ThingsBoard dashboardi, alarmi, RPC, međuspremnik pri ispadu i
-restart provjereni na ThingsBoard CE 4.2.1. **Što još nije:** ništa nije isprobano na stvarnom hardveru, a
-ALPR je mjeren samo na sintetskim slikama – to je posao za tim (vidi [plan rada](osoba-1-voditelj/plan-rada.md)).
+Svaki dio sustava ima svoju mapu s README-om: tko je zadužen, što je već napravljeno, kako se koristi i što još
+treba napraviti.
+
+| uloga | tko | mapa |
+|---|---|---|
+| voditelj, arhitektura, integracija | Patrik | [PROJEKT/upravljanje](PROJEKT/upravljanje) |
+| maketa, napajanje, ožičenje | Patrik, Lovro Gale | [SOFTWARE/maketa](SOFTWARE/maketa) |
+| senzori mjesta, firmware | Toma Burgund (+ Lovro Gale) | [SOFTWARE/senzori](SOFTWARE/senzori) |
+| rampe, aktuatori, lokalna kontrola pristupa | Luka Oslić | [SOFTWARE/rampe](SOFTWARE/rampe) |
+| ALPR – detekcija pločice | Sven Matić | [SOFTWARE/alpr](SOFTWARE/alpr) |
+| OCR, edge servis | Lukas Davorija (+ Luka Oslić za access control) | [SOFTWARE/edge](SOFTWARE/edge) |
+| ThingsBoard | Anja, Leo Hreljanović (analitika) | [SOFTWARE/thingsboard](SOFTWARE/thingsboard) |
+| baza, testovi, GitHub | Lovro Gale | [SOFTWARE/baza](SOFTWARE/baza) |
+
+<!-- gitlab:izostavi -->
+Za voditelja: [vodič za voditelja](PROJEKT/upravljanje/vodic-za-voditelja.md) sa stanjem projekta, pojmovima i
+postavljanjem sustava s hardverom.
+
+<!-- /gitlab -->
+Leo Hreljanović uz to izrađuje [mobilnu aplikaciju za analitiku garaže](SOFTWARE/mobilna-aplikacija) (zauzetost, ulasci po satu, prosječno trajanje, povijest sesija), koja podatke čita iz ThingsBoarda preko REST API-ja.
+
+<!-- gitlab:od-tjedna=12 -->
+Rezultati svih testova (automatskih, u simulaciji i na maketi) vode se u
+[testnom zapisniku](PROJEKT/testiranje/testni-zapisnik.md).
+<!-- /gitlab -->
 
 ## Arhitektura ukratko
 
@@ -46,45 +69,53 @@ flowchart LR
   end
 ```
 
-Detalji: [arhitektura](osoba-1-voditelj/arhitektura.md) · [MQTT teme i poruke](osoba-1-voditelj/komunikacijski-ugovor.md) ·
-[odluke](osoba-1-voditelj/odluke.md) · [demo scenarij](osoba-1-voditelj/demo-scenarij.md)
+Detalji: [arhitektura](PROJEKT/sustav/arhitektura.md) · [MQTT teme i poruke](PROJEKT/sustav/komunikacijski-ugovor.md) ·
+[odluke](PROJEKT/upravljanje/odluke.md) · [demo scenarij](PREZENTACIJA/demo-scenarij.md)
 
+<!-- gitlab:do-tjedna=7
+## Brzi start
+
+```bash
+cd SOFTWARE
+python -m venv .venv && source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements-dev.txt
+pytest
+```
+
+Upute za pojedine dijelove sustava su u `README.md` datotekama mapa u [SOFTWARE](SOFTWARE).
+-->
+<!-- gitlab:od-tjedna=8 -->
 ## Brzi start – cijeli sustav bez hardvera (5 minuta)
 
 Treba: Python ≥ 3.8, [Tesseract OCR](https://tesseract-ocr.github.io/tessdoc/Installation.html) i
 [Mosquitto](https://mosquitto.org/download/) (Linux: `sudo apt install tesseract-ocr mosquitto`).
 
 ```bash
-git clone <repo> && cd IoTGarage
+git clone <repo> && cd IoTGarage/SOFTWARE              # sve naredbe se pokreću iz mape SOFTWARE
 python -m venv .venv && source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements-dev.txt
 
-python osoba-1-voditelj/integracija/simulacija.py --broker     # odigra demo: ulaz, parkiranje, nečitljiva pločica, izlaz s cijenom
-pytest                                                          # svi testovi
+python integracija/simulacija.py --broker     # odigra demo: ulaz, parkiranje, nečitljiva pločica, izlaz s cijenom
+pytest                                        # svi testovi
 ```
 
-S ThingsBoardom (Docker):
-
-```bash
-cd osoba-7-thingsboard && docker compose up -d && python provision/provision.py && cd ..
-python osoba-1-voditelj/integracija/simulacija.py --broker --tb --interactive
-# http://localhost:8080  (tenant@thingsboard.org / tenant) -> Dashboards -> "Garaža - nadzor"
-```
-
-Korisni alati:
-
-```bash
-python -m garage_contract.monitor                                  # sve MQTT poruke, crveno = krši ugovor
-python -m edge_service read slika.jpg                              # pročitaj registraciju sa slike
-python osoba-5-alpr/tools/generate_plates.py --out tablice         # pločice za ispis
-parking-sessions --db data/garage.db list --active                 # tko je u garaži
-```
+<!-- /gitlab -->
+<!-- gitlab:od-tjedna=9 -->
+ThingsBoard, firmware, edge računalo i varijable konfiguracije: [SOFTWARE/INSTALL.md](SOFTWARE/INSTALL.md).
+<!-- /gitlab -->
 
 ## Struktura i pravila
 
-- Python paketi se instaliraju iz svojih foldera (`requirements-dev.txt`), firmware je PlatformIO.
+- Python paketi se instaliraju iz svojih mapa (`SOFTWARE/requirements-dev.txt`), firmware je PlatformIO.
 - Sva vremena: **UTC ISO 8601**. Sve registracije: **izmišljene**.
-- Promjena MQTT poruka samo kroz osobu 1 (sheme u `osoba-1-voditelj/contract`) – CI provjerava sve primjere.
-- Svatko radi u svojoj grani i otvara Pull Request; **CI** (`.github/workflows/ci.yml`) mora biti zelen:
+- MQTT poruke mijenja samo voditelj (sheme u `SOFTWARE/ugovor`), a testovi provjeravaju sve primjere.
+- Tuđa mapa mijenja se samo uz dogovor s njezinim vlasnikom.
+<!-- gitlab:izostavi -->
+- Svatko radi u svojoj grani i otvara Pull Request, koji pregledava barem jedna osoba. CI (`.github/workflows/ci.yml`) mora biti zelen:
   Python testovi (3.8 i 3.12) + e2e simulacija, prevođenje i unit testovi oba firmwarea, renderiranje 3D dijelova.
+- Službeni GitLab repozitorij puni se tjedan po tjedan: [.gitlab-tjedni](.gitlab-tjedni/README.md).
+<!-- /gitlab -->
+<!-- gitlab:do-tjedna=15
+- Prije svakog commita: `pytest` u mapi `SOFTWARE` mora proći.
+-->
 - Ne komitati: `secrets.h`, `edge.yaml`, baze `*.db`, stvarne fotografije.

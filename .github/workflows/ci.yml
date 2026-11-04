@@ -8,22 +8,29 @@ on:
 jobs:
   python:
     name: Python tests (py${{ matrix.python }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.8", "3.12"]   # 3.8 = oldest Python we support on the Jetson Nano
+        include:
+          - python: "3.8"          # oldest Python we support on the Jetson Nano
+            os: ubuntu-24.04       # setup-python has no 3.8 build for newer Ubuntu
+          - python: "3.12"
+            os: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
           cache: pip
+          cache-dependency-path: SOFTWARE/requirements-dev.txt
       - name: System packages
         run: sudo apt-get update && sudo apt-get install -y tesseract-ocr mosquitto
       - name: Install
+        working-directory: SOFTWARE
         run: pip install -r requirements-dev.txt
       - name: Tests (unit + end-to-end simulation)
+        working-directory: SOFTWARE
         run: pytest -q
 
   firmware:
@@ -40,13 +47,13 @@ jobs:
           key: pio-${{ hashFiles('**/platformio.ini') }}
       - run: pip install platformio
       - name: Spot sensors - unit tests
-        run: pio test -e native -d osoba-3-senzori/firmware
+        run: pio test -e native -d SOFTWARE/senzori/firmware
       - name: Spot sensors - build
-        run: pio run -e esp32dev -d osoba-3-senzori/firmware
+        run: pio run -e esp32dev -d SOFTWARE/senzori/firmware
       - name: Gates - unit tests
-        run: pio test -e native -d osoba-4-rampe/firmware
+        run: pio test -e native -d SOFTWARE/rampe/firmware
       - name: Gates - build
-        run: pio run -e esp32dev -d osoba-4-rampe/firmware
+        run: pio run -e esp32dev -d SOFTWARE/rampe/firmware
 
   cad:
     name: 3D parts compile (OpenSCAD)
@@ -56,5 +63,9 @@ jobs:
       - run: sudo apt-get update && sudo apt-get install -y openscad
       - name: Render every part
         run: |
-          cd osoba-2-maketa/3d
+          cd SOFTWARE/maketa/3d
           for f in *.scad; do openscad -o "/tmp/${f%.scad}.stl" "$f"; done
+      - name: Compile the whole-model assembly
+        run: |
+          openscad -o /tmp/sklop.csg SOFTWARE/maketa/3d/sklop/sklop_makete.scad
+          openscad -o /tmp/komponente.csg SOFTWARE/maketa/3d/sklop/komponente.scad

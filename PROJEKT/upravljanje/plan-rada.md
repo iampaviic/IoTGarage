@@ -1,0 +1,80 @@
+# Plan rada po tjednima
+
+## Vremenski okvir
+
+Projekt traje od 19.10.2026. do roka za predaju 29.1.2027. (15 tjedana, T1–T15).
+
+| faza | tjedni | datumi |
+|---|---|---|
+| 1 – definicija i dokaz izvedivosti | T1–T2 | 19.10. – 1.11.2026. |
+| 2 – samostalni podsustavi | T3–T7 | 2.11. – 6.12.2026. |
+| međuispiti – **na projektu se ne radi** | T6–T7 | 23.11. – 4.12.2026. |
+| 3 – integracija | T8–T9 | 7.12. – 20.12.2026. |
+| blagdanska stanka (rezerva) | T10–T11 | 21.12.2026. – 3.1.2027. |
+| 4 – stabilizacija i testiranje | T12–T13 | 4.1. – 17.1.2027. |
+| 5 – dokumentacija, prezentacija i predaja | T14–T15 | 18.1. – 29.1.2027. |
+
+Kontrolne točke (dogovor tima, plan projekta v1.3):
+
+| | kontrolna točka | planirano | ostvareno |
+|---|---|---|---|
+| KT1 | arhitektura, plan i repozitorij | 28.10.2026. | 27.10.2026. ✅ |
+| KT2 | dokaz izvedivosti (1 senzor, 1 servo, ThingsBoard, ALPR na stvarnoj fotografiji), nacrt makete | 10.11.2026. | |
+| KT3 | predaja plana projekta | 20.11.2026. | |
+| KT4 | baza makete izrađena | 23.11.2026. | |
+| KT5 | podsustavi rade na hardveru (senzori 20/20, sigurnosni testovi rampi, detekcija ≥ 90 %) | 23.12.2026. | |
+| KT6 | integracija s hardverom završena; MVP mobilne aplikacije | 11.1.2027. | |
+| KT7 | svi testni scenariji prolaze, demo video snimljen | 17.1.2027. | |
+| KT8 | završna dokumentacija i prezentacija; projekt predan na GitLab | 29.1.2027. | |
+
+## Faza 1 – definicija i dokaz izvedivosti (T1–T2, 19.10. – 1.11.2026.)
+
+Gotovo: arhitektura, ugovor, zahtjevi, rizici, odluke, plan integracije i demo scenarij; sav softver s testovima i
+simulatorima; tlocrt, kalkulator kamere, 3D dijelovi, sheme spajanja i popis komponenti; testni plan i kostur
+dokumentacije. Otvoreno do KT2 (10.11.):
+
+| tko | zadatak |
+|---|---|
+| Patrik | ⬜ potvrditi odluke D-004 i D-007 s timom · ⬜ otvoriti GitHub Projects ploču iz ovog popisa · ⬜ dogovoriti termin tjednog sastanka · ⬜ odabrati mjerilo autića i materijal · ⬜ naručiti ili prikupiti komponente · ⬜ provjeriti minimalni fokus kamere |
+| Toma | ⬜ spojiti jedan HC-SR04 (s djeliteljem!) i vidjeti `CAL` mjerenja |
+| Luka | ⬜ pomaknuti jedan SG90 s ESP32 (`open e` u serijskom monitoru) |
+| Sven | ⬜ isprintati pločice · ⬜ prvih 10 fotografija makete i autića (`capture_dataset.py`) |
+| Lukas | ⬜ `python -m edge_service read` na prvim fotografijama |
+| Anja | ⬜ pokrenuti ThingsBoard na laptopu, `provision.py`, promijeniti lozinku |
+| Lovro | ⬜ pročitati testni plan, dogovoriti pravilo naplate s timom |
+
+## Faza 2 – samostalni podsustavi (T3–T7, 2.11. – 6.12.2026.)
+
+Od 23.11. do 4.12.2026. su međuispiti i na projektu se ne radi. Nakon njih (T8–T9, 7.12. – 20.12.) slijede
+napajanje i ožičenje makete, nadzorni i analitički dashboard, tehnologija i dizajn mobilne aplikacije, kalibracija
+senzora, sigurnosni testovi rampi te mjerenja detekcije i OCR-a, sve do KT5 (23.12.).
+
+| tko | zadatak |
+|---|---|
+| Patrik, Lovro | ⬜ izrada baze i mjesta prema `nacrt/tlocrt.svg` · ⬜ most za senzore iznad mjesta · ⬜ 3D ispis nosača i rampi · ⬜ ožičenje prema `elektronika/wireviz/*.svg`, oznake kabela · ⬜ foto-dnevnik |
+| Toma | ⬜ svih 6 senzora na maketi · ⬜ `kalibracija.py` → pragovi u `config.h` i `tablica-pragova.md` · ⬜ MQTT s pravim brokerom · ⬜ LED traka |
+| Luka | ⬜ montaža obje rampe, kalibracija kutova (`closedAngle/openAngle`) · ⬜ IR senzori na crti rampe · ⬜ sigurnosni testovi (`sigurnosni-testovi-rampi.md`) |
+| Sven | ⬜ skup ≥ 100 stvarnih fotografija (različite pločice, svjetlo, kut, udaljenost) · ⬜ `label_tool.py` · ⬜ `evaluate_detection.py` ≥ 90 % · ⬜ `ogranicenja-alpr.md` |
+| Lukas | ⬜ `evaluate_ocr.py` na stvarnom skupu, 0 pogrešno prihvaćenih · ⬜ podesiti težine/pragove ako treba · ⬜ edge na Raspberry Pi (Docker ili nativno) |
+| Anja | ⬜ dashboardi s pravim podacima, prilagodba izgleda · ⬜ obavijesti na alarm (Notification center) · ⬜ izvoz dashboarda u repo |
+| Lovro | ⬜ provesti testove TC-B*, TC-I* u simulaciji i zapisati u `testni-zapisnik.md` · ⬜ prikupljati materijale za dokumentaciju |
+
+## Faza 3 – integracija (T8–T9, 7.12. – 20.12.2026.)
+
+⬜ Koraci H0–H11 iz [plan-integracije.md](plan-integracije.md) s hardverom, po redu; svaki prolaz zapisuje Lovro.
+
+## Blagdanska stanka (T10–T11, 21.12.2026. – 3.1.2027.)
+
+Rezerva za zaostatke iz faza 2 i 3; nema planiranih zadataka.
+
+## Faza 4 – stabilizacija i testiranje (T12–T13, 4.1. – 17.1.2027.)
+
+⬜ Svi scenariji iz testnog plana (prazna/puna garaža, nepoznata/nečitljiva pločica, prekid Wi-Fi, prekid
+ThingsBoarda, restart ESP32 i edge računala, vozilo predugo ispod rampe, ulazak bez izlaska, izlazak bez sesije)
+· ⬜ rezervni video · ⬜ zamrzavanje značajki (samo popravci).
+
+## Faza 5 – dokumentacija, prezentacija i predaja (T14–T15, 18.1. – 29.1.2027.)
+
+⬜ dokumentacija iz `PROJEKT/dokumentacija` · ⬜ slajdovi (arhitektura, rezultati ALPR i senzora,
+dashboard, sesija iz baze, ograničenja) · ⬜ generalna proba demo scenarija ×2 · ⬜ arhiviranje na GitLabu
+prema [uputama nastavnika](../../OSTALO/upute-nastavnika-gitlab.md), najkasnije 29.1.2027.
