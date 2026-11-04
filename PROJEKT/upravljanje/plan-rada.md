@@ -45,8 +45,9 @@ Kontrolne točke (dogovor tima, plan projekta v1.3):
 
 ## Faza 2 – samostalni podsustavi (T3–T7, 2.11. – 6.12.2026.)
 
-Od 23.11. do 4.12.2026. su međuispiti i na projektu se ne radi. Kalibracija senzora, sigurnosni testovi rampi i
-mjerenja detekcije i OCR-a nastavljaju se nakon međuispita (T8–T9) i završavaju do KT5 (23.12.).
+Od 23.11. do 4.12.2026. su međuispiti i na projektu se ne radi. Nakon međuispita (T8–T9, 7.12. – 20.12.) slijede
+napajanje i ožičenje makete, nadzorni i analitički dashboard, kalibracija senzora, sigurnosni testovi rampi te
+mjerenja detekcije i OCR-a, sve do KT5 (23.12.).
 
 | osoba | zadatak |
 |---|---|

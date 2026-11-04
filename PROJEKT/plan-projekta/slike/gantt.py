@@ -30,8 +30,8 @@ groups = [
         ("Objedinjavanje dokumentacije", "7.12", "29.1")]),
     ("2 Fizička maketa – Patrik, Lovro", [
         ("Nacrt, nabava komponenti, fokus kamere", "19.10", "8.11"),
-        ("Baza, mjesta, mostovi, 3D ispis, montaža", "2.11", "29.11"),
-        ("Napajanje i ožičenje", "16.11", "6.12")]),
+        ("Baza, mjesta, 3D ispis, montaža", "2.11", "29.11"),
+        ("Napajanje i ožičenje", "7.12", "20.12")]),
     ("3 Senzori mjesta – Toma, Lovro", [
         ("Jedan senzor s djeliteljem, mjerenja", "2.11", "10.11"),
         ("6 senzora na mostu, LED traka, MQTT", "11.11", "22.11"),
@@ -51,8 +51,8 @@ groups = [
         ("Tablica točnosti OCR-a, podešavanje", "7.12", "18.12")]),
     ("7 ThingsBoard – Anja, Leo", [
         ("Instalacija, entiteti, bridge", "2.11", "15.11"),
-        ("Nadzorni dashboard, alarmi, obavijesti", "9.11", "6.12"),
-        ("Analitički dashboard i API za aplikaciju (Leo)", "16.11", "6.12")]),
+        ("Nadzorni dashboard, alarmi, obavijesti", "7.12", "20.12"),
+        ("Analitički dashboard i API za aplikaciju (Leo)", "7.12", "20.12")]),
     ("8 Baza, testovi, GitHub – Lovro", [
         ("Model sesija i pravilo naplate", "2.11", "8.11"),
         ("Testni plan, izvođenje i zapisnik testova", "9.11", "17.1"),
