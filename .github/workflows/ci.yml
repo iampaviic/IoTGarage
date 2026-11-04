@@ -8,11 +8,15 @@ on:
 jobs:
   python:
     name: Python tests (py${{ matrix.python }})
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.8", "3.12"]   # 3.8 = oldest Python we support on the Jetson Nano
+        include:
+          - python: "3.8"          # oldest Python we support on the Jetson Nano
+            os: ubuntu-24.04       # setup-python has no 3.8 build for newer Ubuntu
+          - python: "3.12"
+            os: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
