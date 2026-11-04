@@ -177,7 +177,7 @@ ThingsBoard i ALPR na stvarnoj fotografiji, plus nacrt makete.
 | **Sven Matić** | detekcija pločice | detektor, generator pločica, alati za snimanje i mjerenje | isprintati pločice, snimiti prvih 10 fotografija autića |
 | **Lukas Davorija** | OCR, edge računalo | OCR, ALPR servis, kontrola pristupa, Docker za Pi | `python -m edge_service read` na prvim fotografijama; postaviti Raspberry Pi |
 | **Anja** | ThingsBoard | docker-compose, provisioning, bridge, dashboardi, alarmi | pokrenuti ThingsBoard na laptopu koji ide na demonstraciju, `provision.py` |
-| **Leo Hreljanović** | mobilna aplikacija, analitika | upute u [SOFTWARE/mobilna-aplikacija](../../SOFTWARE/mobilna-aplikacija), analitički dashboard | odabrati tehnologiju (npr. Flutter), dohvatiti prve podatke preko REST API-ja |
+| **Leo Hreljanović** | mobilna aplikacija, analitika | upute u [SOFTWARE/mobilna-aplikacija](../../SOFTWARE/mobilna-aplikacija), analitički dashboard | nakon međuispita (od 7.12.): odabrati tehnologiju (npr. Flutter), dohvatiti prve podatke preko REST API-ja |
 
 Zamjene ako netko ispadne (rizik R-11): 3↔4, 5↔6, 7↔8. Svaki podsustav ima simulator, pa nitko ne čeka tuđi hardver.
 

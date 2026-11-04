@@ -62,7 +62,7 @@ groups = [
         ("Stabilizacija, testni scenariji, rezervni video", "4.1", "17.1"),
         ("Prezentacija, generalna proba, predaja", "18.1", "29.1")]),
     ("10 Mobilna aplikacija – Leo", [
-        ("Tehnologija, dizajn, dohvat podataka", "9.11", "6.12"),
+        ("Tehnologija, dizajn, dohvat podataka", "7.12", "20.12"),
         ("Ekrani analitike – MVP", "7.12", "20.12"),
         ("Testiranje i dorada", "4.1", "17.1")]),
 ]

@@ -11,7 +11,7 @@ BLUE, FILL, SURF = "#2a78d6", "#eaf2fc", "#ffffff"
 packages = [
     ("1 Upravljanje projektom", "Patrik", ["Plan, arhitektura, zahtjevi", "Komunikacijski ugovor (MQTT)",
                                              "Tjedni sastanci, rizici, odluke", "Objedinjavanje dokumentacije"]),
-    ("2 Fizička maketa", "Patrik + Lovro", ["Nacrt i nabava komponenti", "Baza, mjesta, mostovi",
+    ("2 Fizička maketa", "Patrik + Lovro", ["Nacrt i nabava komponenti", "Baza, mjesta",
                                              "3D ispis i montaža", "Napajanje i ožičenje"]),
     ("3 Senzori mjesta", "Toma + Lovro", ["Firmware ESP32", "Filtriranje i pragovi",
                                           "MQTT, ponovno spajanje, heartbeat", "Test 20× po mjestu"]),
