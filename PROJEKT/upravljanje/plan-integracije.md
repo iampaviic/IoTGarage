@@ -31,9 +31,9 @@ python SOFTWARE/integracija/simulacija.py --broker        # demo scenarij, ispis
 pytest SOFTWARE/integracija/tests -v                      # end-to-end testovi
 ```
 
-## Tjedni integracijski sastanak (30–45 min)
+## Tjedni integracijski sastanak
 
-1. Status po osobi (2 min svaki): što radi, što blokira – predložak u [sastanci/predlozak.md](sastanci/predlozak.md).
+1. Status po osobi: što radi, što blokira – predložak u [sastanci/predlozak.md](sastanci/predlozak.md).
 2. Demo: zadnji korak integracije uživo (simulator ili hardver).
 3. Promjene ugovora / odluke → [odluke.md](odluke.md).
 4. Rizici → [rizici.md](rizici.md).
@@ -44,4 +44,4 @@ pytest SOFTWARE/integracija/tests -v                      # end-to-end testovi
 - `main` je uvijek ispravan: CI (testovi, firmware build, 3D modeli) mora biti zelen.
 - Svatko radi u svojoj grani `osobaN/kratki-opis` i otvara Pull Request; pregledava barem jedna osoba.
 - Promjena tuđeg foldera samo uz dogovor s vlasnikom; promjena ugovora samo preko osobe 1.
-- Ne komitati: `secrets.h`, `edge.yaml`, baze (`*.db`), fotografije stvarnih vozila.
+- Ne komitati: `secrets.h`, `edge.yaml`, baze (`*.db`).
