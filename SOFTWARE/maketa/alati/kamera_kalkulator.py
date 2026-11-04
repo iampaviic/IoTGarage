@@ -1,4 +1,4 @@
-"""Camera placement calculator for the model (osoba 2 + osoba 5).
+"""Camera placement calculator for the model.
 
 Answers, before anything is glued:
   * does the line of sight pass the barrier arm?           (arm must NOT cover the plate)

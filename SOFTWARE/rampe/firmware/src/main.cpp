@@ -1,4 +1,4 @@
-// Entrance + exit barrier node (ESP32, 2x SG90 servo, 2x IR sensor) - osoba 4
+// Entrance + exit barrier node (ESP32, 2x SG90 servo, 2x IR sensor), owner: Luka
 //
 // Subscribes  garage/gate/<entrance|exit>/command   {"requestId","command":"OPEN|CLOSE|RESET",...}
 // Publishes   garage/gate/<gate>/state (retained)  on every change, as command ack, every 30 s

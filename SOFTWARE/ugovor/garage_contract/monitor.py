@@ -6,7 +6,7 @@
         '{"requestId":"t1","command":"OPEN","reason":"TEST"}'
 
 The most useful tool during integration: if a message is red, the sender
-violates the contract (or the contract must be changed by osoba 1).
+violates the contract (or the contract must be changed by the project lead).
 """
 
 from __future__ import annotations

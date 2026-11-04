@@ -1,6 +1,6 @@
 """Parking sessions: the business record of every vehicle entry and exit.
 
-Owner: osoba 8. Used by the edge access-control service (osoba 6).
+Owner: Lovro. Used by the edge access-control service (edge/edge_service).
 Only depends on the Python standard library (sqlite3).
 """
 

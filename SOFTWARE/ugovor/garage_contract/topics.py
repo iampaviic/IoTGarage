@@ -16,23 +16,23 @@ GATE_TO_PAYLOAD = {"entrance": "ENTRANCE", "exit": "EXIT"}
 GATE_TO_DIRECTION = {"entrance": "ENTRY", "exit": "EXIT"}
 DIRECTION_TO_GATE = {"ENTRY": "entrance", "EXIT": "exit"}
 
-# --- parking spots (owner: osoba 3) -------------------------------------
+# --- parking spots (owner: Toma) ----------------------------------------
 SPOT_TELEMETRY = "garage/parking/spot/{spot_id}/telemetry"  # retained
 SPOT_TELEMETRY_ALL = "garage/parking/spot/+/telemetry"
 
-# --- gates (owner: osoba 4) ----------------------------------------------
+# --- gates (owner: Luka) -------------------------------------------------
 GATE_COMMAND = "garage/gate/{gate}/command"
 GATE_COMMAND_ALL = "garage/gate/+/command"
 GATE_STATE = "garage/gate/{gate}/state"  # retained
 GATE_STATE_ALL = "garage/gate/+/state"
 
-# --- ALPR (owners: osoba 5 + 6) -------------------------------------------
+# --- ALPR (owners: Sven, Lukas) -------------------------------------------
 ALPR_TRIGGER = "garage/alpr/{gate}/trigger"
 ALPR_TRIGGER_ALL = "garage/alpr/+/trigger"
 ALPR_EVENT = "garage/alpr/{gate}/event"
 ALPR_EVENT_ALL = "garage/alpr/+/event"
 
-# --- access control and sessions (owners: osoba 6 + 8) --------------------
+# --- access control and sessions (owners: Lukas, Luka, Lovro) -------------
 ACCESS_DECISION = "garage/access/decision"
 ACCESS_MANUAL = "garage/access/manual"
 SESSION_EVENT = "garage/session/event"

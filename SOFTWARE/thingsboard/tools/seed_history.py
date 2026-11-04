@@ -3,7 +3,7 @@
     python seed_history.py --days 7                 # 7 days of generated sessions + occupancy
     python seed_history.py --clear                  # delete ALL history of these keys (before the real demo!)
 
-Uses the session generator of osoba 8 (parking_sessions.generator) and sends
+Uses the session generator (parking_sessions.generator) and sends
 the data as the Garage-Edge gateway device directly to ThingsBoard's MQTT API.
 The final demonstration must show REAL data: run --clear first, then drive
 the cars through the model.

@@ -13,7 +13,7 @@ Pipeline
   3. best candidate wins; confidence = its score (0..1)
 
 Only *where* the plate is and how good the crop is is decided here. Reading
-the characters is the job of the OCR module (osoba 6).
+the characters is the job of the OCR module (edge/plate_ocr).
 """
 
 from __future__ import annotations

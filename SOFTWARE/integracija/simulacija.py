@@ -3,12 +3,12 @@
     python simulacija.py                 # start everything and play the demo scenario
     python simulacija.py --interactive   # start everything, you drive (see printed hints)
     python simulacija.py --broker        # also start a local mosquitto (if installed)
-    python simulacija.py --tb            # also start the ThingsBoard bridge (osoba 7)
+    python simulacija.py --tb            # also start the ThingsBoard bridge
 
 Started processes:
-    spot simulator (osoba 3), gate simulator (osoba 4),
-    edge service: ALPR with a simulated camera (osoba 5+6) + access control (osoba 6)
-    with the session database of osoba 8 in a temporary folder.
+    spot simulator, gate simulator,
+    edge service: ALPR with a simulated camera + access control
+    with the session database (parking_sessions) in a temporary folder.
 Needs an MQTT broker on $MQTT_HOST:$MQTT_PORT (default localhost:1883), e.g.
     docker run -d -p 1883:1883 eclipse-mosquitto:2 mosquitto -c /mosquitto-no-auth.conf
 """

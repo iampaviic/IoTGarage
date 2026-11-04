@@ -1,4 +1,4 @@
-"""Plate OCR for the IoT Garage (owner: osoba 6).
+"""Plate OCR for the IoT Garage (owner: Lukas).
 
     from plate_ocr import PlateReader
     result = PlateReader().read(detection.crop, detection.variants)

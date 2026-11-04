@@ -1,4 +1,4 @@
-// Parking spot sensor node (ESP32 + up to 6 HC-SR04) - osoba 3
+// Parking spot sensor node (ESP32 + up to 6 HC-SR04), owner: Toma
 //
 // Publishes garage/parking/spot/<id>/telemetry (retained) when a spot changes,
 // every 30 s and after every reconnect; heartbeat on garage/system/heartbeat;

@@ -1,4 +1,4 @@
-"""Plate detection for the IoT Garage ALPR (owner: osoba 5).
+"""Plate detection for the IoT Garage ALPR (owner: Sven).
 
     from plate_detector import PlateDetector
     result = PlateDetector().detect(frame_bgr)

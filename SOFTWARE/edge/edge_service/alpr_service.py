@@ -1,6 +1,6 @@
 """ALPR service: on every trigger take frames, find the plate, read it, publish.
 
-    garage/alpr/<gate>/trigger  ->  capture -> PlateDetector (osoba 5) -> PlateReader (osoba 6)
+    garage/alpr/<gate>/trigger  ->  capture -> PlateDetector -> PlateReader
                                 ->  garage/alpr/<gate>/event
 
 Frame sources

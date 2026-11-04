@@ -12,7 +12,7 @@ Vjerojatnost (V) i utjecaj (U): 1 = nizak, 3 = visok. Prioritet = V × U. Pregle
 | R-06 | Servo resetira ESP32 (pad napona) | 2 | 2 | 4 | servo iz zasebnog 5 V napajanja, zajednička masa, 470–1000 µF kondenzator | Lovro, Luka | otvoren |
 | R-07 | Wi-Fi na fakultetu (portal, izolacija klijenata) blokira ESP32 | 3 | 3 | 9 | vlastiti router / hotspot za maketu; Raspberry Pi kao pristupna točka | Patrik | otvoren |
 | R-10 | Integracija ostavljena za kraj | 2 | 3 | 6 | simulatori od 1. dana, tjedni integracijski korak, e2e test u CI-u | Patrik | u tijeku |
-| R-11 | Član tima nedostupan / kasni | 2 | 2 | 4 | svaki podsustav ima simulator i README; parovi za zamjenu: Toma↔Luka, Sven↔Lukas, Anja↔Lovro | Patrik | otvoren |
+| R-11 | Član tima nedostupan / kasni | 2 | 2 | 4 | svaki podsustav ima simulator i README; parovi za zamjenu: Toma↔Lovro, Luka↔Lukas, Sven↔Lukas, Anja↔Leo | Patrik | otvoren |
 | R-12 | Kvar na dan demonstracije | 2 | 3 | 6 | rezervni video, rezervni ESP32 i kabeli, `simulacija.py` kao plan B, kontrolna lista | Patrik | otvoren |
 | R-13 | Stvarne registracije u repozitoriju / izvještaju | 1 | 3 | 3 | samo generirane pločice, `.gitignore` za `dataset/real`, pregled PR-ova | Sven, Lovro | otvoren |
 | R-15 | Mobilna aplikacija odvlači vrijeme od glavnog sustava ili ne bude gotova | 2 | 1 | 2 | aplikacija samo čita ThingsBoard (REST API), garaža ne ovisi o njoj; MVP do KT6, nakon KT7 samo popravci; analitički dashboard kao rezerva | Leo | otvoren |

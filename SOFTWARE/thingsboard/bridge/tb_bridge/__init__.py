@@ -1,1 +1,1 @@
-"""Bridge between the local MQTT broker and ThingsBoard (owner: osoba 7)."""
+"""Bridge between the local MQTT broker and ThingsBoard (owner: Anja)."""

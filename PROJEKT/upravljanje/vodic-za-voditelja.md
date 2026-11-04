@@ -106,8 +106,8 @@ maketu) i laptop (ThingsBoard, razvoj, dashboard na demonstraciji). Svi su spoje
 Tko radi što piše u tablici [Tim](../../README.md#tim), a zadaci po osobi i kontrolne točke u
 [plan-rada.md](plan-rada.md). Sljedeća kontrolna točka je KT2 (10.11.2026.): jedan senzor, jedan servo, ThingsBoard
 i ALPR na stvarnoj fotografiji te nacrt makete. Od 23.11. do 4.12. su međuispiti, a integraciju s hardverom treba
-završiti prije blagdana (rizik R-16). Ako netko ispadne, mijenjaju se Toma i Luka, Sven i Lukas te Anja i Lovro
-(rizik R-11).
+završiti prije blagdana (rizik R-16). Ako netko ispadne, mijenjaju se Toma i Lovro, Luka i Lukas, Sven i Lukas te Anja i
+Leo (rizik R-11).
 
 ### Odluke koje čekaju tebe i tim
 

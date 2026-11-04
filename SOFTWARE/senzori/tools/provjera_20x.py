@@ -7,7 +7,7 @@ Listens to garage/parking/spot/+/telemetry over MQTT and guides you:
 "put the car on P03" -> waits for OCCUPIED -> "remove it" -> waits for FREE ...
 It counts every state change, so flicker (extra changes) or a missed change is
 caught. Criterion (project plan): 20 correct cycles per spot, no flicker.
-Writes a Markdown test record for osoba 8's test log.
+Writes a Markdown test record for the test log (PROJEKT/testiranje/testni-zapisnik.md).
 """
 
 from __future__ import annotations

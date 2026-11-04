@@ -1,4 +1,4 @@
-// Barrier post for an SG90 micro servo + barrier arm (IoT Garage, osoba 2/4)
+// Barrier post for an SG90 micro servo + barrier arm (IoT Garage)
 // Print: PLA, 0.2 mm layers, 20 % infill, no supports (post upright, arm flat).
 // Arm lower edge ends up ~50 mm above the floor (see alati/kamera_kalkulator.py).
 part = "all";          // "post" | "arm" | "all"

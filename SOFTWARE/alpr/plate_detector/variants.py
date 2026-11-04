@@ -1,6 +1,6 @@
 """Image variants of a rectified plate for the OCR stage.
 
-OCR is run on several versions and the results are voted (osoba 6), because
+OCR is run on several versions and the results are voted (edge/plate_ocr), because
 no single preprocessing works for every lighting condition.
 """
 

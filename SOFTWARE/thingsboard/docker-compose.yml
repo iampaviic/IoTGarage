@@ -1,4 +1,4 @@
-# ThingsBoard Community Edition for development and the demo (osoba 7).
+# ThingsBoard Community Edition for development and the demo.
 #
 #   docker compose up -d            first start installs the database (~2 min)
 #   docker compose logs -f thingsboard

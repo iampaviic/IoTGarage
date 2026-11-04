@@ -1,5 +1,5 @@
 """Labelled dataset format shared by the synthetic generator, the capture and
-labelling tools and the evaluation scripts (detection here, OCR at osoba 6).
+labelling tools and the evaluation scripts (detection here, OCR in edge/plate_ocr).
 
     <dataset>/
         images/0001.jpg ...

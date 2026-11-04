@@ -4,7 +4,7 @@ Inputs (MQTT):  spot telemetry, gate state (incl. vehicle presence), ALPR events
                 manual operator actions, device status
 Outputs (MQTT): ALPR triggers, gate commands, access decisions, session events,
                 garage summary, system alerts
-Storage:        parking_sessions.SessionStore (SQLite, owned by osoba 8)
+Storage:        parking_sessions.SessionStore (SQLite, SOFTWARE/baza)
 
 Works without ThingsBoard: it only needs the local MQTT broker. All handlers
 run on ONE thread (see EventLoop in runner.py) so no locking is needed here,
