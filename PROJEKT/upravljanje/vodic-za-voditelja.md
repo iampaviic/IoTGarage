@@ -191,14 +191,16 @@ Zamjene ako netko ispadne (rizik R-11): 3↔4, 5↔6, 7↔8. Svaki podsustav ima
 |---|---|---|
 | KT1 | arhitektura, plan, repozitorij | 28.10. (ostvareno 27.10.) ✅ |
 | **KT2** | **dokaz izvedivosti: 1 senzor, 1 servo, ThingsBoard, ALPR na stvarnoj fotografiji; nacrt makete** | **10.11.2026.** |
-| KT3 | baza makete izrađena | 23.11.2026. |
-| KT4 | podsustavi rade na hardveru (senzori 20/20, sigurnosni testovi rampi, detekcija ≥ 90 %) | 23.12.2026. |
-| KT5 | integracija s hardverom završena; MVP mobilne aplikacije | 11.1.2027. |
-| KT6 | svi testni scenariji prolaze, rezervni video snimljen | 17.1.2027. |
-| KT7 | dokumentacija, prezentacija, predaja na GitLab | **29.1.2027.** |
+| KT3 | predaja plana projekta | 20.11.2026. |
+| KT4 | baza makete izrađena | 23.11.2026. |
+| KT5 | podsustavi rade na hardveru (senzori 20/20, sigurnosni testovi rampi, detekcija ≥ 90 %) | 23.12.2026. |
+| KT6 | integracija s hardverom završena; MVP mobilne aplikacije | 11.1.2027. |
+| KT7 | svi testni scenariji prolaze, rezervni video snimljen | 17.1.2027. |
+| KT8 | dokumentacija, prezentacija, predaja na GitLab | **29.1.2027.** |
 
-Faze: 1 definicija (do 1.11.) · 2 podsustavi (2.11.–6.12.) · 3 integracija (7.–20.12.) · blagdanska stanka kao
-rezerva (21.12.–3.1.) · 4 testiranje (4.–17.1.) · 5 dokumentacija i predaja (18.–29.1.).
+Faze: 1 definicija (do 1.11.) · 2 podsustavi (2.11.–6.12.), od toga **međuispiti 23.11.–4.12. bez rada na projektu** ·
+3 integracija (7.–20.12.) · blagdanska stanka kao rezerva (21.12.–3.1.) · 4 testiranje (4.–17.1.) ·
+5 dokumentacija i predaja (18.–29.1.).
 **Integraciju s hardverom završiti prije blagdana** (rizik R-16).
 
 ### Odluke koje čekaju tebe i tim
@@ -466,15 +468,15 @@ i pokreni `mosquitto -c lan.conf -v` (na Windowsu prije toga zaustavi servis: te
 | H0 | napajanje bez elektronike | Patrik, Lovro | prije prvog spajanja |
 | H1 | jedan ultrazvučni senzor | Toma | KT2 |
 | H2 | senzori na MQTT-u (I1) | Toma | KT2 |
-| H3 | svih 6 senzora, kalibracija i test 20× | Toma, Lovro, Patrik | KT4 |
+| H3 | svih 6 senzora, kalibracija i test 20× | Toma, Lovro, Patrik | KT5 |
 | H4 | senzori u ThingsBoardu (I2) | Anja | KT2 |
 | H5 | jedan servo | Luka | KT2 |
-| H6 | obje rampe: IR, LED, tipke, sigurnosni testovi | Luka, Patrik | KT4 |
-| H7 | rampe na MQTT-u (I3) | Luka | KT4 |
-| H8 | kamera, detekcija i OCR (I4, I5) | Sven, Lukas, Patrik | KT2 (prva fotografija), KT4 (≥ 90 %) |
-| H9 | cijeli ulaz na edge računalu (I6–I8) | Lukas, Luka | KT5 |
-| H10 | izlaz i ThingsBoard (I9, I10) | svi | KT5 |
-| H11 | testovi otpornosti i proba demonstracije | svi | KT6 |
+| H6 | obje rampe: IR, LED, tipke, sigurnosni testovi | Luka, Patrik | KT5 |
+| H7 | rampe na MQTT-u (I3) | Luka | KT5 |
+| H8 | kamera, detekcija i OCR (I4, I5) | Sven, Lukas, Patrik | KT2 (prva fotografija), KT5 (≥ 90 %) |
+| H9 | cijeli ulaz na edge računalu (I6–I8) | Lukas, Luka | KT6 |
+| H10 | izlaz i ThingsBoard (I9, I10) | svi | KT6 |
+| H11 | testovi otpornosti i proba demonstracije | svi | KT7 |
 
 ### H0. Napajanje bez elektronike
 
@@ -598,7 +600,7 @@ Prvo na laptopu (vidiš sliku), tek onda na Piju.
 5. Kasnije (Sven, Lukas): ≥ 100 slika, `label_tool.py`, `evaluate_detection.py`, `edge/tools/evaluate_ocr.py`.
 
 **Uspjeh:** pločica uokvirena, izrez ravan i čitljiv, registracija točna s pouzdanošću ≥ 0,85.
-Za KT4: detekcija ≥ 90 % i **0 pogrešno prihvaćenih** čitanja.
+Za KT5: detekcija ≥ 90 % i **0 pogrešno prihvaćenih** čitanja.
 
 ### H9. Cijeli ulaz na edge računalu (I6–I8)
 
@@ -636,7 +638,7 @@ Iz [testnog plana](../testiranje/testni-plan.md), na maketi:
 | TC-I04 puna garaža | autić na svako mjesto, sedmi na ulaz | `DENIED GARAGE_FULL` |
 
 Zatim dvije generalne probe po [demo-scenariju](../../PREZENTACIJA/demo-scenarij.md) i snimanje rezervnog videa
-(do KT6, 17.1.2027.).
+(do KT7, 17.1.2027.).
 
 ---
 

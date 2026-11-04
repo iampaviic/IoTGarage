@@ -14,10 +14,10 @@ TJEDNI = {
     1: ("Faza 1 – definicija i dokaz izvedivosti", "Tjedan 1: plan projekta, arhitektura i MQTT ugovor"),
     2: ("Faza 1 – definicija i dokaz izvedivosti", "Tjedan 2: nacrt makete, popis komponenti i 3D dijelovi"),
     3: ("Faza 2 – samostalni podsustavi", "Tjedan 3: firmware senzora mjesta i rampi"),
-    4: ("Faza 2 – samostalni podsustavi", "Tjedan 4: baza parkirnih sesija i ThingsBoard"),
-    5: ("Faza 2 – samostalni podsustavi", "Tjedan 5: ALPR – detekcija registarske pločice"),
-    6: ("Faza 2 – samostalni podsustavi", "Tjedan 6: OCR i lokalna kontrola pristupa (edge servis)"),
-    7: ("Faza 2 – samostalni podsustavi", "Tjedan 7: mobilna aplikacija i dashboardi s pravim podacima"),
+    4: ("Faza 2 – samostalni podsustavi", "Tjedan 4: baza parkirnih sesija, ThingsBoard i dashboardi"),
+    5: ("Faza 2 – samostalni podsustavi", "Tjedan 5: ALPR, OCR i lokalna kontrola pristupa, mobilna aplikacija"),
+    6: ("Međuispiti (ne radi se na projektu)", "Tjedan 6: međuispiti"),
+    7: ("Međuispiti (ne radi se na projektu)", "Tjedan 7: međuispiti"),
     8: ("Faza 3 – integracija", "Tjedan 8: integracija cijelog sustava"),
     9: ("Faza 3 – integracija", "Tjedan 9: postavljanje na edge računalo i upute za instalaciju"),
     10: ("Blagdanska stanka (rezerva)", "Tjedan 10: rad tijekom blagdana"),
@@ -28,7 +28,8 @@ TJEDNI = {
     15: ("Faza 5 – dokumentacija, prezentacija i predaja", "Tjedan 15: prezentacija, izvršne verzije i predaja"),
 }
 
-# (prefiks putanje, tjedan); prefiks koji završava s "/" je mapa. Tjedni 10 i 11 (blagdani) nemaju novih dijelova.
+# (prefiks putanje, tjedan); prefiks koji završava s "/" je mapa. Tjedni 6 i 7 (međuispiti, 23.11. – 4.12.)
+# i 10 i 11 (blagdani) nemaju novih dijelova.
 PRAVILA = [
     # tjedan 1 – ideja, plan, arhitektura, komunikacijski ugovor
     (".gitignore", 1),
@@ -53,13 +54,11 @@ PRAVILA = [
     ("PROJEKT/sustav/model-podataka.md", 4),
     ("SOFTWARE/thingsboard/", 4),
     ("PROJEKT/sustav/entiteti-i-alarmi.md", 4),
-    # tjedan 5 – ALPR
+    ("PROJEKT/slike/", 4),
+    # tjedan 5 – ALPR, OCR i edge servis, mobilna aplikacija (tjedni 6-7 su međuispiti)
     ("SOFTWARE/alpr/", 5),
-    # tjedan 6 – OCR i edge servis
-    ("SOFTWARE/edge/", 6),
-    # tjedan 7 – mobilna aplikacija, dashboardi s pravim podacima
-    ("SOFTWARE/mobilna-aplikacija/", 7),
-    ("PROJEKT/slike/", 7),
+    ("SOFTWARE/edge/", 5),
+    ("SOFTWARE/mobilna-aplikacija/", 5),
     # tjedan 8 – integracija
     ("SOFTWARE/integracija/", 8),
     ("PROJEKT/upravljanje/plan-integracije.md", 8),

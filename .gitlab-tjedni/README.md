@@ -16,10 +16,9 @@ njemu radi prema gantogramu iz plana projekta:
 | 1 | 19.10. – 25.10. | 1 – definicija | README, `OSTALO`, plan projekta, arhitektura, MQTT ugovor, zahtjevi, plan rada, rizici, odluke, `SOFTWARE/ugovor` |
 | 2 | 26.10. – 1.11. | 1 – definicija | maketa: `PROJEKT/maketa` (nacrt, komponente, sheme), `SOFTWARE/maketa` (tlocrt, 3D dijelovi, ožičenje) |
 | 3 | 2.11. – 8.11. | 2 – podsustavi | `SOFTWARE/senzori`, `SOFTWARE/rampe` |
-| 4 | 9.11. – 15.11. | 2 – podsustavi | `SOFTWARE/baza` + model podataka, `SOFTWARE/thingsboard` + entiteti i alarmi |
-| 5 | 16.11. – 22.11. | 2 – podsustavi | `SOFTWARE/alpr` |
-| 6 | 23.11. – 29.11. | 2 – podsustavi | `SOFTWARE/edge` (OCR, kontrola pristupa) |
-| 7 | 30.11. – 6.12. | 2 – podsustavi | `SOFTWARE/mobilna-aplikacija`, snimke dashboarda |
+| 4 | 9.11. – 15.11. | 2 – podsustavi | `SOFTWARE/baza` + model podataka, `SOFTWARE/thingsboard` + entiteti i alarmi, snimke dashboarda |
+| 5 | 16.11. – 22.11. | 2 – podsustavi | `SOFTWARE/alpr`, `SOFTWARE/edge` (OCR, kontrola pristupa), `SOFTWARE/mobilna-aplikacija` |
+| 6–7 | 23.11. – 6.12. | međuispiti (23.11. – 4.12.) | ništa – na projektu se ne radi |
 | 8 | 7.12. – 13.12. | 3 – integracija | `SOFTWARE/integracija` (simulacija + e2e testovi), plan integracije, testni plan |
 | 9 | 14.12. – 20.12. | 3 – integracija | `SOFTWARE/edge/deploy`, `SOFTWARE/INSTALL.md` |
 | 10–11 | 21.12. – 3.1. | blagdanska stanka | ništa novo iz rasporeda – samo ono što tim napravi |

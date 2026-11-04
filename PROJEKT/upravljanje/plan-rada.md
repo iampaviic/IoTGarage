@@ -11,6 +11,7 @@ Projekt traje od **19.10.2026.** do roka za predaju **29.1.2027.** (15 tjedana, 
 |---|---|---|
 | 1 – definicija i dokaz izvedivosti | T1–T2 | 19.10. – 1.11.2026. |
 | 2 – samostalni podsustavi | T3–T7 | 2.11. – 6.12.2026. |
+| međuispiti – **na projektu se ne radi** | T6–T7 | 23.11. – 4.12.2026. |
 | 3 – integracija | T8–T9 | 7.12. – 20.12.2026. |
 | blagdanska stanka (rezerva) | T10–T11 | 21.12.2026. – 3.1.2027. |
 | 4 – stabilizacija i testiranje | T12–T13 | 4.1. – 17.1.2027. |
@@ -22,11 +23,12 @@ Kontrolne točke (dogovor tima, plan projekta v1.3):
 |---|---|---|---|
 | KT1 | arhitektura, plan i repozitorij | 28.10.2026. | 27.10.2026. ✅ |
 | KT2 | dokaz izvedivosti (1 senzor, 1 servo, ThingsBoard, ALPR na stvarnoj fotografiji), nacrt makete | 10.11.2026. | |
-| KT3 | baza makete izrađena | 23.11.2026. | |
-| KT4 | podsustavi rade na hardveru (senzori 20/20, sigurnosni testovi rampi, detekcija ≥ 90 %) | 23.12.2026. | |
-| KT5 | integracija s hardverom završena; MVP mobilne aplikacije | 11.1.2027. | |
-| KT6 | svi testni scenariji prolaze, demo video snimljen | 17.1.2027. | |
-| KT7 | završna dokumentacija i prezentacija; projekt predan na GitLab | 29.1.2027. | |
+| KT3 | predaja plana projekta | 20.11.2026. | |
+| KT4 | baza makete izrađena | 23.11.2026. | |
+| KT5 | podsustavi rade na hardveru (senzori 20/20, sigurnosni testovi rampi, detekcija ≥ 90 %) | 23.12.2026. | |
+| KT6 | integracija s hardverom završena; MVP mobilne aplikacije | 11.1.2027. | |
+| KT7 | svi testni scenariji prolaze, demo video snimljen | 17.1.2027. | |
+| KT8 | završna dokumentacija i prezentacija; projekt predan na GitLab | 29.1.2027. | |
 
 ## Faza 1 – definicija i dokaz izvedivosti (T1–T2, 19.10. – 1.11.2026.)
 
@@ -42,6 +44,9 @@ Kontrolne točke (dogovor tima, plan projekta v1.3):
 | 8 | ✅ baza sesija, naplata, CLI, generator, testovi, testni plan, kostur dokumentacije · ⬜ pročitati testni plan, dogovoriti pravilo naplate s timom |
 
 ## Faza 2 – samostalni podsustavi (T3–T7, 2.11. – 6.12.2026.)
+
+Od 23.11. do 4.12.2026. su međuispiti i na projektu se ne radi. Kalibracija senzora, sigurnosni testovi rampi i
+mjerenja detekcije i OCR-a nastavljaju se nakon međuispita (T8–T9) i završavaju do KT5 (23.12.).
 
 | osoba | zadatak |
 |---|---|
