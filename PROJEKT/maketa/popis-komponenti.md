@@ -1,6 +1,6 @@
 # Popis komponenti
 
-Okvirne cijene (EUR, 2026, domaće trgovine / AliExpress) – provjerite prije narudžbe. CSV za tablični kalkulator: [popis-komponenti.csv](popis-komponenti.csv).
+CSV za tablični kalkulator: [popis-komponenti.csv](popis-komponenti.csv).
 
 | kategorija | komponenta | kom | rezerva | ~€/kom | ~€ ukupno | za što | napomena |
 |---|---|---|---|---|---|---|---|
@@ -36,9 +36,3 @@ Okvirne cijene (EUR, 2026, domaće trgovine / AliExpress) – provjerite prije n
 | maketa | autic 1:24 | 3 | 0 | 12.00 | 36.00 | vozila za demo |  |
 | maketa | mat foto papir A4 / laminiranje | 5 | 0 | 0.50 | 2.50 | pločice | sjajni papir reflektira |
 | maketa | bijela izolirka 5 mm | 1 | 0 | 2.00 | 2.00 | oznake mjesta |  |
-
-**Okvirno ukupno: 229 €** (bez stvari koje već imamo; s rezervnim dijelovima).
-
-Već imamo: Raspberry Pi, Jetson Nano, jednu USB kameru.
-
-Lista za kupnju po prioritetu: (1) ESP32, HC-SR04, SG90, FC-51, otpornici, napajanje – potrebno u 1. tjednu za dokaz izvedivosti; (2) materijal makete, filament, autići; (3) druga kamera, router, LED traka.
