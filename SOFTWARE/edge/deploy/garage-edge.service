@@ -1,4 +1,4 @@
-# systemd unit for a native (non-Docker) install on Raspberry Pi OS / Ubuntu.
+# Varijanta A (rezerva). systemd unit for a native (non-Docker) install on Raspberry Pi OS / Ubuntu.
 #   sudo cp garage-edge.service garage-tb-bridge.service /etc/systemd/system/
 #   sudo systemctl daemon-reload && sudo systemctl enable --now garage-edge garage-tb-bridge
 #   journalctl -u garage-edge -f

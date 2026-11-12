@@ -1,0 +1,8 @@
+# Camera override for varijanta B (see docker-compose.alpr.yml):
+#   docker compose -f docker-compose.alpr.yml -f docker-compose.alpr-camera.yml up -d --build
+services:
+  alpr:
+    environment:
+      ALPR_SOURCE: camera
+    devices:
+      - /dev/video0:/dev/video0      # USB camera; add /dev/video2 for a second camera

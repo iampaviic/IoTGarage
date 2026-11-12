@@ -1,9 +1,11 @@
 """Edge service configuration (YAML file + environment variables).
 
-    python -m edge_service --config edge.yaml all
+    python -m edge_service --config edge.yaml tb-alpr      # varijanta B
+    python -m edge_service --config edge.yaml all          # varijanta A
 
 Copy edge.example.yaml to edge.yaml (git-ignored) and adjust. Environment
-variables MQTT_HOST, MQTT_PORT, GARAGE_DB, GARAGE_SPOTS and PRICING_PROFILE
+variables TB_HOST, TB_MQTT_PORT, TB_TOKEN_ALPR, ALPR_SOURCE (varijanta B) and
+MQTT_HOST, MQTT_PORT, GARAGE_DB, GARAGE_SPOTS, PRICING_PROFILE (varijanta A)
 override the file, which is handy in Docker.
 """
 
@@ -63,8 +65,17 @@ class PrivacyConfig:
 
 
 @dataclass
+class ThingsBoardConfig:
+    """Varijanta B: the ALPR service is the gateway device "alpr-service" in ThingsBoard."""
+    host: str = "localhost"
+    port: int = 1883                  # MQTT port of ThingsBoard (1884 if Mosquitto runs on the same machine)
+    token: str = "alpr-service-token"  # access token of alpr-service (provision.py prints it)
+
+
+@dataclass
 class EdgeConfig:
     mqtt: MqttSettings = field(default_factory=MqttSettings)
+    thingsboard: ThingsBoardConfig = field(default_factory=ThingsBoardConfig)
     spots: int = 6
     database: str = "data/garage.db"
     pricing: str = "demo"
@@ -100,6 +111,7 @@ class EdgeConfig:
                 for name, v in gates.items()
             }
         _update(cfg.privacy, data.get("privacy", {}))
+        _update(cfg.thingsboard, data.get("thingsboard", {}))
 
         # environment wins (Docker / systemd)
         env = os.environ
@@ -115,6 +127,12 @@ class EdgeConfig:
             cfg.spots = int(env["GARAGE_SPOTS"])
         if env.get("PRICING_PROFILE"):
             cfg.pricing = env["PRICING_PROFILE"]
+        if env.get("TB_HOST"):
+            cfg.thingsboard.host = env["TB_HOST"]
+        if env.get("TB_MQTT_PORT"):
+            cfg.thingsboard.port = int(env["TB_MQTT_PORT"])
+        if env.get("TB_TOKEN_ALPR"):
+            cfg.thingsboard.token = env["TB_TOKEN_ALPR"]
         if env.get("ALPR_SOURCE"):
             cfg.alpr.source = env["ALPR_SOURCE"]
         if cfg.access.policy not in ("open", "allowlist"):

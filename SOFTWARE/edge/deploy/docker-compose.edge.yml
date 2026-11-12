@@ -1,4 +1,5 @@
-# Everything that runs on the edge computer (Raspberry Pi or Jetson Nano).
+# Varijanta A (rezerva): everything that runs on the edge computer (Raspberry Pi or Jetson Nano).
+# Varijanta B needs only the ALPR service: docker-compose.alpr.yml.
 #
 #   cd SOFTWARE/edge/deploy
 #   # with the USB camera (Raspberry Pi / Jetson):

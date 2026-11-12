@@ -1,7 +1,15 @@
 # Edge service configuration. Copy to edge.yaml (git-ignored) and adjust.
-# Environment variables MQTT_HOST, MQTT_PORT, GARAGE_DB, GARAGE_SPOTS,
-# PRICING_PROFILE and ALPR_SOURCE override these values.
+# Environment variables TB_HOST, TB_MQTT_PORT, TB_TOKEN_ALPR, ALPR_SOURCE (and for varijanta A
+# MQTT_HOST, MQTT_PORT, GARAGE_DB, GARAGE_SPOTS, PRICING_PROFILE) override these values.
 
+# Varijanta B: `python -m edge_service --config edge.yaml tb-alpr` uses only the sections
+# thingsboard, alpr, privacy and access (thresholds, alpr_failure_alert_after).
+thingsboard:
+  host: localhost          # computer running ThingsBoard
+  port: 1883               # MQTT port of ThingsBoard
+  token: alpr-service-token  # access token of the device alpr-service (provision.py prints it)
+
+# Varijanta A only (rezerva): local broker, session database, access control
 mqtt:
   host: localhost          # Mosquitto on the edge computer itself
   port: 1883
@@ -33,9 +41,9 @@ alpr:
   images_dir: null         # for source: images
   frames_per_trigger: 3    # frames analysed per trigger, the best reading wins
   gates:
-    # Variant B (one camera): the same camera is moved between the entrance and the
-    # exit mount, so both gates read the whole frame.
-    # Variant A (recommended, two cameras): give each gate its own `camera`.
+    # One camera: the same camera is moved between the entrance and the exit mount,
+    # so both gates read the whole frame.
+    # Two cameras (recommended): give each gate its own `camera`.
     # `roi` limits the search to part of the frame: [x0, y0, x1, y1] as fractions.
     entrance:
       camera_id: entrance-camera

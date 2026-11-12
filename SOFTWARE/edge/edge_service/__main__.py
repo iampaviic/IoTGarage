@@ -1,6 +1,7 @@
 """Edge service command line.
 
-    python -m edge_service --config edge.yaml all          run access control + ALPR
+    python -m edge_service --config edge.yaml tb-alpr      varijanta B: ALPR as a ThingsBoard device (RPC readPlate)
+    python -m edge_service --config edge.yaml all          varijanta A: run access control + ALPR
     python -m edge_service --config edge.yaml access       only access control
     python -m edge_service --config edge.yaml alpr         only ALPR
     python -m edge_service read IMAGE [IMAGE ...]          offline: detect + read plates in photos
@@ -70,6 +71,7 @@ def main(argv=None) -> int:
     ap.add_argument("--config", help="YAML config (see edge.example.yaml)")
     ap.add_argument("-v", "--verbose", action="store_true")
     sub = ap.add_subparsers(dest="cmd", required=True)
+    sub.add_parser("tb-alpr")
     sub.add_parser("all")
     sub.add_parser("access")
     sub.add_parser("alpr")
@@ -90,6 +92,11 @@ def main(argv=None) -> int:
     cfg = EdgeConfig.load(args.config)
     if args.cmd == "manual":
         return _manual(cfg, args)
+    if args.cmd == "tb-alpr":
+        from edge_service.tb_alpr import run as run_tb_alpr
+
+        run_tb_alpr(cfg)
+        return 0
     from edge_service.runner import run
 
     run(cfg, ["access", "alpr"] if args.cmd == "all" else [args.cmd])

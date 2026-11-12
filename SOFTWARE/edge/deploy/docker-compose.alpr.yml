@@ -1,0 +1,26 @@
+# Varijanta B: only the ALPR service runs next to the camera (laptop, Raspberry Pi or Jetson Nano).
+# It connects to ThingsBoard as the gateway device "alpr-service" and answers RPC readPlate.
+#
+#   cd SOFTWARE/edge/deploy && cp .env.example .env          # TB_HOST, TB_TOKEN_ALPR, EDGE_CONFIG
+#   docker compose -f docker-compose.alpr.yml up -d --build                                   # synthetic camera
+#   docker compose -f docker-compose.alpr.yml -f docker-compose.alpr-camera.yml up -d --build  # USB camera
+#   docker compose -f docker-compose.alpr.yml logs -f alpr
+services:
+  alpr:
+    build:
+      context: ../..
+      dockerfile: edge/deploy/Dockerfile
+    image: iot-garage-edge
+    restart: unless-stopped
+    environment:
+      TB_HOST: ${TB_HOST:-192.168.1.20}          # computer running ThingsBoard
+      TB_MQTT_PORT: ${TB_MQTT_PORT:-1883}
+      TB_TOKEN_ALPR: ${TB_TOKEN_ALPR:-alpr-service-token}
+      ALPR_SOURCE: ${ALPR_SOURCE:-sim}           # docker-compose.alpr-camera.yml switches to the USB camera
+    volumes:
+      - edge-data:/data
+      - ${EDGE_CONFIG:-../edge.example.yaml}:/config/edge.yaml:ro
+    command: ["python", "-m", "edge_service", "--config", "/config/edge.yaml", "tb-alpr"]
+
+volumes:
+  edge-data:

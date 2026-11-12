@@ -1,4 +1,4 @@
-# Edge image: ALPR + access control + ThingsBoard bridge (multi-arch: amd64, arm64 = Raspberry Pi 4/5, Jetson Nano).
+# Edge image: ALPR (varijanta B: `tb-alpr`) + access control + ThingsBoard bridge (varijanta A) (multi-arch: amd64, arm64 = Raspberry Pi 4/5, Jetson Nano).
 # Build from the SOFTWARE directory:
 #   docker build -f edge/deploy/Dockerfile -t iot-garage-edge .
 FROM python:3.11-slim-bookworm
