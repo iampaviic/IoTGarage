@@ -13,11 +13,13 @@ Vjerojatnost (V) i utjecaj (U): 1 = nizak, 3 = visok. Prioritet = V × U. Pregle
 | R-07 | Wi-Fi na fakultetu (portal, izolacija klijenata) blokira ESP32 | 3 | 3 | 9 | vlastiti router / hotspot za maketu; Raspberry Pi kao pristupna točka | Patrik | otvoren |
 | R-10 | Integracija ostavljena za kraj | 2 | 3 | 6 | simulatori od 1. dana, tjedni integracijski korak, e2e test u CI-u | Patrik | u tijeku |
 | R-11 | Član tima nedostupan / kasni | 2 | 2 | 4 | svaki podsustav ima simulator i README; parovi za zamjenu: Toma↔Lovro, Luka↔Lukas, Sven↔Lukas, Anja↔Leo | Patrik | otvoren |
-| R-12 | Kvar na dan demonstracije | 2 | 3 | 6 | rezervni video, rezervni ESP32 i kabeli, `simulacija.py` kao plan B, kontrolna lista | Patrik | otvoren |
+| R-12 | Kvar na dan demonstracije | 2 | 3 | 6 | rezervni video, rezervni ESP32 i kabeli, `simulacija_b.py --interactive` kao plan B, kontrolna lista | Patrik | otvoren |
 | R-13 | Stvarne registracije u repozitoriju / izvještaju | 1 | 3 | 3 | samo generirane pločice, `.gitignore` za `dataset/real`, pregled PR-ova | Sven, Lovro | otvoren |
 | R-15 | Mobilna aplikacija odvlači vrijeme od glavnog sustava ili ne bude gotova | 2 | 1 | 2 | aplikacija samo čita ThingsBoard (REST API), garaža ne ovisi o njoj; MVP do KT6, nakon KT7 samo popravci; analitički dashboard kao rezerva | Leo | otvoren |
+| R-17 | Varijanta B: bez ThingsBoarda ili mreže nema automatskog ulaza i izlaza (D-012) | 2 | 2 | 4 | ThingsBoard na laptopu uz maketu, vlastiti router (R-07); tipke na rampama i sigurnost u firmwareu; kod varijante A ostaje kao rezerva | Patrik, Anja | otvoren |
+| R-18 | Rule chain se mijenja u web sučelju i promjene se izgube ili se ne testiraju | 2 | 2 | 4 | izvor su TBEL skripte u repozitoriju (`build_rule_chain.py`), CI provjerava `garaza.json`, scenarij `test_varijanta_b.py` prije PR-a | Anja | otvoren |
 | R-16 | Blagdani, kolokviji i ispiti (prosinac – siječanj) smanjuju vrijeme za rad | 3 | 2 | 6 | integracija s hardverom radi se prije blagdana i zaključuje do KT6 (11.1.); blagdanska stanka je rezerva; u siječnju samo testiranje i dokumentacija; termini nedostupnosti u planu projekta | Patrik | otvoren |
 
-Riješeni: R-08 ThingsBoard pretežak za Raspberry Pi (ThingsBoard je na laptopu, D-001), R-09 star Python 3.6 na
-Jetson Nanu (edge je Raspberry Pi ili Docker, D-004) i R-14 nema NTP-a bez interneta (ESP32 šalje `null`, edge
-koristi vrijeme primitka, D-011).
+Riješeni: R-08 ThingsBoard pretežak za Raspberry Pi (ThingsBoard je na laptopu), R-09 star Python 3.6 na
+Jetson Nanu (ALPR na laptopu, Raspberry Piju ili u Dockeru, D-004) i R-14 nema NTP-a bez interneta (u varijanti B
+vrijeme postavlja ThingsBoard, D-011).

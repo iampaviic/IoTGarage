@@ -9,14 +9,14 @@ napraviti. Kod je na engleskom, upute na hrvatskom.
 
 | mapa | sadržaj |
 |---|---|
-| [ugovor/](ugovor) | Python paket `garage_contract`: MQTT teme, 15 JSON shema poruka, validacija, MQTT klijent, monitor poruka; komunikacijski ugovor kao kod, koriste ga svi dijelovi |
-| [integracija/](integracija) | simulacija cijelog sustava na jednom računalu (`simulacija.py`, `scenarij.py`), konfiguracija Mosquitta, end-to-end testovi |
-| [senzori/](senzori) | čvor senzora mjesta: firmware za ESP32 + 6× HC-SR04 (C++, PlatformIO projekt u `firmware/`), Python simulator, alati za kalibraciju i test 20× |
-| [rampe/](rampe) | čvor rampi: firmware za ESP32 + 2× servo, IR senzori, tipke (C++, PlatformIO projekt u `firmware/`), Python simulator i blizanac stroja stanja s testovima |
+| [ugovor/](ugovor) | Python paket `garage_contract`: `tb.py` – imena uređaja i gateway klijent za ThingsBoard (varijanta B); MQTT teme, 15 JSON shema, validacija i monitor varijante A |
+| [integracija/](integracija) | simulacija cijelog sustava: `simulacija_b.py` (varijanta B, s ThingsBoardom, scenarij s provjerom svakog koraka); `simulacija.py`, `scenarij.py`, Mosquitto (varijanta A); end-to-end testovi |
+| [senzori/](senzori) | čvor senzora mjesta: firmware za ESP32 + 6× HC-SR04 (C++, PlatformIO projekt u `firmware/`, gateway `esp32-spots` u ThingsBoardu), simulator, alati za kalibraciju i test 20× |
+| [rampe/](rampe) | čvor rampi: firmware za ESP32 + 2× servo, IR senzori, tipke (C++, PlatformIO projekt u `firmware/`, gateway `esp32-gates`), simulator i blizanac stroja stanja s testovima |
 | [alpr/](alpr) | Python paket `plate_detector`: detekcija registarske pločice (OpenCV), generator izmišljenih pločica za ispis, sintetski skup slika, alati za snimanje, označavanje i mjerenje točnosti (`rezultati/`) |
-| [edge/](edge) | Python paket `garage-edge`: OCR (`plate_ocr`), ALPR servis i lokalna kontrola pristupa (`edge_service`), konfiguracija `edge.example.yaml`, `deploy/` (Docker, nativna instalacija, systemd servisi za Raspberry Pi / Jetson Nano) |
-| [thingsboard/](thingsboard) | ThingsBoard CE (`docker-compose.yml`), provisioning uređaja i alarma (`provision/`), most MQTT → ThingsBoard s međuspremnikom (`bridge/`), dva dashboarda (`dashboards/`) |
-| [baza/](baza) | Python paket `parking_sessions`: SQLite baza parkirnih sesija, naplata, allow-lista, CLI `parking-sessions` |
+| [edge/](edge) | Python paket `garage-edge`: OCR (`plate_ocr`), ALPR servis kao uređaj ThingsBoarda (`edge_service tb-alpr`), konfiguracija `edge.example.yaml`, `deploy/` (Docker, nativna instalacija, systemd); lokalna kontrola pristupa varijante A |
+| [thingsboard/](thingsboard) | ThingsBoard CE (`docker-compose.yml`), rule chain s odlukama, sesijama i naplatom (`rulechain/`), provisioning (`provision/`), dva dashboarda (`dashboards/`); most za varijantu A (`bridge/`) |
+| [baza/](baza) | varijanta A (rezerva): Python paket `parking_sessions`, SQLite baza parkirnih sesija, naplata, allow-lista, CLI |
 | [maketa/](maketa) | izvorne datoteke makete: 3D dijelovi (OpenSCAD `.scad` + gotovi `.stl` u `3d/`), generator tlocrta i kalkulator kamere (`alati/`), tlocrt (`nacrt/`), dijagrami ožičenja (WireViz, `elektronika/`) |
 | [mobilna-aplikacija/](mobilna-aplikacija) | mobilna aplikacija za analitiku garaže (u izradi) |
 | [izvrsne-verzije/](izvrsne-verzije) | izvršne verzije (firmware `.bin`, Docker slika, APK), dodaju se na kraju projekta |

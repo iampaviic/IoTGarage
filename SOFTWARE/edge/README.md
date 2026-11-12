@@ -1,9 +1,11 @@
-# OCR, obrada registracije i edge servis
+# OCR, obrada registracije i ALPR servis
 
-Zaduženi: Lukas Davorija (OCR, ALPR servis, edge računalo) i Luka Oslić (pravila odluke i access control,
-`edge_service/decisions.py` i `edge_service/access_control.py`). Zamjena za ALPR: Sven Matić.
+Zaduženi: Lukas Davorija (OCR, ALPR servis) i Luka Oslić (pravila odluke). Zamjena za ALPR: Sven Matić.
 
-Ovaj servis čita i provjerava registraciju te lokalno odlučuje o ulasku i izlasku. On je "mozak" edge računala.
+U [varijanti B](../../PROJEKT/sustav/varijanta-b.md) ovaj servis samo čita registraciju: on je uređaj `alpr-service`
+u ThingsBoardu i na RPC `readPlate` vrati registraciju i pouzdanost. O ulasku i izlasku odlučuje rule chain
+ThingsBoarda. Lokalna kontrola pristupa (`access_control.py`, `decisions.py`, naredbe `all`, `access`, `manual`)
+pripada varijanti A i ostaje kao rezerva.
 
 ## Što je već napravljeno
 
@@ -13,15 +15,15 @@ Ovaj servis čita i provjerava registraciju te lokalno odlučuje o ulasku i izla
 | [plate_ocr/engines.py](plate_ocr/engines.py) | dva OCR motora: Tesseract (opći) i predlošci (usporedba sa znakovima istog fonta kojim tiskamo pločice) |
 | [plate_ocr/normalize.py](plate_ocr/normalize.py) | normalizacija po formatu HR registracije: O↔0, I↔1, B↔8, S↔5, Z↔2, G↔6 ovisno o poziciji, uklanjanje smeća (grb, rub), popis oznaka gradova |
 | [plate_ocr/reader.py](plate_ocr/reader.py) | glasanje svih motora × varijanti → registracija + pouzdanost + razina (`ACCEPT/RETRY/MANUAL`) |
-| [edge_service/decisions.py](edge_service/decisions.py) | čista pravila odluke; testirano je da se ispod praga rampa nikad ne otvara |
-| [edge_service/access_control.py](edge_service/access_control.py) | access control: stanja mjesta i rampi, ALPR okidači, ponovni pokušaji, sesije, naredbe rampi s potvrdom i ponavljanjem, alarmi, ručne radnje |
-| [edge_service/alpr_service.py](edge_service/alpr_service.py) | ALPR servis: kamera / sintetska kamera / mapa slika → detekcija (`plate_detector`) → OCR → `alpr/<gate>/event` |
-| [edge_service/__main__.py](edge_service/__main__.py) | naredbe: `all`, `access`, `alpr`, `read` (offline), `manual` (operater) |
-| [edge.example.yaml](edge.example.yaml) | konfiguracija s objašnjenjima |
-| [deploy/](deploy) | Docker image i compose za Raspberry Pi/Jetson, nativna instalacija, systemd servisi |
+| [edge_service/tb_alpr.py](edge_service/tb_alpr.py) | **varijanta B**: ALPR kao gateway `alpr-service` u ThingsBoardu, RPC `readPlate` → do 3 slike → odgovor + telemetrija `ALPR-Entrance` / `ALPR-Exit` |
+| [edge_service/alpr_service.py](edge_service/alpr_service.py) | čitanje: kamera / sintetska kamera / mapa slika → detekcija (`plate_detector`) → OCR → najbolji rezultat |
+| [edge_service/__main__.py](edge_service/__main__.py) | naredbe: `tb-alpr` (B), `read` (offline); `all`, `access`, `alpr`, `manual` (A) |
+| [edge_service/decisions.py](edge_service/decisions.py), [access_control.py](edge_service/access_control.py) | varijanta A: pravila odluke i lokalna kontrola pristupa (u B ih zamjenjuje rule chain) |
+| [edge.example.yaml](edge.example.yaml) | konfiguracija s objašnjenjima (sekcija `thingsboard`: host, port, token) |
+| [deploy/](deploy) | Docker (`docker-compose.alpr.yml` za B), nativna instalacija, systemd (`garage-alpr.service`) |
 | [tools/evaluate_ocr.py](tools/evaluate_ocr.py) | tablica točnosti OCR-a s brojem pogrešno prihvaćenih čitanja (mora biti 0) |
 | [rezultati/](rezultati) | izvještaji na sintetskim skupovima |
-| [tests/](tests) | normalizacija, OCR, pravila odluke i scenariji access controla; svaka poruka se provjerava prema ugovoru |
+| [tests/](tests) | normalizacija, OCR, ALPR kao uređaj ThingsBoarda (`test_tb_alpr.py`); pravila odluke i access control (A) |
 
 ## Kako se računa pouzdanost
 
@@ -37,31 +39,26 @@ Pragovi i pravila odluke su u [komunikacijskom ugovoru](../../PROJEKT/sustav/kom
 ```bash
 python -m edge_service read ../alpr/dataset/synthetic/controlled/images/00*.jpg   # offline čitanje
 python tools/evaluate_ocr.py ../alpr/dataset/synthetic/controlled                 # tablica točnosti
-cp edge.example.yaml edge.yaml                  # prilagodi kameru, pragove
-python -m edge_service --config edge.yaml all   # treba Mosquitto; ALPR_SOURCE=sim za rad bez kamere
+cp edge.example.yaml edge.yaml                      # kamera, pragovi, sekcija thingsboard (host, token)
+python -m edge_service --config edge.yaml tb-alpr   # treba ThingsBoard; ALPR_SOURCE=sim za rad bez kamere
 pytest tests
 ```
 
-Ručne radnje operatera (isto rade gumbi na ThingsBoard dashboardu, a svaka se bilježi u bazu):
+Ručne radnje operatera su gumbi na nadzornom dashboardu („Ručno odobri ulaz“, „Odbij“, „Otvori izlaz“).
 
-```bash
-python -m edge_service manual approve-entry --plate ZG1234AB --note "pločica prljava"
-python -m edge_service manual approve-exit --plate ZG1234AB
-python -m edge_service manual deny --gate entrance
-python -m edge_service manual open --gate exit
-```
-
-Postavljanje na Raspberry Pi ili Jetson Nano (Docker ili nativno): [INSTALL.md §6](../INSTALL.md#6-edge-računalo-raspberry-pi-ili-jetson-nano).
+Postavljanje uz kameru (laptop, Raspberry Pi ili Jetson Nano, Docker ili nativno):
+[INSTALL.md §6](../INSTALL.md#6-alpr-servis-laptop-raspberry-pi-ili-jetson-nano-uz-kameru).
 
 ## Zadaci
 
-- ✅ OCR modul `plate_ocr` i lokalni edge servis `edge_service`
-- ✅ baza dopuštenih registracija (tablica `allowed_plates` u [SOFTWARE/baza](../baza)) i CLI
-- ✅ algoritam otvaranja i zatvaranja sesije (`access_control.py`) s testovima
+- ✅ OCR modul `plate_ocr` i ALPR servis
+- ✅ prijelaz na varijantu B: ALPR kao uređaj ThingsBoarda (`tb-alpr`), isproban s ThingsBoardom na sintetskim slikama
+- ✅ (varijanta A) lokalni access control, sesije i allow-lista s testovima
 - ✅ tablica točnosti OCR-a na sintetskom skupu · ⬜ na stvarnom skupu
 - ⬜ `read` i `evaluate_ocr.py` na prvim stvarnim fotografijama
 - ⬜ sa Svenom skup stvarnih slika i tablica točnosti, 0 pogrešno prihvaćenih
 - ⬜ po potrebi podesiti težine, pragove i varijante (`OcrConfig`) i ponoviti mjerenje
-- ⬜ edge na Raspberry Pi (Docker ili nativno), kamera u `edge.yaml`
-- ⬜ s timom dogovoriti `policy: open` ili `allowlist` (`parking-sessions allow add ZG1234AB --label "Testno vozilo 1"`)
+- ⬜ ALPR uz kameru (laptop ili Raspberry Pi), kamera i token `alpr-service` u `edge.yaml`
+- ⬜ izmjeriti vrijeme od `vehicleArrived` do odgovora `readPlate` (cilj: rampa otvorena za < 3 s)
+- ⬜ s timom dogovoriti `policy: open` ili `allowlist` (atributi `policy` i `allowlist` asseta Garage)
 - ⬜ koraci H8–H10 iz [plana integracije](../../PROJEKT/upravljanje/plan-integracije.md) s pravim hardverom

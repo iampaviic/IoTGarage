@@ -5,24 +5,19 @@ svaki korak može isprobati i bez hardvera (stupac "bez hardvera"). Sljedeći ko
 kriterij uspjeha. Rezultat upisuje Lovro u [testni zapisnik](../testiranje/testni-zapisnik.md): datum, tko,
 prošlo ili palo, napomena.
 
-Naredbe se pokreću iz mape `SOFTWARE` s aktiviranim `.venv` ([INSTALL.md](../../SOFTWARE/INSTALL.md)).
+Naredbe se pokreću iz mape `SOFTWARE` s aktiviranim `.venv` ([INSTALL.md](../../SOFTWARE/INSTALL.md)). Plan je za
+[varijantu B](../sustav/varijanta-b.md): ESP32 i ALPR spajaju se izravno na ThingsBoard na laptopu.
 
 ## Prije prvog koraka
 
-- U jednom terminalu stalno radi monitor ugovora: `python -m garage_contract.monitor`. Crveno označi svaku poruku
-  koja krši ugovor.
+- ThingsBoard radi na laptopu i pripremljen je s `provision.py`
+  ([INSTALL.md §3](../../SOFTWARE/INSTALL.md#3-thingsboard-laptop-ili-server-s--4-gb-ram)); `provision.py` ispiše
+  *access tokene* za `secrets.h`. ESP32 u `TB_HOST` ima IP laptopa. Na Windowsu u vatrozidu dopusti Dockeru pristup
+  na privatnoj mreži (port 1883).
+- Poruke se prate u ThingsBoardu: *Entities → Devices → uređaj → Latest telemetry*, a tok kroz rule chain uključivanjem
+  *Debug* na čvoru (*Rule chains → Garaža (varijanta B) → čvor → Debug*, zatim kartica *Events*).
 - Prije svakog spajanja na ESP32 isključi napajanje i dvaput provjeri žice prema
   [shemi spajanja](../maketa/shema-spajanja.md).
-- Dok Raspberry Pi nije spreman, broker može biti laptop. ESP32 tada u `MQTT_HOST` ima adresu laptopa. Mosquitto po
-  zadanom prima samo lokalne veze, pa napravi datoteku `lan.conf`:
-
-  ```
-  listener 1883
-  allow_anonymous true
-  ```
-
-  i pokreni `mosquitto -c lan.conf -v`. Na Windowsu prvo zaustavi servis (`net stop mosquitto` u terminalu
-  pokrenutom kao administrator) i u vatrozidu dopusti pristup na privatnoj mreži.
 
 ## Pregled
 
@@ -30,16 +25,16 @@ Naredbe se pokreću iz mape `SOFTWARE` s aktiviranim `.venv` ([INSTALL.md](../..
 |---|---|---|---|---|
 | H0 | napajanje bez elektronike | Patrik, Lovro | prije prvog spajanja | |
 | H1 | jedan ultrazvučni senzor | Toma | KT2 | |
-| H2 | senzori na MQTT-u | Toma | KT2 | `python senzori/simulator/spot_simulator.py` |
+| H2 | senzori u ThingsBoardu (MQTT, token) | Toma | KT2 | `python senzori/simulator/spot_simulator_tb.py` |
 | H3 | svih 6 senzora, kalibracija i test 20× | Toma, Lovro, Patrik | KT5 | |
-| H4 | senzori u ThingsBoardu | Anja | KT2 | simulator senzora + ThingsBoard + `python -m tb_bridge` |
+| H4 | senzori na dashboardu, gubitak veze | Anja, Toma | KT2 | simulator senzora (`k` = prekid veze) + ThingsBoard |
 | H5 | jedan servo | Luka | KT2 | |
 | H6 | obje rampe: IR, LED, tipke, sigurnosni testovi | Luka, Patrik | KT5 | |
-| H7 | rampe na MQTT-u | Luka | KT5 | `python rampe/simulator/gate_simulator.py` |
+| H7 | rampe u ThingsBoardu (RPC) | Luka | KT5 | `python rampe/simulator/gate_simulator_tb.py` |
 | H8 | kamera, detekcija i OCR | Sven, Lukas, Patrik | KT2 prva fotografija, KT5 ≥ 90 % | `python -m edge_service read <slike>` na sintetskim slikama |
-| H9 | cijeli ulaz na edge računalu | Lukas, Luka | KT6 | `python integracija/simulacija.py --broker` |
-| H10 | izlaz i ThingsBoard | svi | KT6 | `python integracija/simulacija.py --broker --tb` |
-| H11 | testovi otpornosti i proba demonstracije | svi | KT7 | `pytest integracija/tests -v` (isto vrti CI) |
+| H9 | cijeli ulaz kroz rule chain | Lukas, Luka, Anja | KT6 | `python integracija/simulacija_b.py --alpr sim` |
+| H10 | izlaz, ručno odobrenje i dashboardi | svi | KT6 | `python integracija/simulacija_b.py` |
+| H11 | testovi otpornosti i proba demonstracije | svi | KT7 | `TB_LIVE_TEST=1 pytest integracija/tests/test_varijanta_b.py -v` |
 
 ## H0. Napajanje bez elektronike
 
@@ -65,14 +60,16 @@ Treba: ESP32 senzora, jedan HC-SR04, otpornici 1 kΩ i 2 kΩ (ili 2 × 1 kΩ), p
 
 Uspjeh (TC-S01): prazno ~14 cm, s autićem ~6–7 cm, razlika veća od 4 cm.
 
-## H2. Senzori na MQTT-u
+## H2. Senzori u ThingsBoardu
 
-1. U `secrets.h` upiši Wi-Fi i `MQTT_HOST` (laptop s `lan.conf` ili Pi) pa ponovno učitaj firmware.
-2. Serijski `status` mora javiti `WiFi=1 MQTT=1`.
-3. U monitoru su poruke `garage/parking/spot/P01/telemetry` zelene.
-4. Serijski `sim 3 1` simulira zauzeto P03, `sim off` vraća mjerenje.
+1. U `secrets.h` upiši Wi-Fi, `TB_HOST` (IP laptopa) i `TB_TOKEN` uređaja `esp32-spots` pa ponovno učitaj firmware.
+2. Serijski monitor javlja `ThingsBoard: connected`, a `status` `WiFi=1 ThingsBoard=1`. `rc=4` ili `rc=5` znači
+   pogrešan token.
+3. U ThingsBoardu `esp32-spots` je *Active*, a `ParkingSpot-01` … `06` imaju svježu telemetriju (`state`,
+   `sensorStatus`); `esp32-spots` ima `freeSpots`, `occupiedSpots`, `unknownSpots`.
+4. Serijski `sim 3 1` simulira zauzeto P03, `sim off` vraća mjerenje. Isto radi RPC `sim` na `esp32-spots`.
 
-Uspjeh: poruke svih 6 mjesta su zelene, promjena stanja stiže za manje od 1 s.
+Uspjeh: svih 6 mjesta ima telemetriju, promjena stanja je u ThingsBoardu za manje od 1 s.
 
 ## H3. Svih 6 senzora, kalibracija i test 20×
 
@@ -85,22 +82,21 @@ Uspjeh: poruke svih 6 mjesta su zelene, promjena stanja stiže za manje od 1 s.
    `senzori/firmware/include/config.h` i tablicu za [tablica-pragova.md](../testiranje/tablica-pragova.md).
    "PROVJERITI montažu" znači da senzor nije okomit ili vidi zid.
 3. Upiši pragove u `config.h` i ponovno učitaj firmware.
-4. Test prihvaćanja preko MQTT-a:
+4. Test prihvaćanja, s ESP32 spojenim USB-om (alat čita promjene koje firmware ispisuje i šalje ThingsBoardu):
    ```bash
-   MQTT_HOST=192.168.1.10 python senzori/tools/provjera_20x.py --all --cycles 20 --out testni-zapis-senzori.md
+   python senzori/tools/provjera_20x.py --port COM5 --all --cycles 20 --out testni-zapis-senzori.md
    ```
-   U Windows PowerShellu adresu brokera postavi prije naredbe: `$env:MQTT_HOST="192.168.1.10"`.
 
 Uspjeh (TC-S02): 20/20 ciklusa i točno 40 promjena po mjestu. Svaka dodatna promjena je treperenje.
 
-## H4. Senzori u ThingsBoardu
+## H4. Senzori na dashboardu, gubitak veze
 
-1. ThingsBoard radi na laptopu ([INSTALL.md §4](../../SOFTWARE/INSTALL.md#4-thingsboard-laptop-ili-server-s--4-gb-ram)).
-2. Bridge na Piju pokreće Docker. Dok Pija nema, pokreni ga na laptopu: `python -m tb_bridge` (zadano je
-   `MQTT_HOST=localhost`, `TB_HOST=localhost`, `TB_MQTT_PORT=1884`).
-3. Stavi i makni autić na jednom mjestu i izmjeri vrijeme štopericom.
+1. Otvori nadzorni dashboard „Garaža - nadzor“.
+2. Stavi i makni autić na jednom mjestu i izmjeri vrijeme štopericom.
+3. Isključi napajanje ESP32 senzora. Unutar ≈ 45 s mjesta postanu siva (`UNKNOWN` / `OFFLINE`), broj slobodnih je 0,
+   a u tablici alarma je „Uređaj nije dostupan“. Uključi ga natrag: stanja se vrate, alarm se ugasi.
 
-Uspjeh (TC-T01): tlocrt na dashboardu promijeni boju za manje od 3 s.
+Uspjeh (TC-T01, TC-I07): tlocrt promijeni boju za manje od 3 s; nestanak čvora nikad ne prikaže mjesta kao slobodna.
 
 ## H5. Jedan servo
 
@@ -126,18 +122,15 @@ Uspjeh: ruka se glatko otvara i zatvara, a ESP32 se pritom ne resetira.
 
 Uspjeh: svi sigurnosni testovi prolaze i upisani su u zapisnik.
 
-## H7. Rampe na MQTT-u
+## H7. Rampe u ThingsBoardu
 
-1. U `secrets.h` upiši Wi-Fi i `MQTT_HOST`, ponovno učitaj firmware. Monitor prikazuje zelene
-   `garage/gate/entrance/state`.
-2. Pošalji naredbu s laptopa, bez edge servisa:
-   ```bash
-   python -m garage_contract.monitor --pub garage/gate/entrance/command '{"requestId":"t1","command":"OPEN"}'
-   ```
-   Na Windowsu ovu naredbu pokreni u Git Bashu (dolazi s gitom), jer PowerShell iz nje miče navodnike. Kad edge
-   servis radi, isto napravi `python -m edge_service manual open --gate entrance`.
+1. U `secrets.h` upiši Wi-Fi, `TB_HOST` i `TB_TOKEN` uređaja `esp32-gates`, ponovno učitaj firmware. U ThingsBoardu
+   `EntranceGate` i `ExitGate` imaju telemetriju `state`, `vehiclePresent`.
+2. Na dashboardu pritisni „Otvori ulaz“ (RPC `open`). Gumb dobije odgovor rampe.
+3. Autić na crtu ulazne rampe: `EntranceGate` dobije `vehicleArrived = true`. Dok ALPR ne radi, rule chain nakon 15 s
+   javi `MANUAL_REQUIRED` (alarm „Potrebna ručna intervencija“), a „Ručno odobri ulaz“ otvori rampu.
 
-Uspjeh: stanja `OPENING → OPEN → CLOSING → CLOSED` i potvrda s istim `requestId` za manje od 1 s.
+Uspjeh: stanja `OPENING → OPEN → CLOSING → CLOSED` u ThingsBoardu, odgovor na RPC za manje od 1 s.
 
 ## H8. Kamera, detekcija i OCR
 
@@ -164,26 +157,26 @@ Prvo na laptopu, gdje se vidi slika, a tek onda na Piju.
 Uspjeh: pločica je uokvirena, izrez ravan i čitljiv, registracija točna s pouzdanošću ≥ 0,85. Za KT5 detekcija
 ≥ 90 % i 0 pogrešno prihvaćenih čitanja.
 
-## H9. Cijeli ulaz na edge računalu
+## H9. Cijeli ulaz kroz rule chain
 
-1. Pi radi s kamerom ([INSTALL.md §6](../../SOFTWARE/INSTALL.md#6-edge-računalo-raspberry-pi-ili-jetson-nano)), a
-   oba ESP32 koriste Pi kao broker.
+1. ALPR servis radi uz kameru, na laptopu ili Piju
+   ([INSTALL.md §6](../../SOFTWARE/INSTALL.md#6-alpr-servis-laptop-raspberry-pi-ili-jetson-nano-uz-kameru)), a
+   `alpr-service` je u ThingsBoardu *Active*.
 2. Autić dođe na ulaz i stane na graničnik.
-3. U monitoru redom: `gate/entrance/state` (vozilo prisutno), `alpr/entrance/event` (registracija i pouzdanost),
-   `access/decision GRANTED`, `gate/entrance/command OPEN`. Rampa se otvara.
-4. Sesija u bazi, na Piju u mapi `edge/deploy`:
-   ```bash
-   docker compose -f docker-compose.edge.yml -f docker-compose.camera.yml exec edge parking-sessions --db /data/garage.db list --active
-   ```
+3. U ThingsBoardu redom: `EntranceGate` `vehicleArrived`, `ALPR-Entrance` `plate` i `ocrConfidence`, na assetu
+   Garage `decision = GRANTED` i `sessionEvent = SESSION_OPENED`, zatim `EntranceGate` `OPENING`. Rampa se otvara.
+4. Sesija je u atributu `sessions` asseta Garage (*Entities → Assets → Garage → Attributes*), a na dashboardu
+   „Vozila u garaži“ poraste za 1.
 
-Uspjeh (TC-I01): od zaustavljanja do otvaranja prođe manje od 3 s, sesija je `ACTIVE` s vremenom ulaska, a rampa se
-otvara samo nakon `GRANTED`.
+Uspjeh (TC-I01): od zaustavljanja do otvaranja prođe manje od 3 s, sesija ima vrijeme ulaska, a rampa se otvara samo
+nakon `GRANTED`.
 
 ## H10. Izlaz i ThingsBoard
 
 1. Autić s P03 vozi na izlaz. Stiže `SESSION_CLOSED` s trajanjem i cijenom i rampa se otvara.
 2. Na nadzornom dashboardu su odluke, sesije i alarmi, a na analitičkom ulazak i trajanje.
-3. Gumbi: "Otvori ulaz" i "Ručno odobri ulaz". Za drugi prekrij pločicu: `MANUAL_REQUIRED` → gumb → `GRANTED`.
+3. Gumbi: "Otvori ulaz" i "Ručno odobri ulaz". Za drugi prekrij pločicu: `MANUAL_REQUIRED` → upiši registraciju u
+   „Registracija za ručno odobrenje“ → gumb → `GRANTED MANUAL_APPROVAL`.
 
 Uspjeh: cijeli [demo scenarij](../../PREZENTACIJA/demo-scenarij.md) (koraci 1–13) prolazi bez zastoja.
 
@@ -193,9 +186,9 @@ Na maketi, iz [testnog plana](../testiranje/testni-plan.md):
 
 | test | kako | očekivano |
 |---|---|---|
-| TC-I08 ThingsBoard ne radi | na laptopu `docker compose stop thingsboard`, autić uđe, zatim `start` | ulaz radi; događaji se pojave s izvornim vremenom |
+| TC-I08 ThingsBoard ne radi | na laptopu `docker compose stop thingsboard`, autić na ulaz, tipka, zatim `start` | rampa se otvara samo tipkom i sama zatvara; nakon `start` uređaji se sami spoje, stanja i sesije su točni |
 | TC-I09 restart ESP32 | tipka EN/RST na oba ESP32 | za manje od 30 s sve radi |
-| TC-I10 restart Pija | `sudo reboot` | servisi se sami pokrenu, aktivne sesije ostaju |
+| TC-I10 restart ALPR računala | `sudo reboot` (ili ponovno pokreni `tb-alpr`) | servis se sam pokrene i spoji; aktivne sesije ostaju (u ThingsBoardu) |
 | TC-I14 nema Wi-Fi-ja | ugasi router na 1 min | tipka na rampi radi; nakon povratka stanja su točna |
 | TC-S04 senzor ne radi | odspoji ECHO jednog senzora | mjesto `UNKNOWN`, ne broji se kao slobodno, alarm |
 | TC-I04 puna garaža | autić na svako mjesto, sedmi na ulaz | `DENIED GARAGE_FULL` |

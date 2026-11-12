@@ -1,4 +1,6 @@
-# tb_bridge – Mosquitto → ThingsBoard
+# tb_bridge – Mosquitto → ThingsBoard (varijanta A, rezerva)
+
+U varijanti B se ne koristi: uređaji se spajaju izravno na ThingsBoard.
 
 ```bash
 pip install -e SOFTWARE/thingsboard/bridge

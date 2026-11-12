@@ -14,8 +14,8 @@ iz [testnog plana](../testiranje/testni-plan.md). Status ažurira Patrik na tjed
 | FR-05 | Sustav pronalazi pločicu i izrezuje je s ispravljenom perspektivom | M | Sven | TC-A02 | gotovo (sintetski 100 %) |
 | FR-06 | Sustav čita registraciju i vraća pouzdanost | M | Lukas | TC-O01 | gotovo (sintetski) |
 | FR-07 | Rampa se nikad ne otvara automatski ispod praga pouzdanosti (0.85) | M | Lukas | TC-O03 | gotovo (test po svim kombinacijama) |
-| FR-08 | Edge lokalno odlučuje o ulasku: valjana registracija + slobodno mjesto + nije već unutra | M | Lukas | TC-I01 | gotovo |
-| FR-09 | Nesigurno očitanje → nova slika (do 3x) → ručno odobrenje | M | Lukas | TC-I03 | gotovo |
+| FR-08 | Sustav (rule chain ThingsBoarda) odlučuje o ulasku: valjana registracija + slobodno mjesto + nije već unutra | M | Anja, Luka | TC-I01 | gotovo (simulacija s ThingsBoardom) |
+| FR-09 | Nesigurno očitanje → nova slika (do 3x, u ALPR servisu) → ručno odobrenje | M | Lukas, Anja | TC-I03 | gotovo |
 | FR-10 | Ulazna i izlazna rampa otvaraju/zatvaraju se na naredbu i potvrđuju izvršenje | M | Luka | TC-R01 | firmware gotov |
 | FR-11 | Rampa se automatski zatvara i ne zatvara dok je vozilo ispod nje | M | Luka | TC-R03, TC-R04 | firmware + testovi gotovi |
 | FR-12 | Ručno otvaranje rampe (fizička tipka i dashboard) | M | Luka, Anja | TC-R06, TC-T04 | gotovo |
@@ -33,13 +33,13 @@ iz [testnog plana](../testiranje/testni-plan.md). Status ažurira Patrik na tjed
 
 | ID | zahtjev | mjera | provjera |
 |---|---|---|---|
-| NFR-01 | Rad bez ThingsBoarda | ulaz/izlaz rade, podaci se šalju naknadno | TC-I08 |
+| NFR-01 | Rad bez ThingsBoarda (varijanta B, D-012) | rampe se otvaraju tipkom, same se zatvaraju i ne spuštaju se na vozilo; nakon povratka stanja su točna | TC-I08 |
 | NFR-02 | Vrijeme od zaustavljanja vozila do otvaranja rampe | < 3 s u kontroliranim uvjetima | TC-I01 (mjeriti) |
 | NFR-03 | Točnost detekcije pločice na vlastitom skupu slika | ≥ 90 % | TC-A02 |
 | NFR-04 | Senzor mjesta | 20/20 ispravnih ciklusa po mjestu, bez treperenja | TC-S02 |
 | NFR-05 | Restart ThingsBoarda ne briše konfiguraciju ni povijest | provjereno | TC-T06 |
-| NFR-06 | Restart ESP32 / edge računala: sustav se oporavi sam | < 30 s | TC-I09, TC-I10 |
-| NFR-07 | Vrijeme u UTC ISO 8601 u svim porukama i bazi | 100 % poruka (monitor) | TC-C01 |
+| NFR-06 | Restart ESP32 / ALPR računala / ThingsBoarda: sustav se oporavi sam | < 30 s (ThingsBoard: nakon pokretanja) | TC-I09, TC-I10 |
+| NFR-07 | Vrijeme: ThingsBoard sprema UTC (ms), odluke i sesije u UTC ISO 8601 | 100 % zapisa | TC-C01 |
 | NFR-08 | Privatnost: samo izmišljene registracije, nema spremanja punih slika, brisanje nakon 30 dana | provjera konfiguracije | TC-P01 |
 | NFR-09 | Svaki podsustav ima simulacijski način | simulatori + `ALPR_SOURCE=sim` | TC-I11 |
-| NFR-10 | Svaka poruka poštuje komunikacijski ugovor | 0 grešaka u monitoru tijekom demo scenarija | TC-C01 |
+| NFR-10 | Svaka poruka poštuje komunikacijski ugovor | scenarij `simulacija_b.py` prolazi; na maketi 0 nepoznatih ključeva u ThingsBoardu | TC-C01 |

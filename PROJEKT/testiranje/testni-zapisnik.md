@@ -26,6 +26,11 @@ Svaki provedeni test = jedan redak (ne brisati stare – povijest pokazuje napre
 | 2026-10-21 | TC-T04 | SIM + ThingsBoard | ✅ | RPC `open` na EntranceGate → rampa `OPENING → OPEN`; `approveExit` → `MANUAL_APPROVAL`, sesija zatvorena (pozvano preko REST API-ja, gumb u UI-ju još kliknuti) | Claude |
 | 2026-10-21 | TC-T06 | SIM + ThingsBoard | ✅ | nakon restarta kontejnera: dashboardi postoje, 183 točke povijesti `entry` postoje | Claude |
 | 2026-10-22 | sve automatske | SIM (Python 3.13) | ✅ prolaz | nakon reorganizacije repozitorija po uputama nastavnika: `pytest` iz mape `SOFTWARE` **145 passed** (uklj. e2e); svih 7 3D dijelova se renderira | Claude |
+| 2026-11-12 | sve automatske | SIM (Python 3.13) | ✅ prolaz | prijelaz na varijantu B (D-012): `pytest` iz mape `SOFTWARE` **151 passed** (uklj. rule chain, ALPR kao uređaj ThingsBoarda, e2e varijante A) | Claude |
+| 2026-11-12 | firmware build | PlatformIO (espressif32 6.x) | ✅ | firmware B: senzori RAM 13,8 %, flash 59,0 %; rampe RAM 14,3 %, flash 61,6 %; `pio test -e native` 8/8 i 7/7; **nije još isproban na pločici** | Claude |
+| 2026-11-12 | TC-C01, TC-I01, I03, I04, I05, I07, I13, I16, TC-T04, TC-S06 | SIM + ThingsBoard CE 4.2.1 | ✅ | `test_varijanta_b.py`: scenarij od 8 koraka (ulaz, ručno odobrenje, već unutra, izlaz s cijenom, nepoznato vozilo i „Odbij“, puna garaža, gubitak veze čvora senzora → `OFFLINE`, alarm, oporavak); 3 uzastopna prolaza | Claude |
+| 2026-11-12 | TC-I01, I16 | SIM + ThingsBoard, pravi ALPR na sintetskim slikama | ✅ | `simulacija_b.py --alpr sim`: `ZG1234AB` pročitan s 0,98; nečitljiva pločica → `MANUAL_REQUIRED (NO_PLATE)`; `RI999XX` pročitan kao `RI999NN` s 0,31 → operater (rampa zatvorena) | Claude |
+| 2026-11-12 | TC-O03, TC-I02, TC-B02 | SIM + ThingsBoard | ✅ | `decide.tbel` u ThingsBoardu: nikad otvaranje ispod 0,85 (168 kombinacija), allow-lista, cijena = Python pravilo na 10 granica × 2 profila | Claude |
 | | TC-S01, S02, S04–S06 | HW | ⬜ | | Toma |
 | | TC-R01 – R13 | HW | ⬜ | | Luka |
 | | TC-A01, A02 (stvarni skup) | HW | ⬜ | | Sven |

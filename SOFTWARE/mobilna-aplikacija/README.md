@@ -9,7 +9,10 @@ u [planu projekta](../../PROJEKT/plan-projekta)).
 ## Kako dohvatiti podatke
 
 - ThingsBoard pokreni prema [thingsboard/README.md](../thingsboard/README.md); podaci bez hardvera:
-  `python integracija/simulacija.py --broker --tb` (iz mape `SOFTWARE`).
+  `python integracija/simulacija_b.py --interactive` ili fiktivna povijest `python thingsboard/tools/seed_history.py`
+  (iz mape `SOFTWARE`).
+- Analitika (sažetak, ulasci, trajanje, cijena, odluke) je telemetrija **asseta** `Garage` (`entityType` = `ASSET`),
+  a stanje mjesta i rampi telemetrija uređaja `ParkingSpot-0x`, `EntranceGate`, `ExitGate`.
 - Za aplikaciju napravi korisnika **samo za čitanje** (customer user), ne koristi tenant račun.
 - Prijava: `POST /api/auth/login` → JWT token; telemetrija: `GET /api/plugins/telemetry/{entityType}/{entityId}/values/timeseries?keys=...`
   ([REST API](https://thingsboard.io/docs/reference/rest-api/)).

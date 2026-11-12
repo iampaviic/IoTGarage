@@ -13,6 +13,6 @@ dokumentaciju.
 | [arhitektura.md](../sustav/arhitektura.md) | blok-dijagram, tokovi ulaska i izlaska, rad kad podsustav ispadne |
 | [komunikacijski-ugovor.md](../sustav/komunikacijski-ugovor.md) | MQTT teme, JSON poruke i pravila (QoS, retained, requestId, UTC) |
 | [zahtjevi.md](../sustav/zahtjevi.md) | funkcionalni i nefunkcionalni zahtjevi s vlasnikom i testom |
-| [SOFTWARE/ugovor](../../SOFTWARE/ugovor) | ugovor kao Python paket `garage_contract`: teme, JSON sheme, validacija, monitor |
+| [SOFTWARE/ugovor](../../SOFTWARE/ugovor) | ugovor kao Python paket `garage_contract`: imena uređaja i gateway klijent za ThingsBoard (B); teme, JSON sheme, monitor (A) |
 | [SOFTWARE/integracija](../../SOFTWARE/integracija) | simulacija cijelog sustava na jednom laptopu i end-to-end testovi |
 | [demo-scenarij.md](../../PREZENTACIJA/demo-scenarij.md) | završna demonstracija korak po korak |

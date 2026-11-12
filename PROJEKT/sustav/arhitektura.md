@@ -1,17 +1,21 @@
-# Arhitektura sustava
+# Arhitektura sustava – varijanta A (rezerva)
 
-Vlasnik dokumenta je Patrik. Promjena koja utječe na više podsustava ide kroz ovaj dokument i
+> **Tim radi varijantu B** ([varijanta-b.md](varijanta-b.md), odluka D-012). Ovaj dokument opisuje varijantu A
+> (lokalno odlučivanje na edge računalu), čiji kod ostaje u repozitoriju kao rezerva i ne razvija se dalje.
+
+Vlasnik dokumenta je Patrik. Promjena koja utječe na više podsustava ide kroz [varijanta-b.md](varijanta-b.md) i
 [komunikacijski-ugovor.md](komunikacijski-ugovor.md) te se bilježi u [odluke.md](../upravljanje/odluke.md).
 
 ## 1. Minimalni sustav (cilj)
 
-Vozilo dolazi do ulaza → kamera očitava registraciju → edge računalo lokalno odlučuje → rampa se otvara →
+Vozilo dolazi do ulaza → kamera očitava registraciju → edge računalo lokalno odlučuje (u varijanti B: rule chain
+ThingsBoarda) → rampa se otvara →
 senzor mjesta mijenja stanje nakon parkiranja → sve je vidljivo u ThingsBoardu. Na izlazu se registracija
 ponovno očitava, izračunava se trajanje i cijena te se zatvara parkirna sesija.
 
 ## 2. Blok-dijagram
 
-Ovo je varijanta A: odluke se donose lokalno na edge računalu i sustav radi i bez ThingsBoarda. Jednostavnija
+Ovo je varijanta A: odluke se donose lokalno na edge računalu i sustav radi i bez ThingsBoarda. Odabrana
 varijanta B, u kojoj sve odluke i podatke preuzima ThingsBoard, opisana je u [varijanta-b.md](varijanta-b.md).
 
 ```mermaid

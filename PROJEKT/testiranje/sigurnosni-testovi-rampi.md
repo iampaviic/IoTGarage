@@ -15,7 +15,7 @@ stvarni hardver (servo, IR senzor, montaža).
 | TC-R07 | ERROR i reset | 3× zaredom prekini zatvaranje | `ERROR`, rampa gore, LED trepće; tipka 3 s → reset | | |
 | TC-R08 | dvostruka naredba | pošalji isti `requestId` dvaput | drugi put `DUPLICATE`, nema dvostrukog pomaka | | |
 | TC-R09 | nevaljana naredba | `{"requestId":"x","command":"FLY"}` | `success:false`, `INVALID_COMMAND`, rampa miruje | | |
-| TC-R10 | ispad MQTT-a | zaustavi Mosquitto, pritisni tipku, provezi autić | otvaranje/zatvaranje lokalno radi; nakon povratka broker dobiva stanje | | |
+| TC-R10 | ispad ThingsBoarda ili mreže | zaustavi ThingsBoard (`docker compose stop`) ili router, pritisni tipku, provezi autić | otvaranje/zatvaranje lokalno radi; nakon povratka ThingsBoard dobiva stanje | | |
 | TC-R11 | ispad edge-a | edge ugašen, autić dođe | rampa ostaje zatvorena (nema odluke), tipka radi | | |
 | TC-R12 | restart ESP32 | reset tipka na ESP32 | rampa se zatvori/ostane zatvorena, `online:true`, `source: BOOT` < 10 s | | |
 | TC-R13 | struja servo | oba servo istovremeno | ESP32 se ne resetira (napajanje odvojeno, kondenzator) | | |

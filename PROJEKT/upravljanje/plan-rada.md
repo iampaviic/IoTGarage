@@ -70,7 +70,7 @@ Rezerva za zaostatke iz faza 2 i 3; nema planiranih zadataka.
 ## Faza 4 – stabilizacija i testiranje (T12–T13, 4.1. – 17.1.2027.)
 
 ⬜ Svi scenariji iz testnog plana (prazna/puna garaža, nepoznata/nečitljiva pločica, prekid Wi-Fi, prekid
-ThingsBoarda, restart ESP32 i edge računala, vozilo predugo ispod rampe, ulazak bez izlaska, izlazak bez sesije)
+ThingsBoarda, restart ESP32 i ALPR računala, vozilo predugo ispod rampe, ulazak bez izlaska, izlazak bez sesije)
 · ⬜ rezervni video · ⬜ zamrzavanje značajki (samo popravci).
 
 ## Faza 5 – dokumentacija, prezentacija i predaja (T14–T15, 18.1. – 29.1.2027.)

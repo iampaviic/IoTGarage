@@ -66,7 +66,7 @@ pytest tests
 
 ## Zadaci
 
-- ✅ modul za detekciju pločice `plate_detector` (koristi ga edge servis)
+- ✅ modul za detekciju pločice `plate_detector` (koristi ga ALPR servis u `SOFTWARE/edge`)
 - ✅ sintetski skup slika, alat za mjerenje i sintetski izvještaji
 - ✅ početna verzija [ograničenja](../../PROJEKT/testiranje/ogranicenja-alpr.md)
 - ⬜ isprintati pločice (100 %, mat papir) i zalijepiti ih na autiće (držač `SOFTWARE/maketa/3d/drzac_tablice.scad`)

@@ -2,21 +2,21 @@
 
 Registarske oznake, slike vozila i vremena ulaska/izlaska mogu se povezati s osobama (osobni podaci prema
 GDPR-u). Iako maketa ne obrađuje stvarne osobe, sustav je napravljen prema načelima zaštite podataka
-(smjernice EDPB-a za povezana vozila – lokalna obrada; AZOP – svrha, zaštita, označavanje videonadzora).
+(smjernice EDPB-a za povezana vozila – obrada slika uz kameru; AZOP – svrha, zaštita, označavanje videonadzora).
 
 | načelo | provedba u sustavu |
 |---|---|
 | minimizacija | slike se obrađuju u memoriji i ne spremaju; opcionalno samo izrez pločice (`privacy.save_crops`) |
-| lokalna obrada | ALPR i odluke na edge računalu; u ThingsBoard idu samo rezultati (registracija, odluka) |
-| ograničeno čuvanje | `parking-sessions purge --days 30`; izrezi pločica brišu se nakon `retention_days`; ThingsBoard TTL 30 dana (`SQL_TTL_TS_TS_KEY_VALUE_TTL`) |
+| lokalna obrada slika | ALPR na računalu uz kameru; u ThingsBoard idu samo rezultati (registracija, pouzdanost), nikad slike |
+| ograničeno čuvanje | ThingsBoard TTL 30 dana za telemetriju (`SQL_TTL_TS_TS_KEY_VALUE_TTL`); aktivne sesije samo dok je vozilo unutra; izrezi pločica brišu se nakon `retention_days` |
 | izmišljeni podaci | sve pločice generira `generate_plates.py`; stvarne registracije zabranjene u repozitoriju i izvještaju |
-| ograničen pristup | baza samo na edge računalu; ThingsBoard s promijenjenom lozinkom; token gatewaya tajan; Mosquitto s lozinkom za demo |
-| sljedivost | svaka ručna radnja zapisuje operatera, vrijeme i razlog (`events` tablica) |
+| ograničen pristup | ThingsBoard s promijenjenom lozinkom; tajni *access tokeni* uređaja (`esp32-spots`, `esp32-gates`, `alpr-service`); bez tokena se nitko ne može spojiti |
+| sljedivost | svaka odluka i ručna radnja je telemetrija asseta Garage (`decisionManual`), a ThingsBoard bilježi korisnika u *Audit logs* |
 | označavanje | na maketi natpis "Prostor pod videonadzorom" kao u stvarnoj garaži |
 
 ## Sigurnosne mjere (za demonstraciju)
-- Mosquitto: `allow_anonymous false` + `password_file` (upute u `SOFTWARE/integracija/mosquitto.conf`)
-- ESP32: lozinke samo u `secrets.h` (ne komita se)
-- ThingsBoard: promijeniti `tenant@thingsboard.org` lozinku, tajni `TB_GATEWAY_TOKEN`
+- ESP32: Wi-Fi lozinka i *access token* samo u `secrets.h` (ne komita se)
+- ThingsBoard: promijeniti `tenant@thingsboard.org` lozinku, tajni tokeni (`TB_TOKEN_SPOTS`, `TB_TOKEN_GATES`,
+  `TB_TOKEN_ALPR` pri `provision.py`)
 - Wi-Fi: zasebna mreža za maketu (WPA2)
 - Fizička sigurnost rampe: ne zatvara se na vozilo, nakon 3 sigurnosna otvaranja ide u ERROR (ostaje gore)

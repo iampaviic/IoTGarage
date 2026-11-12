@@ -1,5 +1,9 @@
 # Model podataka
 
+> Varijanta B (odabrana): parkirne sesije su atribut `sessions` asseta „Garage“ u ThingsBoardu, a završene sesije
+> i odluke njegova telemetrija ([komunikacijski ugovor](komunikacijski-ugovor.md#asset-garage-rule-chain)).
+> Pravilo naplate je isto (TBEL skripta `decide.tbel`). SQLite baza dolje pripada varijanti A (rezerva).
+
 SQLite baza na edge računalu (`GARAGE_DB`, zadano `data/garage.db`), shema u
 [SOFTWARE/baza/parking_sessions/store.py](../../SOFTWARE/baza/parking_sessions/store.py) (verzija 1).
 Sva vremena su tekst **UTC ISO 8601** (`2026-10-19T08:31:12Z`) – čitljivo u bilo kojem SQLite alatu
@@ -57,7 +61,8 @@ Pravila koja čuva baza:
 | najviše po započetom danu (24 h) | 15,00 € |
 
 Profil **`demo`**: vrijeme × 60 (1 minuta se naplaćuje kao 1 sat, prvih 15 s besplatno) – da se u demonstraciji
-od par minuta vidi cijena. Odabir: `PRICING_PROFILE=demo|real`. Implementacija i testovi graničnih slučajeva:
+od par minuta vidi cijena. Odabir: varijanta B `provision.py --demo-pricing` (atribut `timeMultiplier = 60` asseta
+Garage), varijanta A `PRICING_PROFILE=demo|real`. Implementacija i testovi graničnih slučajeva:
 [pricing.py](../../SOFTWARE/baza/parking_sessions/pricing.py), [test_sessions.py](../../SOFTWARE/baza/tests/test_sessions.py).
 
 ## API (servisne funkcije)

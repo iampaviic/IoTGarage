@@ -20,18 +20,18 @@ Dokument se ne kopira na GitLab ([.gitlab-tjedni](../../.gitlab-tjedni/README.md
 | dio | stanje |
 |---|---|
 | plan projekta (gantogram, kontrolne točke) | ✅ [PROJEKT/plan-projekta](../plan-projekta) |
-| arhitektura i komunikacijski ugovor | ✅ varijanta A je napisana u kodu; [varijanta B](../sustav/varijanta-b.md) (sve u ThingsBoardu) je samo opisana |
-| softver na edge računalu: ALPR, OCR, kontrola pristupa, baza sesija | ✅ napisan i testiran u simulaciji |
-| ThingsBoard: uređaji, 2 dashboarda, 7 alarma, bridge | ✅ isproban na ThingsBoard CE 4.2.1 |
-| simulacija cijelog sustava na jednom laptopu | ✅ `simulacija.py`, 0 poruka koje krše ugovor |
+| arhitektura i komunikacijski ugovor | ✅ odabrana je [varijanta B](../sustav/varijanta-b.md) (sve u ThingsBoardu, D-012), sa sekvencijskim dijagramima; varijanta A ostaje kao rezerva |
+| ThingsBoard: rule chain (odluke, sesije, naplata, alarmi), uređaji, 2 dashboarda | ✅ isproban na ThingsBoard CE 4.2.1 |
+| ALPR i OCR kao uređaj ThingsBoarda | ✅ napisan, isproban sa sintetskim slikama |
+| simulacija cijelog sustava s ThingsBoardom | ✅ `simulacija_b.py`, scenarij od 8 koraka prolazi |
 | automatski testovi (Python i oba firmwarea, u CI-u) | ✅ prolaze |
-| firmware za oba ESP32 | ✅ preveden, ⬜ nije isproban na hardveru |
+| firmware za oba ESP32 (ThingsBoard API) | ✅ preveden, ⬜ nije isproban na hardveru |
 | ALPR na stvarnim fotografijama makete | ⬜ zasad samo sintetske slike |
 | maketa | ⬜ nacrt 1:1, 3D dijelovi i 3D sklop postoje, fizička maketa ne |
 | mobilna aplikacija (Leo) | ⬜ nije započeta, postoje samo upute |
 | završna dokumentacija | ✅ kostur i 2 poglavlja, ⬜ ostalo |
 
-Sav softver postoji i radi u simulaciji. Preostaju hardver, maketa, mjerenja na stvarnim fotografijama, mobilna
+Sav softver postoji i radi u simulaciji s pravim ThingsBoardom. Preostaju hardver, maketa, mjerenja na stvarnim fotografijama, mobilna
 aplikacija i dokumentacija.
 
 Na GitHubu (`iampaviic/iotgarage`) grana `main` još ima staru strukturu s mapama `osoba-1-voditelj` …
@@ -45,56 +45,58 @@ prođe, *Merge pull request*. Zatim svi rade `git checkout main && git pull`. Tk
 Priča jednog autića:
 
 1. Autić dođe do ulazne rampe i stane na graničnik. IR senzor na crti rampe ga vidi.
-2. ESP32 rampi javi "vozilo je na ulazu" preko Wi-Fi-ja (MQTT poruka).
-3. Na edge računalu (Raspberry Pi uz maketu) servis za kontrolu pristupa traži od ALPR-a da pročita registraciju.
+2. ESP32 rampi javi ThingsBoardu "vozilo je na ulazu" preko Wi-Fi-ja (MQTT poruka `vehicleArrived`).
+3. Rule chain ThingsBoarda traži od ALPR servisa (laptop ili Raspberry Pi uz kameru) da pročita registraciju.
    ALPR uzme do 3 slike s USB kamere, pronađe pločicu i pročita znakove (OCR).
-4. Ako je pouzdanost dovoljna, ima slobodnih mjesta i vozilo već nije unutra, kontrola pristupa javi `GRANTED`,
-   otvori parkirnu sesiju u bazi (SQLite) i pošalje rampi naredbu "otvori".
+4. Ako je pouzdanost dovoljna, ima slobodnih mjesta i vozilo već nije unutra, rule chain zapiše `GRANTED`,
+   otvori parkirnu sesiju (atribut asseta Garage) i pošalje rampi naredbu "otvori" (RPC).
 5. ESP32 rampi okrene servo i upali zelenu LED. Kad autić prođe, sam zatvori rampu nakon 2 s.
 6. Autić parkira na P03. Ultrazvučni senzor iznad mjesta to vidi, ESP32 senzora javi "P03 zauzeto" i LED na mjestu
    postane crvena.
 7. Izlaz ide isto: kamera na izlazu, pronađena sesija, trajanje i cijena, rampa se otvara.
-8. Sve poruke idu i u ThingsBoard na laptopu: dashboard u stvarnom vremenu, povijest, alarmi i gumbi za ručno
-   upravljanje. Mobilna aplikacija čita analitiku iz ThingsBoarda.
+8. Dashboard u stvarnom vremenu pokazuje mjesta, rampe, odluke i alarme, a gumbi služe za ručno upravljanje.
+   Mobilna aplikacija čita analitiku iz ThingsBoarda.
 
-Glavno pravilo arhitekture (varijanta A) je da se odluka donosi lokalno na edge računalu. Ulaz i izlaz rade i kad
-ThingsBoard ili internet ne rade, a ThingsBoard služi za nadzor i povijest. Detalji su u
-[arhitektura.md](../sustav/arhitektura.md).
+Glavno pravilo arhitekture (varijanta B, odluka D-012) je da sve odluke donosi ThingsBoard. Bez ThingsBoarda ili
+mreže rampe se otvaraju samo tipkom (i dalje se same zatvaraju i ne spuštaju se na vozilo). Detalji i sekvencijski
+dijagrami su u [varijanta-b.md](../sustav/varijanta-b.md).
 
 ```
- MAKETA                         EDGE RAČUNALO (Raspberry Pi)              LAPTOP
- ESP32 senzora (6 mjesta) ─┐    ┌ MQTT broker (Mosquitto) ┐               ThingsBoard (Docker)
- ESP32 rampi (2 rampe)  ───┼──► │ ALPR + OCR              │ ── bridge ──►  dashboardi, alarmi
- USB kamera ───────────────┘    │ kontrola pristupa       │                     │
-                                └ baza sesija (SQLite)    ┘               mobilna aplikacija
+ MAKETA                                   LAPTOP
+ ESP32 senzora (6 mjesta) ──MQTT──┐       ┌ ThingsBoard (Docker) ──────────────────┐
+ ESP32 rampi (2 rampe)  ───MQTT───┼─────► │ rule chain: odluke, sesije, alarmi     │ ── REST ──► mobilna aplikacija
+ USB kamera ── ALPR + OCR ─MQTT───┘       └ dashboardi                             ┘
+              (laptop ili Pi)
 ```
 
-U sustavu su tri vrste računala: dva ESP32 (mikrokontroleri na maketi), jedan Raspberry Pi (edge računalo uz
-maketu) i laptop (ThingsBoard, razvoj, dashboard na demonstraciji). Svi su spojeni na isti Wi-Fi router.
+U sustavu su dva ESP32 (mikrokontroleri na maketi) i laptop (ThingsBoard, ALPR, dashboard na demonstraciji);
+ALPR po potrebi radi na Raspberry Piju uz kameru. Svi su spojeni na isti Wi-Fi router.
 
 ## 3. Rječnik
 
 | pojam | značenje |
 |---|---|
 | MQTT | jednostavan protokol za poruke: uređaj pošalje poruku na *temu*, a dobiju je svi koji su *pretplaćeni* na tu temu |
-| broker | "poštanski ured" za MQTT poruke; kod nas Mosquitto na Raspberry Piju, port 1883 |
-| tema (*topic*) | adresa poruke, npr. `garage/parking/spot/P03/telemetry` |
-| retained | broker pamti zadnju poruku teme i daje je svakom tko se spoji kasnije (koristimo za stanja) |
-| komunikacijski ugovor | popis svih tema i oblika poruka ([komunikacijski-ugovor.md](../sustav/komunikacijski-ugovor.md)); monitor ugovora crveno označi svaku poruku koja ga krši |
+| broker | "poštanski ured" za MQTT poruke; kod nas je to ugrađeni MQTT ThingsBoarda, port 1883 |
+| tema (*topic*) | adresa poruke, npr. `v1/gateway/telemetry` |
+| *access token* | "lozinka" uređaja u ThingsBoardu; ESP32 ga šalje kao MQTT korisničko ime |
+| gateway uređaj | uređaj koji jednom vezom šalje podatke za više uređaja (ESP32 senzora za 6 mjesta) |
+| rule chain | lanac pravila u ThingsBoardu koji obrađuje svaku poruku; kod nas donosi odluke, vodi sesije i alarme |
+| TBEL | jezik skripti u rule chainu (sličan JavaScriptu); naše skripte su u `SOFTWARE/thingsboard/rulechain/scripts` |
+| komunikacijski ugovor | popis tema, uređaja, ključeva i RPC metoda ([komunikacijski-ugovor.md](../sustav/komunikacijski-ugovor.md)) |
 | ESP32 | mali mikrokontroler s Wi-Fi-jem; imamo dva, za senzore mjesta i za rampe |
 | firmware | program na ESP32 (C++); prevodi se i učitava s PlatformIO u VS Codeu |
-| edge računalo | računalo uz maketu koje donosi odluke (Raspberry Pi; Jetson Nano je rezerva) |
+| edge računalo | računalo uz kameru na kojem radi ALPR (laptop ili Raspberry Pi; Jetson Nano je rezerva) |
 | ALPR | automatsko prepoznavanje registracija: *detekcija* (gdje je pločica) i *OCR* (što na njoj piše) |
 | OCR | čitanje znakova sa slike; imamo dva motora (Tesseract i usporedba s predlošcima) koji glasaju |
 | pouzdanost (*confidence*) | broj 0–1 koji kaže koliko se čitanja slažu; pragovi za odluku su u [ugovoru](../sustav/komunikacijski-ugovor.md#pravila-odlučivanja) |
-| kontrola pristupa (*access control*) | servis koji odlučuje: `GRANTED`, `DENIED`, `RETRY`, `MANUAL_REQUIRED` |
-| parkirna sesija | zapis jednog boravka: ulaz, mjesto, izlaz, trajanje, cijena |
-| ThingsBoard | IoT platforma s dashboardima, alarmima i poviješću (*digitalni blizanac* garaže) |
-| bridge | program koji prosljeđuje poruke s brokera u ThingsBoard i čuva ih dok ThingsBoard ne radi |
-| RPC | naredba iz ThingsBoarda prema uređaju; tako rade gumbi na dashboardu |
-| simulator | program koji se na MQTT-u ponaša kao hardver, pa nitko ne čeka tuđi hardver |
-| requestId | oznaka naredbe; potvrda nosi isti `requestId`, a ponovljena naredba se ne izvršava dvaput |
-| Last Will, heartbeat | poruka "uređaj je offline" koju broker pošalje kad ESP32 nestane; poruka "živ sam" svakih 30 s |
+| odluka | `GRANTED`, `DENIED` ili `MANUAL_REQUIRED` (operater odlučuje), s razlogom |
+| parkirna sesija | zapis jednog boravka: ulaz, izlaz, trajanje, cijena |
+| ThingsBoard | IoT platforma s dashboardima, alarmima i poviješću (*digitalni blizanac* garaže); kod nas i "mozak" sustava |
+| asset Garage | entitet u ThingsBoardu za cijelu garažu: postavke, sesije, sažetak, odluke |
+| RPC | naredba iz ThingsBoarda prema uređaju s odgovorom; tako rade gumbi na dashboardu i naredbe rampi |
+| simulator | program koji se prema ThingsBoardu ponaša kao hardver, pa nitko ne čeka tuđi hardver |
+| heartbeat, Disconnect | poruka "živ sam" svakih 30 s; kad ESP32 nestane, ThingsBoard to vidi (Disconnect Event) i digne alarm |
 | Docker, docker compose | pokreće programe u kontejnerima, istim naredbama na svakom računalu |
 | venv | izolirano Python okruženje projekta (mapa `.venv`) |
 | CI | GitHub nakon svakog pusha sam pokrene sve testove i prevede firmware |
@@ -113,10 +115,10 @@ Leo (rizik R-11).
 
 | odluka | prijedlog | gdje |
 |---|---|---|
-| edge računalo | Raspberry Pi 4, Jetson Nano kao rezerva (D-004) | [odluke.md](odluke.md) |
+| gdje radi ALPR | na laptopu s ThingsBoardom (najjednostavnije) ili na Raspberry Piju uz kameru (D-004) | [odluke.md](odluke.md) |
 | jedna ili dvije kamere | počnite s jednom koja se premješta, druga (~20 €) ako budžet dopusti (D-007) | [odluke.md](odluke.md), [nacrt-makete.md](../maketa/nacrt-makete.md#3-kamera) |
-| varijanta arhitekture A ili B | A, jer je napisana i testirana; B traži novi posao u ThingsBoardu | [varijanta-b.md](../sustav/varijanta-b.md) |
-| tko smije ući | `policy: open` (svaka valjana pločica) ili `allowlist` (samo s popisa) | `SOFTWARE/edge/edge.example.yaml` |
+| ~~varijanta arhitekture A ili B~~ | ✅ odlučeno: B (D-012) | [varijanta-b.md](../sustav/varijanta-b.md) |
+| tko smije ući | `policy: open` (svaka valjana pločica) ili `allowlist` (samo s popisa) | atributi `policy`, `allowlist` asseta Garage |
 | naplata | prijedlog D-009 | [model-podataka.md](../sustav/model-podataka.md#pravilo-naplate) |
 | mjerilo autića | 1:24 (baza 688 × 821 mm) | [nacrt-makete.md](../maketa/nacrt-makete.md) |
 | vlastiti Wi-Fi router za maketu | da, jer fakultetski Wi-Fi često blokira ESP32 (R-07, najveći rizik) | [rizici.md](rizici.md) |
@@ -144,14 +146,15 @@ Odluku upiši u [odluke.md](odluke.md) (kontekst → odluka → posljedice) i ma
 ## 5. Priprema laptopa
 
 Prije hardvera na svom laptopu pokreni cijeli sustav u simulaciji i ThingsBoard, da znaš kako sve treba izgledati.
-Koraci su u [INSTALL.md](../../SOFTWARE/INSTALL.md), poglavlja 1–4. Za GitHub još vrijedi:
+Koraci su u [INSTALL.md](../../SOFTWARE/INSTALL.md), poglavlja 1–4 (Python, ThingsBoard, simulacija). Za GitHub
+još vrijedi:
 
 - Repozitorij je privatan, pa git traži prijavu: korisničko ime s GitHuba i *personal access token* umjesto lozinke
   (GitHub → *Settings* → *Developer settings* → *Personal access tokens*).
 - Dok grana nije spojena u `main`, nakon kloniranja napravi `git checkout claude/gitlab-struktura`.
 
-Uspjeh: `pytest` završi s `passed` bez grešaka, `simulacija.py --broker` na kraju ispiše cijenu i
-`poruke koje krše ugovor: 0`, a na dashboardu "Garaža – nadzor" mjesta mijenjaju boju dok simulacija radi.
+Uspjeh: `pytest` završi s `passed` bez grešaka, `simulacija_b.py` na kraju ispiše `scenarij prošao`, a na
+dashboardu "Garaža – nadzor" mjesta mijenjaju boju i pojavljuju se odluke dok simulacija radi.
 
 ## 6. Postavljanje cijelog sustava s hardverom
 
@@ -163,118 +166,105 @@ Ovo je postupak kad je hardver spojen i ožičen. Kako se do toga dolazi dio po 
 Sve ide na vlastiti Wi-Fi router makete. ESP32 radi samo na 2,4 GHz, pa na routeru uključi 2,4 GHz mrežu i ne
 koristi mrežu s prijavom preko web stranice.
 
-U postavkama routera (DHCP → *address reservation*) svakom računalu daj stalnu adresu. Adrese iz primjera su već
-upisane u predloške:
+U postavkama routera (DHCP → *address reservation*) laptopu daj stalnu adresu. Adresa iz primjera je već upisana u
+predloške:
 
 | uređaj | adresa | gdje se upisuje |
 |---|---|---|
-| Raspberry Pi (edge, broker) | `192.168.1.10` | `MQTT_HOST` u `secrets.h` oba ESP32 |
-| laptop (ThingsBoard) | `192.168.1.20` | `TB_HOST` u `SOFTWARE/edge/deploy/.env` na Piju |
+| laptop (ThingsBoard, ALPR) | `192.168.1.20` | `TB_HOST` u `secrets.h` oba ESP32 (i `thingsboard.host` u `edge.yaml` ako ALPR radi na Piju) |
+| Raspberry Pi (samo ako ALPR radi na njemu) | `192.168.1.10` | |
 | ESP32 senzora, ESP32 rampi | bilo koja (DHCP) | |
 
 Ako router dijeli druge adrese (npr. `192.168.0.x`), koristi njih, ali iste u svim datotekama.
 
-### 6.2 Raspberry Pi (edge računalo)
-
-1. Sustav: u [Raspberry Pi Imageru](https://www.raspberrypi.com/software/) odaberi *Raspberry Pi OS Lite (64-bit)*.
-   U *Edit settings* postavi hostname `garaza-edge`, korisnika `pi` s lozinkom, Wi-Fi routera makete i uključi SSH.
-   Zapiši sustav na microSD, umetni ga u Pi i uključi.
-2. S laptopa se spoji: `ssh pi@garaza-edge.local` (ili `ssh pi@192.168.1.10`).
-3. Docker:
-   ```bash
-   sudo apt update && sudo apt full-upgrade -y && sudo apt install -y git
-   curl -fsSL https://get.docker.com | sh
-   sudo usermod -aG docker $USER          # zatim se odjavi (exit) i ponovno spoji
-   docker run --rm hello-world            # mora ispisati "Hello from Docker!"
-   ```
-4. Kod i postavke:
-   ```bash
-   git clone https://github.com/iampaviic/iotgarage.git ~/IoTGarage
-   cd ~/IoTGarage/SOFTWARE
-   cp edge/edge.example.yaml edge/edge.yaml            # kamera, pragovi, policy, naplata
-   cp edge/deploy/.env.example edge/deploy/.env
-   nano edge/deploy/.env                               # TB_HOST = adresa laptopa s ThingsBoardom
-   ```
-   U `edge.yaml` za početak ništa ne mijenjaj (jedna kamera `"0"`, `policy: open`, demo naplata). Datoteka mora
-   postojati prije pokretanja, inače Docker umjesto nje napravi praznu mapu.
-5. Pokretanje (prvi put gradi image, 10–30 min):
-   ```bash
-   cd ~/IoTGarage/SOFTWARE/edge/deploy
-   alias dc='docker compose -f docker-compose.edge.yml -f docker-compose.camera.yml'
-   dc up -d --build
-   dc ps                                               # mosquitto, edge, tb-bridge: running
-   dc logs -f edge                                     # zapisi edge servisa (Ctrl+C za izlaz)
-   ```
-   `alias` vrijedi do odjave. Da bude trajan, isti redak dodaj na kraj `~/.bashrc`. Naredbe `dc …` u ovom vodiču
-   pokreću se iz mape `~/IoTGarage/SOFTWARE/edge/deploy`. Bez kamere, samo za probu, pokreni
-   `docker compose -f docker-compose.edge.yml up -d --build` i ALPR će koristiti sintetske slike. Nakon restarta
-   Pija servisi se pokreću sami (`restart: unless-stopped`).
-6. Provjera s laptopa: `python -m garage_contract.monitor --host 192.168.1.10`. Svakih 30 s stižu heartbeat poruke
-   servisa na Piju.
-7. Vrijeme bez interneta (opcionalno, D-011): `sudo apt install -y chrony`, u `/etc/chrony/chrony.conf` dodaj redak
-   `allow 192.168.1.0/24` i pokreni `sudo systemctl restart chrony`. Zatim u `secrets.h` oba ESP32 postavi
-   `NTP_SERVER` na adresu Pija.
-
-Nova verzija koda: `cd ~/IoTGarage && git pull && cd SOFTWARE/edge/deploy && dc up -d --build`.
-Pi uvijek gasi sa `sudo shutdown -h now`, jer naglo isključivanje može oštetiti microSD.
-
-### 6.3 Laptop: ThingsBoard
+### 6.2 Laptop: ThingsBoard
 
 Na laptopu koji ide na demonstraciju pokreni ThingsBoard kao u
-[INSTALL.md §4](../../SOFTWARE/INSTALL.md#4-thingsboard-laptop-ili-server-s--4-gb-ram), a zatim:
+[INSTALL.md §3](../../SOFTWARE/INSTALL.md#3-thingsboard-laptop-ili-server-s--4-gb-ram), a zatim:
 
-- da tlocrt na dashboardu odgovara maketi: `python provision/provision.py --positions ../maketa/nacrt/spots.json`;
-- bridge s Pija spaja se na laptop na port 1884; ako Windows pita za vatrozid, dopusti Docker na privatnoj mreži;
-- za demonstraciju tajni token: `python provision/provision.py --token <tajna>`, isti `TB_GATEWAY_TOKEN` upiši u
-  `.env` na Piju i ondje pokreni `dc up -d`.
+- da tlocrt na dashboardu odgovara maketi: `python thingsboard/provision/provision.py --demo-pricing --positions maketa/nacrt/spots.json`;
+- za demonstraciju promijeni lozinku tenanta i postavi tajne tokene:
+  `TB_TOKEN_SPOTS=… TB_TOKEN_GATES=… TB_TOKEN_ALPR=… python thingsboard/provision/provision.py --password <nova>`;
+  iste tokene upiši u `secrets.h` oba ESP32 i u `edge/edge.yaml`;
+- ESP32 se spajaju na laptop na port 1883; ako Windows pita za vatrozid, dopusti Docker na privatnoj mreži.
 
-Uspjeh: na dashboardu "Garaža – nadzor" uređaj *Garage-Edge* je aktivan i stižu podaci.
+Uspjeh: rule chain „Garaža (varijanta B)“ je *root*, a dashboard „Garaža – nadzor“ se otvara.
+
+### 6.3 ALPR servis
+
+Najjednostavnije na istom laptopu, s kamerom na USB-u laptopa:
+
+```bash
+cp edge/edge.example.yaml edge/edge.yaml      # kamera "0", sekcija thingsboard: host localhost, token alpr-service
+python -m edge_service --config edge/edge.yaml tb-alpr
+```
+
+Ako kamera mora biti uz maketu daleko od laptopa, ALPR radi na Raspberry Piju:
+
+1. U [Raspberry Pi Imageru](https://www.raspberrypi.com/software/) odaberi *Raspberry Pi OS Lite (64-bit)*, u
+   *Edit settings* hostname `garaza-edge`, korisnika `pi`, Wi-Fi routera makete i SSH. S laptopa
+   `ssh pi@garaza-edge.local`.
+2. Docker: `curl -fsSL https://get.docker.com | sh`, `sudo usermod -aG docker $USER`, odjava i ponovna prijava.
+3. Kod i postavke:
+   ```bash
+   git clone https://github.com/iampaviic/iotgarage.git ~/IoTGarage && cd ~/IoTGarage/SOFTWARE
+   cp edge/edge.example.yaml edge/edge.yaml && cp edge/deploy/.env.example edge/deploy/.env
+   nano edge/deploy/.env                     # TB_HOST = adresa laptopa, TB_TOKEN_ALPR = token alpr-service
+   cd edge/deploy
+   docker compose -f docker-compose.alpr.yml -f docker-compose.alpr-camera.yml up -d --build   # prvi put 10–30 min
+   docker compose -f docker-compose.alpr.yml logs -f alpr
+   ```
+   `edge.yaml` mora postojati prije pokretanja, inače Docker umjesto nje napravi praznu mapu. Pi gasi sa
+   `sudo shutdown -h now`.
+
+Uspjeh: u ThingsBoardu je `alpr-service` *Active*, a u zapisima `connected to ThingsBoard`.
 
 ### 6.4 ESP32 senzora
 
 1. VS Code → *File* → *Open Folder* → `SOFTWARE/senzori/firmware`. PlatformIO sam prepozna projekt.
-2. Kopiraj `include/secrets.example.h` u `include/secrets.h` i upiši `WIFI_SSID`, `WIFI_PASSWORD`, `MQTT_HOST`
-   (adresa Pija) i `NTP_SERVER`. `secrets.h` se nikad ne komita.
+2. Kopiraj `include/secrets.example.h` u `include/secrets.h` i upiši `WIFI_SSID`, `WIFI_PASSWORD`, `TB_HOST`
+   (adresa laptopa) i `TB_TOKEN` (token `esp32-spots`). `secrets.h` se nikad ne komita.
 3. Spoji ESP32 USB kabelom koji prenosi podatke, ne samo kabelom za punjenje.
 4. *Upload* (strelica → u donjoj traci PlatformIO-a) ili `pio run -t upload`. Ako zapne na `Connecting....___`,
    drži tipku BOOT na pločici dok upload ne krene.
 5. *Serial Monitor* (ikona utikača) ili `pio device monitor` (115200). Očekuješ:
    ```
-   IoT Garage spot sensors 0.1.0, 6 spots
+   IoT Garage spot sensors 0.2.0, 6 spots
    WiFi: connecting...
-   MQTT: connecting to 192.168.1.10:1883
-   MQTT: connected
+   ThingsBoard: connecting to 192.168.1.20:1883
+   ThingsBoard: connected
    ```
-   Naredba `status` mora javiti `WiFi=1 MQTT=1 time=1`.
-6. Na laptopu `python -m garage_contract.monitor --host 192.168.1.10` prikazuje zelene poruke
-   `garage/parking/spot/P01…P06/telemetry`.
+   Naredba `status` mora javiti `WiFi=1 ThingsBoard=1`.
+6. U ThingsBoardu `esp32-spots` je *Active*, a `ParkingSpot-01…06` imaju telemetriju; na dashboardu mjesta imaju boju.
 
 Pinovi i pragovi su u `include/config.h`. Pragovi se ondje upišu nakon kalibracije (korak H3 plana integracije).
+Što čvor šalje i kada: sekvencijski dijagrami u [varijanta-b.md](../sustav/varijanta-b.md#čvor-senzora-mjesta-esp32).
 
 ### 6.5 ESP32 rampi
 
-Isto kao 6.4, u mapi `SOFTWARE/rampe/firmware`. U serijskom monitoru očekuješ `IoT Garage gates 0.1.0` i
-`MQTT: connected`. Naredbe su `open e`, `close e`, `reset e` i `status` (`x` umjesto `e` je izlazna rampa).
-Kutovi serva (`closedAngle`, `openAngle`) su u `include/config.h`.
+Isto kao 6.4, u mapi `SOFTWARE/rampe/firmware`, s tokenom `esp32-gates`. U serijskom monitoru očekuješ
+`IoT Garage gates 0.2.0` i `ThingsBoard: connected`. Naredbe su `open e`, `close e`, `reset e` i `status` (`x` umjesto
+`e` je izlazna rampa). Kutovi serva (`closedAngle`, `openAngle`) su u `include/config.h`.
 
 ### 6.6 Kamera
 
 1. Kamera je na mostu iznad trake, 200 mm iza crte rampe, s objektivom ~130 mm iznad poda. Gleda koso prema dolje na
    pločicu autića koji stoji na graničniku ([nacrt-makete.md](../maketa/nacrt-makete.md#3-kamera)).
-2. Uključi je u USB Raspberry Pija i provjeri: `ls /dev/video*` mora pokazati `/dev/video0`.
-3. Druga kamera je obično `/dev/video2`. Dodaj je u `docker-compose.camera.yml` (`devices`) i u `edge.yaml` za izlaz
-   postavi `camera: "2"` (upute su u komentarima `edge.example.yaml`).
+2. Na Linuxu `ls /dev/video*` mora pokazati `/dev/video0`; na Windowsu je prva kamera `"0"` u `edge.yaml`.
+3. Druga kamera je obično `"1"` (Windows) ili `/dev/video2` (Linux). U `edge.yaml` za izlaz postavi `camera`, a na
+   Piju je dodaj i u `docker-compose.alpr-camera.yml` (`devices`).
 4. Svjetlo: LED traka s difuzorom iznad zone kamere i pločice na mat papiru, bez odsjaja.
 
 ### 6.7 Svaki put kad pališ sustav
 
-1. Upali router, zatim Raspberry Pi (servisi se pokrenu sami za ~1 min).
-2. Na laptopu pokreni `docker compose up -d` u `SOFTWARE/thingsboard` i otvori dashboard.
+1. Upali router i laptop, pokreni `docker compose -f thingsboard/docker-compose.yml up -d` (iz mape `SOFTWARE`) i
+   otvori dashboard.
+2. Pokreni ALPR (`tb-alpr` na laptopu; na Piju se pokreće sam).
 3. Uključi maketu sklopkom 5 V.
 4. Nakon ~30 s sva mjesta imaju boju, rampe su zatvorene, a broj slobodnih mjesta je točan.
 5. Proba: autić na ulaz, rampa se otvara, parkiraj, mjesto postane crveno.
 
-Gasi se obrnutim redom, Pi sa `sudo shutdown -h now`. Upute za operatera dashboarda su u
+Gasi se obrnutim redom. Upute za operatera dashboarda su u
 [03-korisnicke-upute.md](../dokumentacija/03-korisnicke-upute.md), a za dan demonstracije u
 [demo-scenarij.md](../../PREZENTACIJA/demo-scenarij.md).
 
@@ -289,21 +279,21 @@ rokovima su u [plan-integracije.md](plan-integracije.md). Svaki tjedan s timom n
 |---|---|---|
 | upload na ESP32 ne uspijeva / nema porta | kabel samo za punjenje, nema drivera | drugi kabel; driver CP210x ili CH340 (piše na čipu do USB-a); drži BOOT tijekom `Connecting...` |
 | ESP32 stalno `WiFi: connecting...` | 5 GHz mreža, kriva lozinka, mreža s web prijavom | 2,4 GHz mreža routera makete, provjeri `secrets.h` |
-| `MQTT: failed, rc=-2` | kriva adresa brokera, broker ne radi ili prima samo lokalne veze, vatrozid | provjeri `MQTT_HOST`; na laptopu `mosquitto -c lan.conf -v`; dopusti port 1883 |
-| `MQTT: failed, rc=5` | broker traži lozinku | `MQTT_USER` / `MQTT_PASSWORD` u `secrets.h` |
-| monitor ne prikazuje ništa | monitor gleda drugi broker | `python -m garage_contract.monitor --host <adresa brokera>` |
-| crvene poruke u monitoru | netko šalje poruku koja ne odgovara ugovoru | monitor ispiše temu i razlog; ispravlja vlasnik tog dijela |
+| `ThingsBoard: failed, rc=-2` | kriva adresa laptopa, ThingsBoard ne radi, vatrozid | provjeri `TB_HOST`; `docker compose ps`; dopusti port 1883 |
+| `ThingsBoard: failed, rc=4` ili `rc=5` | pogrešan *access token* | `TB_TOKEN` u `secrets.h` = token koji je ispisao `provision.py` |
+| uređaj je *Active*, a nema telemetrije | poruka nije u očekivanom obliku ili ide na krivi uređaj | *Latest telemetry* uređaja i gatewaya; *Debug* na prvom čvoru rule chaina, kartica *Events* |
 | ESP32 se resetira kad se servo pomakne | pad napona | servo s adaptera, zajednička masa, kondenzator 1000 µF uz servo |
 | senzor uvijek `TIMEOUT` / `UNKNOWN` | ECHO nije spojen kroz djelitelj na pravi pin, senzor bez 5 V | provjeri pin u [shemi](../maketa/shema-spajanja.md), napon djelitelja, serijski `cal` |
 | mjesto treperi | senzor vidi zid ili nije okomit, pragovi preblizu | montaža, ponovno `kalibracija.py` |
 | IR javlja vozilo bez autića | vidi ruku rampe ili pod, previsoka osjetljivost | potenciometar na FC-51, položaj senzora |
-| rampa se ne otvara iako je registracija pročitana | odluka nije `GRANTED` | u monitoru pogledaj razlog u `access/decision` (`GARAGE_FULL`, `ALREADY_INSIDE`, `RETRY`, `MANUAL_REQUIRED`) |
-| uvijek `RETRY` / `MANUAL_REQUIRED` | mutna slika, odsjaj, loše svjetlo, pločica nije ispisana na 100 % | fokus i udaljenost kamere, mat papir, difuzor, graničnik kotača |
-| na Piju se `edge` ruši odmah nakon starta | `edge.yaml` ne postoji (Docker napravi mapu) ili kamera nije `/dev/video0` | `ls ~/IoTGarage/SOFTWARE/edge/edge.yaml`, `ls /dev/video*`, `dc logs edge` |
-| ThingsBoard ne dobiva ništa s Pija | kriva `TB_HOST` adresa, vatrozid laptopa, token se ne slaže | `.env` na Piju, port 1884 na laptopu, isti token u `provision.py --token` i `TB_GATEWAY_TOKEN`; `dc logs tb-bridge` |
-| gumbi na dashboardu ne rade ništa | bridge ili edge servis ne rade | `dc ps` na Piju |
-| `pytest` ili `simulacija.py` ne rade na laptopu | `.venv` nije aktiviran ili ne radiš iz mape `SOFTWARE` | `cd IoTGarage/SOFTWARE`, aktiviraj `.venv` |
-| `tesseract` / `mosquitto` "not recognized" (Windows) | nisu u PATH-u | dodaj mape u PATH, otvori novi terminal |
+| rampa se ne otvara iako je registracija pročitana | odluka nije `GRANTED` | asset Garage, *Latest telemetry*: `decision`, `decisionReason` (`GARAGE_FULL`, `ALREADY_INSIDE`, `LOW_CONFIDENCE`, `TIMEOUT` …) |
+| uvijek `MANUAL_REQUIRED` s razlogom `TIMEOUT` | ALPR servis ne radi ili nije spojen | `alpr-service` mora biti *Active*; zapisi `tb-alpr` |
+| uvijek `MANUAL_REQUIRED` s `LOW_CONFIDENCE` / `NO_PLATE` | mutna slika, odsjaj, loše svjetlo, pločica nije ispisana na 100 % | fokus i udaljenost kamere, mat papir, difuzor, graničnik kotača |
+| ništa se ne događa kad autić stane na rampu | nema `vehicleArrived` (IR) ili rule chain nije *root* | `EntranceGate` telemetrija; ponovno `provision.py` |
+| na Piju se `alpr` ruši odmah nakon starta | `edge.yaml` ne postoji (Docker napravi mapu) ili kamera nije `/dev/video0` | `ls ~/IoTGarage/SOFTWARE/edge/edge.yaml`, `ls /dev/video*`, `docker compose -f docker-compose.alpr.yml logs alpr` |
+| gumbi na dashboardu javljaju grešku | rampa nije spojena ili ne odgovara u 5 s | `esp32-gates` *Active*; alarm „Rampa ne potvrđuje naredbe“ |
+| `pytest` ili `simulacija_b.py` ne rade na laptopu | `.venv` nije aktiviran, ne radiš iz mape `SOFTWARE` ili ThingsBoard nije pripremljen | `cd IoTGarage/SOFTWARE`, aktiviraj `.venv`, `provision.py` |
+| `tesseract` "not recognized" (Windows) | nije u PATH-u | dodaj mapu u PATH, otvori novi terminal |
 
 Ako ništa od toga ne pomogne, pokreni isti korak sa simulatorom umjesto hardvera. Ako sa simulatorom radi, problem
 je u hardveru ili mreži. Ako ne radi ni tamo, problem je u kodu i javi se vlasniku tog dijela.
