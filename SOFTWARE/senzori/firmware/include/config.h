@@ -3,8 +3,9 @@
 #pragma once
 #include <stdint.h>
 
-#define FW_VERSION "0.1.0"
-#define DEVICE_ID  "esp32-spots"
+#define FW_VERSION "0.2.0"
+#define DEVICE_ID  "esp32-spots"          // gateway device in ThingsBoard, also the MQTT client id
+#define SPOT_DEVICE_PREFIX "ParkingSpot-"  // P03 -> ThingsBoard device ParkingSpot-03 (profile ParkingSpot)
 
 // ---------------------------------------------------------------- spots
 // HC-SR04 mounted ABOVE each spot looking down: empty spot = distance to the
@@ -40,8 +41,9 @@ static const SpotPins SPOTS[SPOT_COUNT] = {
 
 // ---------------------------------------------------------------- timing
 #define SENSOR_GAP_MS          60     // pause between two sensors (no ultrasonic cross-talk)
-#define HEARTBEAT_MS           30000  // republish all spots + heartbeat
+#define HEARTBEAT_MS           30000  // republish all spots + counts + heartbeat
 #define RECONNECT_MS           5000
+#define MQTT_KEEPALIVE_S       30     // ThingsBoard closes a silent connection after 1.5x this -> spots OFFLINE
 
 // ---------------------------------------------------------------- LEDs (optional)
 // One WS2812B LED per spot on a single data pin: green free, red occupied, blue unknown.

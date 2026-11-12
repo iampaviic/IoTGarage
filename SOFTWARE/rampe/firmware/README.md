@@ -4,9 +4,9 @@
 |---|---|
 | `platformio.ini` | `esp32dev` (Arduino) i `native` (unit testovi na PC-u) |
 | `include/config.h` | pinovi obje rampe, kutovi serva, vremena (automatsko zatvaranje, debounce) |
-| `include/secrets.example.h` | predložak za Wi-Fi/MQTT (kopiraj u `secrets.h`) |
+| `include/secrets.example.h` | predložak za Wi-Fi i ThingsBoard (IP, *access token*; kopiraj u `secrets.h`) |
 | `lib/GateLogic/` | stroj stanja rampe (bez Arduina, testabilan) |
-| `src/main.cpp` | servo (glatko pomicanje), IR, tipke (kratko/dugo), LED, zujalica, MQTT, serijske naredbe |
+| `src/main.cpp` | servo (glatko pomicanje), IR, tipke (kratko/dugo), LED, zujalica, ThingsBoard (gateway API, RPC), serijske naredbe |
 | `test/test_gate/` | Unity testovi stroja stanja |
 
 ```bash

@@ -1,18 +1,21 @@
 """Acceptance test of the spot sensors: 20x place and remove the car on every spot.
 
-    python provjera_20x.py --spot P03 --cycles 20
-    python provjera_20x.py --all --cycles 20 --out ../testni-zapis-P0x.md
+    python provjera_20x.py --port COM5 --spot P03 --cycles 20              # Linux: --port /dev/ttyUSB0
+    python provjera_20x.py --port COM5 --all --cycles 20 --out ../testni-zapis-P0x.md
 
-Listens to garage/parking/spot/+/telemetry over MQTT and guides you:
+Reads the state changes the sensor ESP32 prints on its serial port ("P03 -> OCCUPIED (6.4 cm, OK)",
+the same changes it sends to ThingsBoard) and guides you:
 "put the car on P03" -> waits for OCCUPIED -> "remove it" -> waits for FREE ...
 It counts every state change, so flicker (extra changes) or a missed change is
 caught. Criterion (project plan): 20 correct cycles per spot, no flicker.
 Writes a Markdown test record for the test log (PROJEKT/testiranje/testni-zapisnik.md).
+Without --port it listens to garage/parking/spot/+/telemetry on Mosquitto (varijanta A).
 """
 
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 import threading
 import time
@@ -49,6 +52,24 @@ class Recorder:
         return time.time() - t0
 
 
+CHANGE_RE = re.compile(r"^(P\d\d) -> (FREE|OCCUPIED|UNKNOWN) \((-?[\d.]+) cm")
+STATUS_RE = re.compile(r"^(P\d\d) (FREE|OCCUPIED|UNKNOWN)\s+filtered=(-?[\d.]+)")
+
+
+def read_serial(port: str, rec: Recorder, stop: threading.Event) -> None:
+    """Feed the recorder from the firmware's serial output (varijanta B: no broker needed)."""
+    import serial  # pyserial
+
+    with serial.Serial(port, 115200, timeout=0.5) as ser:
+        time.sleep(2.0)                 # opening the port may reset the ESP32
+        ser.write(b"status\n")          # current state of every spot
+        while not stop.is_set():
+            line = ser.readline().decode("utf-8", "replace").strip()
+            m = CHANGE_RE.match(line) or STATUS_RE.match(line)
+            if m:
+                rec.on_msg("", {"spotId": m.group(1), "state": m.group(2), "distanceCm": float(m.group(3))})
+
+
 def test_spot(rec: Recorder, spot: str, cycles: int, timeout: float, settle: float):
     results = []
     if rec.state.get(spot) != "FREE":
@@ -78,15 +99,22 @@ def main(argv=None) -> int:
     ap.add_argument("--timeout", type=float, default=15.0, help="max seconds for a state change")
     ap.add_argument("--settle", type=float, default=2.0, help="wait after each change (flicker shows up here)")
     ap.add_argument("--out", help="Markdown test record")
+    ap.add_argument("--port", help="serial port of the sensor ESP32 (COM5, /dev/ttyUSB0); without it: MQTT (A)")
     args = ap.parse_args(argv)
 
     rec = Recorder()
-    conn = MqttConnection("provjera-20x-%d" % int(time.time()), MqttSettings.from_env())
-    conn.subscribe(topics.SPOT_TELEMETRY_ALL, rec.on_msg)
-    if not conn.start():
-        print("MQTT broker not reachable", file=sys.stderr)
-        return 2
-    time.sleep(1.0)
+    stop = threading.Event()
+    conn = None
+    if args.port:
+        threading.Thread(target=read_serial, args=(args.port, rec, stop), daemon=True).start()
+        time.sleep(3.0)
+    else:
+        conn = MqttConnection("provjera-20x-%d" % int(time.time()), MqttSettings.from_env())
+        conn.subscribe(topics.SPOT_TELEMETRY_ALL, rec.on_msg)
+        if not conn.start():
+            print("MQTT broker not reachable", file=sys.stderr)
+            return 2
+        time.sleep(1.0)
     spots = GarageConfig.from_env().spots if args.all else [args.spot.upper()]
     lines = ["# Testni zapis senzora - %s" % time.strftime("%Y-%m-%d %H:%M"), "",
              "| mjesto | ciklusa | točno | promjena stanja (očekivano) | prosj. vrijeme detekcije | rezultat |",
@@ -105,7 +133,9 @@ def main(argv=None) -> int:
         print("=== %s: %d/%d cycles, %d state changes (expected %d) -> %s" % (
             spot, good, args.cycles, changes, 2 * args.cycles, "PASS" if ok else "FAIL"))
     lines += ["", "Kriterij: svako mjesto %d puta ispravno, bez treperenja (broj promjena = 2 x ciklusa)." % args.cycles]
-    conn.stop()
+    stop.set()
+    if conn:
+        conn.stop()
     text = "\n".join(lines) + "\n"
     print("\n" + text)
     if args.out:

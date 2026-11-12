@@ -4,11 +4,8 @@
 #define WIFI_SSID     "IoTGarage"
 #define WIFI_PASSWORD "change-me"
 
-// MQTT broker = the edge computer (Raspberry Pi / Jetson Nano) running Mosquitto
-#define MQTT_HOST     "192.168.1.10"
-#define MQTT_PORT     1883
-#define MQTT_USER     ""          // empty = anonymous
-#define MQTT_PASSWORD ""
-
-// time source for ISO 8601 timestamps; the edge computer can run an NTP server (chrony)
-#define NTP_SERVER    "pool.ntp.org"
+// ThingsBoard (varijanta B): the laptop or server running ThingsBoard, its MQTT port and the
+// access token of the gateway device "esp32-gates" (provision.py prints it; use a secret one for the demo)
+#define TB_HOST       "192.168.1.20"
+#define TB_PORT       1883
+#define TB_TOKEN      "esp32-gates-token"

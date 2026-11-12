@@ -4,9 +4,9 @@
 |---|---|
 | `platformio.ini` | `esp32dev` (Arduino) i `native` (unit testovi na PC-u) |
 | `include/config.h` | pinovi, pragovi po mjestu, vremena, LED traka |
-| `include/secrets.example.h` | predložak za Wi-Fi/MQTT (kopiraj u `secrets.h`, ne komitaj) |
+| `include/secrets.example.h` | predložak za Wi-Fi i ThingsBoard (IP, *access token*; kopiraj u `secrets.h`, ne komitaj) |
 | `lib/OccupancyFilter/` | filtar zauzetosti (bez Arduina, testabilan) |
-| `src/main.cpp` | mjerenje, MQTT, reconnect, Last Will, heartbeat, NTP, LED, serijske naredbe, simulacija |
+| `src/main.cpp` | mjerenje, ThingsBoard (gateway API, RPC), reconnect, heartbeat, LED, serijske naredbe, simulacija |
 | `test/test_filter/` | Unity testovi filtra |
 
 ```bash

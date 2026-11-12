@@ -1,9 +1,16 @@
-// Entrance + exit barrier node (ESP32, 2x SG90 servo, 2x IR sensor), owner: Luka
+// Entrance + exit barrier node (ESP32, 2x SG90 servo, 2x IR sensor), owner: Luka. Varijanta B: ThingsBoard.
 //
-// Subscribes  garage/gate/<entrance|exit>/command   {"requestId","command":"OPEN|CLOSE|RESET",...}
-// Publishes   garage/gate/<gate>/state (retained)  on every change, as command ack, every 30 s
+// The node is the gateway device "esp32-gates" in ThingsBoard (MQTT user name = access token) and
+// speaks for the devices EntranceGate and ExitGate through the ThingsBoard Gateway MQTT API:
+//   v1/gateway/telemetry  {"EntranceGate":[{state, stateCode, vehiclePresent, lastSource}]}
+//                         on every change and every 30 s;
+//                         + vehicleArrived:true when a vehicle reaches a CLOSED gate (the rule chain
+//                         then asks ALPR to read the plate and decides)
+//   v1/gateway/rpc        in:  {"device":"EntranceGate","data":{"id":7,"method":"open|close|reset|deny"}}
+//                         out: {"device":"EntranceGate","id":7,"data":{"success":true,"state":"OPENING"}}
+//   v1/devices/me/telemetry  heartbeat {uptimeS, rssi, freeHeap}; attributes {fwVersion, ip} after connecting
 // The state machine (lib/GateLogic) runs locally: auto close, safety reverse, buttons and LEDs
-// keep working when Wi-Fi, MQTT or the edge computer are down.
+// keep working when Wi-Fi or ThingsBoard are down.
 //
 // Serial commands: "open e|x", "close e|x", "reset e|x", "status"
 #include <Arduino.h>
@@ -11,7 +18,6 @@
 #include <ESP32Servo.h>
 #include <PubSubClient.h>
 #include <WiFi.h>
-#include <time.h>
 
 #include "GateController.h"
 #include "config.h"
@@ -31,82 +37,115 @@ struct GateRuntime {
     bool btnStable, btnRaw;
     uint32_t btnChangedMs, btnPressedMs;
     bool btnLongDone;
+    bool arrived;            // vehicle reached the closed gate -> vehicleArrived for the rule chain
+    long rpcId;              // RPC waiting for the answer of the state machine (-1 = none)
+    char rpcRequestId[24];
 };
 
 WiFiClient wifiClient;
 PubSubClient mqtt(wifiClient);
 GateRuntime gates[2];
-uint32_t lastLoopMs = 0, lastPeriodicMs = 0, lastHeartbeatMs = 0, lastWifiTryMs = 0, lastMqttTryMs = 0;
+uint32_t lastLoopMs = 0, lastPeriodicMs = 0, lastWifiTryMs = 0, lastMqttTryMs = 0;
 uint32_t beepUntil = 0;
-char statusTopic[64];
 
-bool timeValid() { return time(nullptr) > 1600000000; }
+int stateCode(GateState s) { return (int)s; }  // 0 CLOSED, 1 OPENING, 2 OPEN, 3 CLOSING, 4 ERROR
 
-void putTimestamp(JsonDocument& doc) {
-    if (!timeValid()) {
-        doc["timestamp"] = nullptr;
-        return;
-    }
-    char ts[24];
-    time_t now = time(nullptr);
-    struct tm t;
-    gmtime_r(&now, &t);
-    strftime(ts, sizeof ts, "%Y-%m-%dT%H:%M:%SZ", &t);
-    doc["timestamp"] = ts;
+bool publishJson(const char* topic, JsonDocument& doc) {
+    if (!mqtt.connected()) return false;
+    char buf[384];
+    size_t n = serializeJson(doc, buf, sizeof buf);
+    return mqtt.publish(topic, (const uint8_t*)buf, n, false);
 }
 
-void publishState(uint8_t i, const GateEvent* ev, const char* source) {
+void publishState(uint8_t i, const GateEvent* ev, const char* source, bool arrived = false) {
     GateRuntime& g = gates[i];
-    Serial.printf("[%s] %s present=%d %s %s\n", GATES[i].name, GateController::stateName(ev ? ev->state : g.ctrl.state()),
-                  ev ? ev->vehiclePresent : g.ctrl.vehiclePresent(), ev && ev->requestId[0] ? ev->requestId : "",
-                  ev && ev->reason ? ev->reason : "");
-    if (!mqtt.connected()) return;
+    GateState s = ev ? ev->state : g.ctrl.state();
+    bool present = ev ? ev->vehiclePresent : g.ctrl.vehiclePresent();
+    Serial.printf("[%s] %s present=%d %s %s%s\n", GATES[i].name, GateController::stateName(s), present,
+                  ev && ev->requestId[0] ? ev->requestId : "", ev && ev->reason ? ev->reason : "",
+                  arrived ? " vehicleArrived" : "");
     JsonDocument doc;
-    doc["gate"] = GATES[i].payloadName;
-    doc["state"] = GateController::stateName(ev ? ev->state : g.ctrl.state());
-    doc["vehiclePresent"] = ev ? ev->vehiclePresent : g.ctrl.vehiclePresent();
-    if (ev && ev->requestId[0]) doc["requestId"] = ev->requestId;
-    else doc["requestId"] = nullptr;
-    doc["success"] = ev ? ev->success : true;
-    if (ev && ev->reason) doc["reason"] = ev->reason;
-    else doc["reason"] = nullptr;
-    doc["source"] = ev ? ev->source : source;
-    doc["deviceId"] = DEVICE_ID;
-    putTimestamp(doc);
-    char topic[48], buf[320];
-    snprintf(topic, sizeof topic, "garage/gate/%s/state", GATES[i].name);
-    size_t n = serializeJson(doc, buf, sizeof buf);
-    mqtt.publish(topic, (const uint8_t*)buf, n, true);
+    JsonObject v = doc[GATES[i].device].add<JsonObject>();  // no ts -> ThingsBoard uses the time of receipt
+    v["state"] = GateController::stateName(s);
+    v["stateCode"] = stateCode(s);
+    v["vehiclePresent"] = present;
+    v["lastSource"] = ev ? ev->source : source;
+    if (ev && ev->requestId[0]) {
+        v["lastCommandSuccess"] = ev->success;
+        if (ev->reason) v["lastCommandReason"] = ev->reason;
+    }
+    if (arrived) v["vehicleArrived"] = true;
+    publishJson("v1/gateway/telemetry", doc);
+}
+
+void answerRpc(uint8_t i, long id, bool success, const char* state, const char* reason) {
+    JsonDocument doc;
+    doc["device"] = GATES[i].device;
+    doc["id"] = id;
+    doc["data"]["success"] = success;
+    doc["data"]["state"] = state;
+    if (reason) doc["data"]["reason"] = reason;
+    else doc["data"]["reason"] = nullptr;
+    publishJson("v1/gateway/rpc", doc);
 }
 
 void publishHeartbeat() {
-    if (!mqtt.connected()) return;
     JsonDocument doc;
-    doc["deviceId"] = DEVICE_ID;
-    doc["deviceType"] = "GATE_CONTROLLER";
     doc["uptimeS"] = millis() / 1000;
-    doc["fwVersion"] = FW_VERSION;
     doc["rssi"] = WiFi.RSSI();
     doc["freeHeap"] = ESP.getFreeHeap();
-    doc["ip"] = WiFi.localIP().toString();
-    putTimestamp(doc);
-    char buf[256];
-    size_t n = serializeJson(doc, buf, sizeof buf);
-    mqtt.publish("garage/system/heartbeat", (const uint8_t*)buf, n, false);
+    publishJson("v1/devices/me/telemetry", doc);
 }
 
+// RPC from the rule chain / dashboard to EntranceGate or ExitGate
 void onMessage(char* topic, byte* payload, unsigned int len) {
+    if (strcmp(topic, "v1/gateway/rpc") != 0) return;
     JsonDocument doc;
     if (deserializeJson(doc, payload, len)) {
-        Serial.println("ignoring invalid JSON command");
+        Serial.println("ignoring invalid RPC JSON");
         return;
     }
+    const char* device = doc["device"] | "";
+    long id = doc["data"]["id"] | -1L;
+    const char* method = doc["data"]["method"] | "";
     for (uint8_t i = 0; i < 2; i++) {
-        char t[48];
-        snprintf(t, sizeof t, "garage/gate/%s/command", GATES[i].name);
-        if (strcmp(topic, t) == 0)
-            gates[i].ctrl.command(doc["command"] | "", doc["requestId"] | "", "MQTT", millis());
+        if (strcmp(device, GATES[i].device) != 0) continue;
+        GateRuntime& g = gates[i];
+        if (!strcmp(method, "deny")) {  // operator or rule chain refused the vehicle: short beep, stay closed
+            beepUntil = millis() + 400;
+            answerRpc(i, id, true, GateController::stateName(g.ctrl.state()), nullptr);
+            return;
+        }
+        char cmd[8];
+        if (!strcmp(method, "open")) strcpy(cmd, "OPEN");
+        else if (!strcmp(method, "close")) strcpy(cmd, "CLOSE");
+        else if (!strcmp(method, "reset")) strcpy(cmd, "RESET");
+        else {
+            answerRpc(i, id, false, GateController::stateName(g.ctrl.state()), "INVALID_COMMAND");
+            return;
+        }
+        // the state machine answers with an event carrying this requestId; loop() sends it back as the RPC answer
+        g.rpcId = id;
+        snprintf(g.rpcRequestId, sizeof g.rpcRequestId, "rpc-%ld", id);
+        g.ctrl.command(cmd, g.rpcRequestId, "RPC", millis());
     }
+}
+
+void onConnected() {
+    for (uint8_t i = 0; i < 2; i++) {  // ThingsBoard links EntranceGate / ExitGate to this gateway
+        JsonDocument doc;
+        doc["device"] = GATES[i].device;
+        doc["type"] = "Gate";
+        publishJson("v1/gateway/connect", doc);
+    }
+    mqtt.subscribe("v1/gateway/rpc", 1);
+    JsonDocument attrs;
+    attrs["fwVersion"] = FW_VERSION;
+    attrs["ip"] = WiFi.localIP().toString();
+    attrs["deviceType"] = "GATE_CONTROLLER";
+    publishJson("v1/devices/me/attributes", attrs);
+    for (uint8_t i = 0; i < 2; i++) publishState(i, nullptr, "BOOT");
+    publishHeartbeat();
 }
 
 void ensureConnections() {
@@ -121,19 +160,13 @@ void ensureConnections() {
     }
     if (mqtt.connected() || now - lastMqttTryMs < RECONNECT_MS) return;
     lastMqttTryMs = now;
-    const char* will = "{\"deviceId\":\"" DEVICE_ID "\",\"online\":false}";
-    bool ok = strlen(MQTT_USER) ? mqtt.connect(DEVICE_ID, MQTT_USER, MQTT_PASSWORD, statusTopic, 1, true, will)
-                                : mqtt.connect(DEVICE_ID, statusTopic, 1, true, will);
-    if (!ok) {
-        Serial.printf("MQTT: failed rc=%d\n", mqtt.state());
+    if (!mqtt.connect(DEVICE_ID, TB_TOKEN, nullptr)) {
+        // rc 4/5 = wrong access token (check TB_TOKEN and the device esp32-gates in ThingsBoard)
+        Serial.printf("ThingsBoard: failed rc=%d\n", mqtt.state());
         return;
     }
-    Serial.println("MQTT: connected");
-    mqtt.publish(statusTopic, "{\"deviceId\":\"" DEVICE_ID "\",\"online\":true}", true);
-    mqtt.subscribe("garage/gate/entrance/command", 1);
-    mqtt.subscribe("garage/gate/exit/command", 1);
-    for (uint8_t i = 0; i < 2; i++) publishState(i, nullptr, "BOOT");
-    publishHeartbeat();
+    Serial.println("ThingsBoard: connected");
+    onConnected();
 }
 
 void readInputs(uint8_t i, uint32_t now) {
@@ -144,6 +177,7 @@ void readInputs(uint8_t i, uint32_t now) {
         g.irChangedMs = now;
     } else if (ir != g.irStable && now - g.irChangedMs >= IR_DEBOUNCE_MS) {
         g.irStable = ir;
+        if (ir && g.ctrl.state() == GateState::Closed) g.arrived = true;
         g.ctrl.setVehicle(ir, now);
     }
     bool pressed = digitalRead(GATES[i].buttonPin) == LOW;
@@ -198,6 +232,7 @@ void handleSerial() {
                     Serial.printf("%s %s present=%d angle=%.0f\n", GATES[i].name,
                                   GateController::stateName(gates[i].ctrl.state()), gates[i].ctrl.vehiclePresent(),
                                   gates[i].angle);
+                Serial.printf("WiFi=%d ThingsBoard=%d\n", WiFi.status() == WL_CONNECTED, mqtt.connected());
                 continue;
             }
             uint8_t i = which == 'x' ? 1 : 0;
@@ -213,7 +248,6 @@ void setup() {
     Serial.begin(115200);
     delay(200);
     Serial.printf("\nIoT Garage gates %s\n", FW_VERSION);
-    snprintf(statusTopic, sizeof statusTopic, "garage/system/status/%s", DEVICE_ID);
     GateTiming t;
     t.moveMs = GATE_MOVE_MS;
     t.closeAfterPassMs = CLOSE_AFTER_PASS_MS;
@@ -236,15 +270,17 @@ void setup() {
         g.btnRaw = g.btnStable = false;
         g.irChangedMs = g.btnChangedMs = g.btnPressedMs = 0;
         g.btnLongDone = true;
+        g.arrived = false;
+        g.rpcId = -1;
+        g.rpcRequestId[0] = 0;
     }
     if (BUZZER_PIN) pinMode(BUZZER_PIN, OUTPUT);
     WiFi.mode(WIFI_STA);
     WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
     lastWifiTryMs = millis();
-    configTime(0, 0, NTP_SERVER);
-    mqtt.setServer(MQTT_HOST, MQTT_PORT);
+    mqtt.setServer(TB_HOST, TB_PORT);
     mqtt.setBufferSize(512);
-    mqtt.setKeepAlive(30);
+    mqtt.setKeepAlive(MQTT_KEEPALIVE_S);
     mqtt.setCallback(onMessage);
     lastLoopMs = millis();
 }
@@ -257,12 +293,21 @@ void loop() {
     uint32_t dt = now - lastLoopMs;
     lastLoopMs = now;
     for (uint8_t i = 0; i < 2; i++) {
+        GateRuntime& g = gates[i];
         readInputs(i, now);
-        gates[i].ctrl.tick(now);
+        g.ctrl.tick(now);
         GateEvent ev;
-        while (gates[i].ctrl.popEvent(ev)) {
+        while (g.ctrl.popEvent(ev)) {
             publishState(i, &ev, ev.source);
+            if (g.rpcId >= 0 && !strcmp(ev.requestId, g.rpcRequestId)) {
+                answerRpc(i, g.rpcId, ev.success, GateController::stateName(ev.state), ev.reason);
+                g.rpcId = -1;
+            }
             if (ev.state == GateState::Closing && BUZZER_PIN) beepUntil = now + 150;
+        }
+        if (g.arrived) {
+            g.arrived = false;
+            publishState(i, nullptr, "SENSOR", true);
         }
         driveOutputs(i, now, dt);
     }
@@ -270,9 +315,6 @@ void loop() {
     if (now - lastPeriodicMs >= PERIODIC_STATE_MS) {
         lastPeriodicMs = now;
         for (uint8_t i = 0; i < 2; i++) publishState(i, nullptr, "PERIODIC");
-    }
-    if (now - lastHeartbeatMs >= 30000) {
-        lastHeartbeatMs = now;
         publishHeartbeat();
     }
     delay(5);
