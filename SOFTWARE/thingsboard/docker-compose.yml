@@ -9,8 +9,9 @@
 # tb-logs, so restarting or recreating the container never loses configuration
 # or history (project criterion). Only `docker compose down -v` deletes it.
 #
-# Ports: 8080 web UI + REST API, 1884 MQTT device API of ThingsBoard
-# (1883 stays free for Mosquitto on the same machine).
+# Ports: 8080 web UI + REST API, 1883 MQTT device API of ThingsBoard (varijanta B: the ESP32s
+# and the ALPR service connect here). If Mosquitto (varijanta A) runs on the same machine,
+# use "1884:1883" instead and set TB_MQTT_PORT=1884 / TB_PORT 1884 in the firmware.
 services:
   thingsboard:
     image: thingsboard/tb-postgres:4.2.1.1
@@ -18,7 +19,7 @@ services:
     restart: unless-stopped
     ports:
       - "8080:9090"
-      - "1884:1883"
+      - "1883:1883"
     environment:
       TB_QUEUE_TYPE: in-memory
       # load demo users (tenant@thingsboard.org / tenant) on the first start

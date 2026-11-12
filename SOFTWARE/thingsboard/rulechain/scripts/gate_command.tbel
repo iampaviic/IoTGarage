@@ -1,0 +1,13 @@
+// RPC to the gate: open after GRANTED; deny (short signal) when the operator's request did not open it.
+// Automatic decisions must not reuse the RPC id of an earlier request; a manual one answers the dashboard.
+if (metadata.manual != 'true') {
+    metadata.remove('requestUUID');
+    metadata.remove('oneway');
+    metadata.remove('expirationTime');
+    metadata.remove('persistent');
+    metadata.remove('retries');
+    metadata.remove('originServiceId');
+}
+var method = metadata.openGate == 'true' ? 'open' : 'deny';
+return {msg: {method: method, params: {reason: metadata.cmdReason, plate: metadata.cmdPlate}}, metadata: metadata,
+        msgType: 'RPC_CALL_FROM_SERVER_TO_DEVICE'};

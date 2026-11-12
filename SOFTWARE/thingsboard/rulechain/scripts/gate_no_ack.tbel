@@ -1,0 +1,2 @@
+// The gate did not answer the command in time
+return {msg: {ackTimeout: true}, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};

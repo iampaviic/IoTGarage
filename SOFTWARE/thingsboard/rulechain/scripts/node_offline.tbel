@@ -1,0 +1,1 @@
+return {msg: {online: false}, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};

@@ -1,0 +1,19 @@
+// Garage summary after a sensor or session change. Originator: asset "Garage".
+// free spots for a new car = min(FREE spots, total - active sessions); UNKNOWN is never counted as free
+function num(v, d) {
+    if (v == null || v == '') { return d; }
+    return parseInt(v.toString());
+}
+var total = num(metadata.ss_totalSpots, 6);
+var free = num(metadata.ss_sensorFree, 0);
+var occupied = num(metadata.ss_sensorOccupied, 0);
+var active = 0;
+if (metadata.ss_sessions != null && metadata.ss_sessions != '') { active = JSON.parse(metadata.ss_sessions).size(); }
+var available = Math.min(free, total - active);
+if (available < 0) { available = 0; }
+var unknown = total - free - occupied;
+if (unknown < 0) { unknown = 0; }
+var pct = total > 0 ? Math.round(1000.0 * occupied / total) / 10.0 : 0.0;
+return {msg: {totalSpots: total, freeSpots: free, occupiedSpots: occupied, unknownSpots: unknown, occupancyPct: pct,
+              activeSessions: active, availableSpots: available, full: available == 0},
+        metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};

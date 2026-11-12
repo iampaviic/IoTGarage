@@ -3,7 +3,7 @@
  "configuration": {
   "description": "Zauzetost kroz vrijeme, ulasci po satu, prosječno trajanje, popunjenost i prihod.",
   "widgets": {
-   "7412b293-4729-4739-614f-f3d719db3ad0": {
+   "5af30553-5ec4-2e08-29a3-b2e95d65a441": {
     "typeFullFqn": "system.time_series_chart",
     "type": "timeseries",
     "sizeX": 12,
@@ -12,7 +12,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -30,7 +30,7 @@
            "lineWidth": 2
           }
          },
-         "_hash": 0.28938796360210717,
+         "_hash": 0.10100142940972912,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -52,7 +52,7 @@
            "lineWidth": 2
           }
          },
-         "_hash": 0.0797919769236275,
+         "_hash": 0.2779736031100921,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -74,7 +74,7 @@
            "lineWidth": 2
           }
          },
-         "_hash": 0.23279088636103018,
+         "_hash": 0.6356844442644002,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -345,9 +345,9 @@
     },
     "row": 0,
     "col": 0,
-    "id": "7412b293-4729-4739-614f-f3d719db3ad0"
+    "id": "5af30553-5ec4-2e08-29a3-b2e95d65a441"
    },
-   "12476f57-a5e5-a5ab-aefc-fad8efc89849": {
+   "3eabedcb-baa8-0dd4-88bd-64072bcfbe01": {
     "typeFullFqn": "system.bar_chart",
     "type": "timeseries",
     "sizeX": 12,
@@ -356,7 +356,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -367,7 +367,7 @@
          "settings": {
           "type": "bar"
          },
-         "_hash": 0.2095070307714877,
+         "_hash": 0.6480353852465935,
          "units": null,
          "decimals": 0,
          "funcBody": null,
@@ -382,7 +382,7 @@
          "settings": {
           "type": "bar"
          },
-         "_hash": 0.26697782204911336,
+         "_hash": 0.6091310056669882,
          "units": null,
          "decimals": 0,
          "funcBody": null,
@@ -653,9 +653,9 @@
     },
     "row": 0,
     "col": 12,
-    "id": "12476f57-a5e5-a5ab-aefc-fad8efc89849"
+    "id": "3eabedcb-baa8-0dd4-88bd-64072bcfbe01"
    },
-   "5af30553-5ec4-2e08-29a3-b2e95d65a441": {
+   "aefcfad8-efc8-9849-b3aa-7efe4458a885": {
     "typeFullFqn": "system.bar_chart",
     "type": "timeseries",
     "sizeX": 12,
@@ -664,7 +664,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -675,7 +675,7 @@
          "settings": {
           "type": "bar"
          },
-         "_hash": 0.6356844442644002,
+         "_hash": 0.2095070307714877,
          "units": "%",
          "decimals": 0,
          "funcBody": null,
@@ -946,9 +946,9 @@
     },
     "row": 6,
     "col": 0,
-    "id": "5af30553-5ec4-2e08-29a3-b2e95d65a441"
+    "id": "aefcfad8-efc8-9849-b3aa-7efe4458a885"
    },
-   "3eabedcb-baa8-0dd4-88bd-64072bcfbe01": {
+   "ece66fa2-fd51-66e6-451b-4cf36123fdf7": {
     "typeFullFqn": "system.bar_chart",
     "type": "timeseries",
     "sizeX": 8,
@@ -957,7 +957,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -968,7 +968,7 @@
          "settings": {
           "type": "bar"
          },
-         "_hash": 0.6091310056669882,
+         "_hash": 0.1634024937619284,
          "units": "min",
          "decimals": 0,
          "funcBody": null,
@@ -1239,9 +1239,9 @@
     },
     "row": 6,
     "col": 12,
-    "id": "3eabedcb-baa8-0dd4-88bd-64072bcfbe01"
+    "id": "ece66fa2-fd51-66e6-451b-4cf36123fdf7"
    },
-   "5304317f-af42-e12f-3838-b3268e944239": {
+   "d261a7ab-3aa2-e4f9-0e51-f30dc6a7ee39": {
     "typeFullFqn": "system.cards.aggregated_value_card",
     "type": "timeseries",
     "sizeX": 4,
@@ -1250,7 +1250,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -1259,7 +1259,7 @@
          "label": "Prosječno trajanje",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.6399997598540929,
+         "_hash": 0.8428519201898096,
          "units": "min",
          "decimals": 0,
          "funcBody": null,
@@ -1442,9 +1442,9 @@
     },
     "row": 6,
     "col": 20,
-    "id": "5304317f-af42-e12f-3838-b3268e944239"
+    "id": "d261a7ab-3aa2-e4f9-0e51-f30dc6a7ee39"
    },
-   "ece66fa2-fd51-66e6-451b-4cf36123fdf7": {
+   "5304317f-af42-e12f-3838-b3268e944239": {
     "typeFullFqn": "system.bar_chart",
     "type": "timeseries",
     "sizeX": 10,
@@ -1453,7 +1453,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -1464,7 +1464,7 @@
          "settings": {
           "type": "bar"
          },
-         "_hash": 0.1634024937619284,
+         "_hash": 0.6399997598540929,
          "units": "EUR",
          "decimals": 2,
          "funcBody": null,
@@ -1735,9 +1735,9 @@
     },
     "row": 12,
     "col": 0,
-    "id": "ece66fa2-fd51-66e6-451b-4cf36123fdf7"
+    "id": "5304317f-af42-e12f-3838-b3268e944239"
    },
-   "e9c349e0-3602-f8ac-10f1-bc81448aaa9e": {
+   "366eb16f-508e-bad7-b7c9-3acfe059a0ee": {
     "typeFullFqn": "system.cards.timeseries_table",
     "type": "timeseries",
     "sizeX": 14,
@@ -1746,7 +1746,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -1755,7 +1755,7 @@
          "label": "Registracija",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.8428519201898096,
+         "_hash": 0.03210024390403776,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -1768,7 +1768,7 @@
          "label": "Događaj",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.7759999115462448,
+         "_hash": 0.3154530480590819,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -1781,7 +1781,7 @@
          "label": "Ulazak (UTC)",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.22904807196410437,
+         "_hash": 0.26774087597570273,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -1794,7 +1794,7 @@
          "label": "Trajanje [min]",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.03210024390403776,
+         "_hash": 0.21098284358632646,
          "units": null,
          "decimals": 1,
          "funcBody": null,
@@ -1807,7 +1807,7 @@
          "label": "Cijena [EUR]",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.3154530480590819,
+         "_hash": 0.9429097143350544,
          "units": null,
          "decimals": 2,
          "funcBody": null,
@@ -1860,7 +1860,7 @@
     },
     "row": 12,
     "col": 10,
-    "id": "e9c349e0-3602-f8ac-10f1-bc81448aaa9e"
+    "id": "366eb16f-508e-bad7-b7c9-3acfe059a0ee"
    }
   },
   "states": {
@@ -1870,43 +1870,43 @@
     "layouts": {
      "main": {
       "widgets": {
-       "7412b293-4729-4739-614f-f3d719db3ad0": {
+       "5af30553-5ec4-2e08-29a3-b2e95d65a441": {
         "sizeX": 12,
         "sizeY": 6,
         "row": 0,
         "col": 0
        },
-       "12476f57-a5e5-a5ab-aefc-fad8efc89849": {
+       "3eabedcb-baa8-0dd4-88bd-64072bcfbe01": {
         "sizeX": 12,
         "sizeY": 6,
         "row": 0,
         "col": 12
        },
-       "5af30553-5ec4-2e08-29a3-b2e95d65a441": {
+       "aefcfad8-efc8-9849-b3aa-7efe4458a885": {
         "sizeX": 12,
         "sizeY": 6,
         "row": 6,
         "col": 0
        },
-       "3eabedcb-baa8-0dd4-88bd-64072bcfbe01": {
+       "ece66fa2-fd51-66e6-451b-4cf36123fdf7": {
         "sizeX": 8,
         "sizeY": 6,
         "row": 6,
         "col": 12
        },
-       "5304317f-af42-e12f-3838-b3268e944239": {
+       "d261a7ab-3aa2-e4f9-0e51-f30dc6a7ee39": {
         "sizeX": 4,
         "sizeY": 6,
         "row": 6,
         "col": 20
        },
-       "ece66fa2-fd51-66e6-451b-4cf36123fdf7": {
+       "5304317f-af42-e12f-3838-b3268e944239": {
         "sizeX": 10,
         "sizeY": 6,
         "row": 12,
         "col": 0
        },
-       "e9c349e0-3602-f8ac-10f1-bc81448aaa9e": {
+       "366eb16f-508e-bad7-b7c9-3acfe059a0ee": {
         "sizeX": 14,
         "sizeY": 6,
         "row": 12,
@@ -1967,16 +1967,6 @@
      "deviceNameFilter": ""
     },
     "id": "de2be91f-87f7-57ce-b966-68a104c1e8eb"
-   },
-   "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd": {
-    "alias": "Edge",
-    "filter": {
-     "type": "entityName",
-     "resolveMultiple": false,
-     "entityType": "DEVICE",
-     "entityNameFilter": "Garage-Edge"
-    },
-    "id": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
    },
    "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace": {
     "alias": "Ulazna rampa",

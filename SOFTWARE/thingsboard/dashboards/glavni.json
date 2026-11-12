@@ -98,7 +98,7 @@
       },
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -129,7 +129,7 @@
      "settings": {
       "useMarkdownTextFunction": true,
       "markdownTextPattern": "### Markdown/HTML card\n - **Current entity**: ${entityName}.\n - **Current value**: ${Temperature}.",
-      "markdownTextFunction": "\nvar spots = [], gates = {}, alpr = {}, edge = {};\nfor (var i = 0; i < data.length; i++) {\n  var d = data[i], n = d.entityName || '';\n  if (n.indexOf('ParkingSpot') === 0) spots.push(d);\n  else if (n === 'EntranceGate' || n === 'ExitGate') gates[n] = d;\n  else if (n.indexOf('ALPR') === 0) alpr[n] = d;\n  else if (n === 'Garage-Edge') edge = d;\n}\nspots.sort(function (a, b) { return a.entityName < b.entityName ? -1 : 1; });\nfunction spotClass(s) { return s === 'FREE' ? 'free' : (s === 'OCCUPIED' ? 'occ' : 'unk'); }\nfunction spotText(s) { return s === 'FREE' ? 'slobodno' : (s === 'OCCUPIED' ? 'zauzeto' : 'nepoznato'); }\nfunction gateClass(s) { return s === 'OPEN' ? 'open' : (s === 'ERROR' ? 'err' : (s === 'OPENING' || s === 'CLOSING' ? 'moving' : 'closed')); }\nvar gateNames = { CLOSED: 'zatvorena', OPENING: 'otvara se', OPEN: 'otvorena', CLOSING: 'zatvara se', ERROR: 'KVAR' };\nfunction fmtPlate(p) {\n  var m = /^([A-Z]{2})(\\d{3,4})([A-Z]{1,2})$/.exec(p || '');\n  return m ? m[1] + ' ' + m[2] + '-' + m[3] : (p || '-');\n}\nfunction gateHtml(name, label, camera) {\n  var g = gates[name] || {}, a = alpr[camera] || {};\n  var conf = a.alprConfidence !== undefined && a.alprConfidence !== '' ? Math.round(Number(a.alprConfidence) * 100) + ' %' : '';\n  return '<div class=\"gate ' + gateClass(g.gateState) + '\">' +\n    '<div class=\"gname\">' + label + '</div>' +\n    '<div class=\"barrier\"></div>' +\n    '<div class=\"gstate\">' + (gateNames[g.gateState] || '-') + (String(g.vehiclePresent) === 'true' ? ' &middot; vozilo' : '') + '</div>' +\n    '<div class=\"plate\">' + fmtPlate(a.alprPlate) + '</div>' +\n    '<div class=\"conf\">' + (conf ? 'pouzdanost ' + conf : '') + '</div></div>';\n}\nvar html = '<div class=\"garage\"><div class=\"spots\">';\nfor (var j = 0; j < spots.length; j++) {\n  var s = spots[j];\n  html += '<div class=\"spot ' + spotClass(s.spotState) + '\"><div class=\"sid\">P' + s.entityName.slice(-2) + '</div>' +\n          '<div class=\"car\"></div><div class=\"stxt\">' + spotText(s.spotState) + '</div></div>';\n}\nhtml += '</div><div class=\"lane\">&larr; &nbsp; prometnica &nbsp; &rarr;</div><div class=\"gates\">' +\n        gateHtml('EntranceGate', 'ULAZ', 'ALPR-Entrance') +\n        '<div class=\"free-count\"><div class=\"num\">' + (edge.freeSpots !== undefined && edge.freeSpots !== '' ? edge.freeSpots : '-') +\n        '</div><div>slobodnih mjesta</div></div>' +\n        gateHtml('ExitGate', 'IZLAZ', 'ALPR-Exit') + '</div></div>';\nreturn html;\n",
+      "markdownTextFunction": "\nvar spots = [], gates = {}, alpr = {}, garage = {};\nfor (var i = 0; i < data.length; i++) {\n  var d = data[i], n = d.entityName || '';\n  if (n.indexOf('ParkingSpot') === 0) spots.push(d);\n  else if (n === 'EntranceGate' || n === 'ExitGate') gates[n] = d;\n  else if (n.indexOf('ALPR') === 0) alpr[n] = d;\n  else if (n === 'Garage') garage = d;\n}\nspots.sort(function (a, b) { return a.entityName < b.entityName ? -1 : 1; });\nfunction spotClass(s) { return s === 'FREE' ? 'free' : (s === 'OCCUPIED' ? 'occ' : 'unk'); }\nfunction spotText(s) { return s === 'FREE' ? 'slobodno' : (s === 'OCCUPIED' ? 'zauzeto' : 'nepoznato'); }\nfunction gateClass(s) { return s === 'OPEN' ? 'open' : (s === 'ERROR' ? 'err' : (s === 'OPENING' || s === 'CLOSING' ? 'moving' : 'closed')); }\nvar gateNames = { CLOSED: 'zatvorena', OPENING: 'otvara se', OPEN: 'otvorena', CLOSING: 'zatvara se', ERROR: 'KVAR' };\nfunction fmtPlate(p) {\n  var m = /^([A-Z]{2})(\\d{3,4})([A-Z]{1,2})$/.exec(p || '');\n  return m ? m[1] + ' ' + m[2] + '-' + m[3] : (p || '-');\n}\nfunction gateHtml(name, label, camera) {\n  var g = gates[name] || {}, a = alpr[camera] || {};\n  var conf = a.alprConfidence !== undefined && a.alprConfidence !== '' ? Math.round(Number(a.alprConfidence) * 100) + ' %' : '';\n  return '<div class=\"gate ' + gateClass(g.gateState) + '\">' +\n    '<div class=\"gname\">' + label + '</div>' +\n    '<div class=\"barrier\"></div>' +\n    '<div class=\"gstate\">' + (gateNames[g.gateState] || '-') + (String(g.vehiclePresent) === 'true' ? ' &middot; vozilo' : '') + '</div>' +\n    '<div class=\"plate\">' + fmtPlate(a.alprPlate) + '</div>' +\n    '<div class=\"conf\">' + (conf ? 'pouzdanost ' + conf : '') + '</div></div>';\n}\nvar html = '<div class=\"garage\"><div class=\"spots\">';\nfor (var j = 0; j < spots.length; j++) {\n  var s = spots[j];\n  html += '<div class=\"spot ' + spotClass(s.spotState) + '\"><div class=\"sid\">P' + s.entityName.slice(-2) + '</div>' +\n          '<div class=\"car\"></div><div class=\"stxt\">' + spotText(s.spotState) + '</div></div>';\n}\nhtml += '</div><div class=\"lane\">&larr; &nbsp; prometnica &nbsp; &rarr;</div><div class=\"gates\">' +\n        gateHtml('EntranceGate', 'ULAZ', 'ALPR-Entrance') +\n        '<div class=\"free-count\"><div class=\"num\">' + (garage.freeSpots !== undefined && garage.freeSpots !== '' ? garage.freeSpots : '-') +\n        '</div><div>slobodnih mjesta</div></div>' +\n        gateHtml('ExitGate', 'IZLAZ', 'ALPR-Exit') + '</div></div>';\nreturn html;\n",
       "applyDefaultMarkdownStyle": false,
       "markdownCss": "\n.garage { font-family: Roboto, Arial, sans-serif; height: 100%; display: flex; flex-direction: column; gap: 10px; }\n.spots { display: flex; gap: 8px; flex: 1; min-height: 110px; }\n.spot { flex: 1; border-radius: 8px; border: 3px dashed #ffffff; color: #fff; display: flex; flex-direction: column;\n        align-items: center; justify-content: space-between; padding: 6px 0; font-weight: 500; }\n.spot .sid { font-size: 20px; }\n.spot .stxt { font-size: 13px; text-transform: uppercase; letter-spacing: .5px; }\n.spot.free { background: #2e7d32; }\n.spot.occ { background: #c62828; }\n.spot.unk { background: #757575; }\n.spot .car { width: 46%; height: 34%; border-radius: 6px; }\n.spot.occ .car { background: rgba(255,255,255,.85); }\n.lane { text-align: center; background: #424242; color: #fafafa; padding: 6px; border-radius: 6px; letter-spacing: 2px; }\n.gates { display: flex; gap: 10px; }\n.gate { flex: 1; border-radius: 8px; padding: 8px; background: #eceff1; text-align: center; border-left: 8px solid #c62828; }\n.gate.open { border-left-color: #2e7d32; }\n.gate.moving { border-left-color: #f9a825; }\n.gate.err { border-left-color: #6a1b9a; background: #f3e5f5; }\n.gate .gname { font-weight: 700; letter-spacing: 1px; }\n.gate .barrier { height: 6px; margin: 6px 20%; background: repeating-linear-gradient(90deg, #c62828 0 12px, #fff 12px 24px); }\n.gate.open .barrier { transform: rotate(-60deg); transform-origin: left; width: 30px; }\n.gate .plate { display: inline-block; margin-top: 6px; padding: 2px 10px; border: 2px solid #212121; border-radius: 4px;\n               background: #fff; font: 700 20px 'DejaVu Sans Condensed', Arial Narrow, sans-serif; letter-spacing: 1px; }\n.gate .conf, .gate .gstate { font-size: 12px; color: #455a64; margin-top: 2px; }\n.free-count { flex: 0 0 140px; background: #1565c0; color: #fff; border-radius: 8px; display: flex; flex-direction: column;\n              justify-content: center; align-items: center; }\n.free-count .num { font-size: 44px; font-weight: 700; line-height: 1; }\n"
      },
@@ -162,7 +162,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -317,7 +317,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -472,7 +472,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -1023,7 +1023,7 @@
     "sizeY": 1,
     "config": {
      "targetDeviceAliases": [
-      "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+      "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace"
      ],
      "showTitle": false,
      "backgroundColor": "#e6e7e8",
@@ -1037,7 +1037,7 @@
        "isRaised": true,
        "isPrimary": true
       },
-      "methodName": "approveEntry",
+      "methodName": "approve",
       "methodParams": "{}"
      },
      "title": "Odobri ulaz",
@@ -1053,14 +1053,14 @@
      "actions": {},
      "targetDevice": {
       "type": "entity",
-      "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+      "entityAliasId": "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace"
      }
     },
     "row": 8,
     "col": 16,
     "id": "580d7b71-d8f5-6413-5be6-128e18c26797"
    },
-   "11ce5dd2-b45e-d1f0-3139-d32c93cd59bf": {
+   "fc377a4c-4a15-544d-c5e7-ce8a3a578a8e": {
     "typeFullFqn": "system.cards.timeseries_table",
     "type": "timeseries",
     "sizeX": 14,
@@ -1069,7 +1069,7 @@
      "datasources": [
       {
        "type": "entity",
-       "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
        "filterId": null,
        "dataKeys": [
         {
@@ -1078,7 +1078,7 @@
          "label": "Smjer",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.9731157639793706,
+         "_hash": 0.8294046642529949,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -1091,7 +1091,7 @@
          "label": "Registracija",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.3785343772083535,
+         "_hash": 0.6185197523642461,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -1107,7 +1107,7 @@
           "useCellStyleFunction": true,
           "cellStyleFunction": "var c = {FREE: '#2e7d32', OCCUPIED: '#c62828', UNKNOWN: '#757575', OPEN: '#2e7d32', OPENING: '#f9a825',\n CLOSING: '#f9a825', CLOSED: '#c62828', ERROR: '#6a1b9a', GRANTED: '#2e7d32', DENIED: '#c62828',\n RETRY: '#f9a825', MANUAL_REQUIRED: '#6a1b9a'}[value];\nreturn c ? {color: '#fff', background: c, fontWeight: 500, borderRadius: '4px'} : {};"
          },
-         "_hash": 0.552040631273227,
+         "_hash": 0.8617069003107772,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -1120,7 +1120,7 @@
          "label": "Razlog",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.8294046642529949,
+         "_hash": 0.577352145256762,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -1133,7 +1133,7 @@
          "label": "Pouzdanost",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.6185197523642461,
+         "_hash": 0.7045718362149235,
          "units": null,
          "decimals": 2,
          "funcBody": null,
@@ -1146,7 +1146,7 @@
          "label": "Ručno",
          "color": "#2196f3",
          "settings": {},
-         "_hash": 0.8617069003107772,
+         "_hash": 0.045824383655662215,
          "units": null,
          "decimals": null,
          "funcBody": null,
@@ -1199,13 +1199,13 @@
     },
     "row": 9,
     "col": 0,
-    "id": "11ce5dd2-b45e-d1f0-3139-d32c93cd59bf"
+    "id": "fc377a4c-4a15-544d-c5e7-ce8a3a578a8e"
    },
-   "c5e7ce8a-3a57-8a8e-a948-8d990bbb2599": {
+   "ddd1dfb2-3b98-2ef8-daf6-1a26146d3f31": {
     "typeFullFqn": "system.alarm_widgets.alarms_table",
     "type": "alarm",
     "sizeX": 10,
-    "sizeY": 6,
+    "sizeY": 4,
     "config": {
      "timewindow": {
       "realtime": {
@@ -1352,7 +1352,66 @@
     },
     "row": 9,
     "col": 14,
-    "id": "c5e7ce8a-3a57-8a8e-a948-8d990bbb2599"
+    "id": "ddd1dfb2-3b98-2ef8-daf6-1a26146d3f31"
+   },
+   "4b0dbb41-8d52-88f1-142c-3fe860e7a113": {
+    "typeFullFqn": "system.input_widgets.update_server_string_attribute",
+    "type": "latest",
+    "sizeX": 10,
+    "sizeY": 2,
+    "config": {
+     "datasources": [
+      {
+       "type": "entity",
+       "entityAliasId": "5d57b3c6-e6e8-58a6-adde-3e64bf6f40dc",
+       "filterId": null,
+       "dataKeys": [
+        {
+         "name": "manualPlate",
+         "type": "attribute",
+         "label": "Registracija (prazno = zadnja očitana)",
+         "color": "#2196f3",
+         "settings": {},
+         "_hash": 0.9731157639793706,
+         "units": null,
+         "decimals": null,
+         "funcBody": null,
+         "usePostProcessing": null,
+         "postFuncBody": null
+        }
+       ]
+      }
+     ],
+     "timewindow": {
+      "realtime": {
+       "timewindowMs": 60000
+      }
+     },
+     "showTitle": true,
+     "backgroundColor": "#fff",
+     "color": "rgba(0, 0, 0, 0.87)",
+     "padding": "8px",
+     "settings": {
+      "showResultMessage": true,
+      "showLabel": true,
+      "isRequired": true
+     },
+     "title": "Registracija za ručno odobrenje",
+     "dropShadow": true,
+     "enableFullscreen": false,
+     "enableDataExport": false,
+     "widgetStyle": {},
+     "titleStyle": {
+      "fontSize": "16px",
+      "fontWeight": 400
+     },
+     "useDashboardTimewindow": true,
+     "showLegend": false,
+     "actions": {}
+    },
+    "row": 13,
+    "col": 14,
+    "id": "4b0dbb41-8d52-88f1-142c-3fe860e7a113"
    },
    "0b1f9163-ce9f-f57f-43b7-a3a69a8dca03": {
     "typeFullFqn": "system.control_widgets.rpcbutton",
@@ -1361,7 +1420,7 @@
     "sizeY": 1,
     "config": {
      "targetDeviceAliases": [
-      "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+      "8a5cff6c-da2a-524c-b0fc-c8525228ecca"
      ],
      "showTitle": false,
      "backgroundColor": "#e6e7e8",
@@ -1375,7 +1434,7 @@
        "isRaised": true,
        "isPrimary": true
       },
-      "methodName": "approveExit",
+      "methodName": "approve",
       "methodParams": "{}"
      },
      "title": "Odobri izlaz",
@@ -1391,7 +1450,7 @@
      "actions": {},
      "targetDevice": {
       "type": "entity",
-      "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+      "entityAliasId": "8a5cff6c-da2a-524c-b0fc-c8525228ecca"
      }
     },
     "row": 15,
@@ -1405,7 +1464,7 @@
     "sizeY": 1,
     "config": {
      "targetDeviceAliases": [
-      "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+      "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace"
      ],
      "showTitle": false,
      "backgroundColor": "#e6e7e8",
@@ -1435,7 +1494,7 @@
      "actions": {},
      "targetDevice": {
       "type": "entity",
-      "entityAliasId": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
+      "entityAliasId": "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace"
      }
     },
     "row": 15,
@@ -1504,16 +1563,22 @@
         "row": 8,
         "col": 16
        },
-       "11ce5dd2-b45e-d1f0-3139-d32c93cd59bf": {
+       "fc377a4c-4a15-544d-c5e7-ce8a3a578a8e": {
         "sizeX": 14,
         "sizeY": 7,
         "row": 9,
         "col": 0
        },
-       "c5e7ce8a-3a57-8a8e-a948-8d990bbb2599": {
+       "ddd1dfb2-3b98-2ef8-daf6-1a26146d3f31": {
         "sizeX": 10,
-        "sizeY": 6,
+        "sizeY": 4,
         "row": 9,
+        "col": 14
+       },
+       "4b0dbb41-8d52-88f1-142c-3fe860e7a113": {
+        "sizeX": 10,
+        "sizeY": 2,
+        "row": 13,
         "col": 14
        },
        "0b1f9163-ce9f-f57f-43b7-a3a69a8dca03": {
@@ -1583,16 +1648,6 @@
      "deviceNameFilter": ""
     },
     "id": "de2be91f-87f7-57ce-b966-68a104c1e8eb"
-   },
-   "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd": {
-    "alias": "Edge",
-    "filter": {
-     "type": "entityName",
-     "resolveMultiple": false,
-     "entityType": "DEVICE",
-     "entityNameFilter": "Garage-Edge"
-    },
-    "id": "1b9d1ea2-1fd8-580f-88bd-603d5b1a7fcd"
    },
    "b9edce5f-a1d4-56c4-af39-fe6f5ffd1ace": {
     "alias": "Ulazna rampa",

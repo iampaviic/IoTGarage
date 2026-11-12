@@ -3,8 +3,8 @@
     python seed_history.py --days 7                 # 7 days of generated sessions + occupancy
     python seed_history.py --clear                  # delete ALL history of these keys (before the real demo!)
 
-Uses the session generator (parking_sessions.generator) and sends
-the data as the Garage-Edge gateway device directly to ThingsBoard's MQTT API.
+Uses the session generator (parking_sessions.generator) and writes the data as telemetry of the
+asset "Garage" over the REST API (varijanta B: the rule chain writes the real data there).
 The final demonstration must show REAL data: run --clear first, then drive
 the cars through the model.
 """
@@ -12,19 +12,17 @@ the cars through the model.
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import sys
-import time
 from datetime import datetime, timedelta, timezone
 
 import requests
 
-from garage_contract.mqtt import new_paho_client
 from parking_sessions.generator import generate_sessions
 
 KEYS = ["entry", "exit", "durationMin", "price", "sessionPlate", "sessionEvent", "sessionId", "sessionEntryTime",
-        "occupiedSpots", "freeSpots", "unknownSpots", "occupancyPct", "activeSessions", "totalSpots", "full"]
+        "occupiedSpots", "freeSpots", "unknownSpots", "occupancyPct", "activeSessions", "availableSpots", "totalSpots",
+        "full"]
 
 
 def ms(dt: datetime) -> int:
@@ -51,46 +49,42 @@ def build_points(days: int, spots: int):
         occ = max(0, min(spots, inside))
         points.append((ms(t), {"occupiedSpots": occ, "freeSpots": spots - occ, "unknownSpots": 0,
                                "occupancyPct": round(100.0 * occ / spots, 1), "activeSessions": max(0, inside),
-                               "totalSpots": spots, "full": occ >= spots}))
+                               "availableSpots": spots - occ, "totalSpots": spots, "full": occ >= spots}))
     points.sort(key=lambda p: p[0])
     return points, len(sessions)
 
 
-def seed(host: str, port: int, token: str, days: int, spots: int) -> None:
+def garage(url: str, user: str, password: str):
+    tok = requests.post(url + "/api/auth/login", json={"username": user, "password": password}, timeout=20)
+    tok.raise_for_status()
+    h = {"X-Authorization": "Bearer " + tok.json()["token"]}
+    asset = requests.get(url + "/api/tenant/assets", params={"assetName": "Garage"}, headers=h, timeout=20)
+    asset.raise_for_status()   # 404: run provision.py first
+    return h, asset.json()["id"]["id"]
+
+
+def seed(url: str, user: str, password: str, days: int, spots: int) -> None:
     points, n = build_points(days, spots)
-    c = new_paho_client("seed-history-%d" % int(time.time()))
-    c.username_pw_set(token)
-    c.connect(host, port, 30)
-    c.loop_start()
-    batch = []
-    for ts, values in points:
-        batch.append({"ts": ts, "values": values})
-        if len(batch) == 100:
-            c.publish("v1/devices/me/telemetry", json.dumps(batch), qos=1).wait_for_publish(10)
-            batch = []
-    if batch:
-        c.publish("v1/devices/me/telemetry", json.dumps(batch), qos=1).wait_for_publish(10)
-    c.loop_stop()
-    c.disconnect()
-    print("sent %d points (%d fictional sessions over %d days) to Garage-Edge" % (len(points), n, days))
+    h, gid = garage(url, user, password)
+    for i in range(0, len(points), 100):
+        batch = [{"ts": ts, "values": values} for ts, values in points[i:i + 100]]
+        r = requests.post(url + "/api/plugins/telemetry/ASSET/%s/timeseries/ANY" % gid, headers=h, json=batch,
+                          timeout=60)
+        r.raise_for_status()
+    print("sent %d points (%d fictional sessions over %d days) to the asset Garage" % (len(points), n, days))
 
 
 def clear(url: str, user: str, password: str) -> None:
-    tok = requests.post(url + "/api/auth/login", json={"username": user, "password": password}, timeout=20).json()
-    h = {"X-Authorization": "Bearer " + tok["token"]}
-    dev = requests.get(url + "/api/tenant/devices", params={"deviceName": "Garage-Edge"}, headers=h, timeout=20).json()
-    r = requests.delete(url + "/api/plugins/telemetry/DEVICE/%s/timeseries/delete" % dev["id"]["id"], headers=h,
+    h, gid = garage(url, user, password)
+    r = requests.delete(url + "/api/plugins/telemetry/ASSET/%s/timeseries/delete" % gid, headers=h,
                         params={"keys": ",".join(KEYS), "deleteAllDataForKeys": "true"}, timeout=60)
-    print("cleared history of Garage-Edge:", r.status_code)
+    print("cleared history of the asset Garage:", r.status_code)
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--days", type=int, default=7)
     ap.add_argument("--spots", type=int, default=int(os.environ.get("GARAGE_SPOTS", "6")))
-    ap.add_argument("--tb-host", default=os.environ.get("TB_HOST", "localhost"))
-    ap.add_argument("--tb-port", type=int, default=int(os.environ.get("TB_MQTT_PORT", "1884")))
-    ap.add_argument("--token", default=os.environ.get("TB_GATEWAY_TOKEN", "garage-edge-gateway-token"))
     ap.add_argument("--clear", action="store_true", help="delete the history instead of adding to it")
     ap.add_argument("--url", default=os.environ.get("TB_URL", "http://localhost:8080"))
     ap.add_argument("--user", default=os.environ.get("TB_USER", "tenant@thingsboard.org"))
@@ -99,7 +93,7 @@ def main(argv=None) -> int:
     if args.clear:
         clear(args.url, args.user, args.password)
     else:
-        seed(args.tb_host, args.tb_port, args.token, args.days, args.spots)
+        seed(args.url, args.user, args.password, args.days, args.spots)
     return 0
 
 

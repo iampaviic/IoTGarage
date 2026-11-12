@@ -1,16 +1,20 @@
 """Create every ThingsBoard entity of the garage in one go (idempotent - run it again any time).
 
-    python provision.py                                   # localhost:8080, demo tenant
+    python provision.py                                   # localhost:8080, demo tenant, varijanta B
     python provision.py --url http://192.168.1.20:8080 --user tenant@thingsboard.org --password tenant
+    python provision.py --demo-pricing                    # 1 minute is billed as 1 hour (demonstration)
     python provision.py --spots 4 --no-dashboards
+    python provision.py --varijanta a                     # old setup: Garage-Edge gateway for tb_bridge
 
-Creates
-  * device profiles with alarm rules: ParkingSpot, Gate, ALPR, GarageEdge, Controller
-  * devices ParkingSpot-01..06, EntranceGate, ExitGate, ALPR-Entrance, ALPR-Exit
-  * the gateway device Garage-Edge with a fixed access token (used by the bridge)
-  * asset "Garage" with "Contains" relations to all devices
-  * server attributes: name, position on the floor plan, ...
+Varijanta B (default, PROJEKT/sustav/varijanta-b.md) creates
+  * device profiles with alarm rules: ParkingSpot, Gate, ALPR, Controller
+  * gateway devices with fixed access tokens: esp32-spots, esp32-gates, alpr-service
+  * their devices ParkingSpot-01..06, EntranceGate, ExitGate, ALPR-Entrance, ALPR-Exit
+  * asset "Garage" with "Contains" relations to all devices and the settings of the rule chain
+    (pricing, accept threshold, policy); parking sessions live in its attribute "sessions"
+  * the rule chain ../rulechain/garaza.json as the ROOT rule chain (decisions, sessions, alarms)
   * dashboards from ../dashboards/*.json (overwritten by title)
+Running it again never deletes sessions or telemetry.
 """
 
 from __future__ import annotations
@@ -20,13 +24,30 @@ import glob
 import json
 import os
 import sys
+import time
 import uuid
 from typing import Any, Dict, List, Optional
 
 import requests
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_TOKEN = "garage-edge-gateway-token"
+DEFAULT_TOKEN = "garage-edge-gateway-token"           # varijanta A: tb_bridge
+RULE_CHAIN = os.path.join(HERE, "..", "rulechain", "garaza.json")
+
+# varijanta B: gateway devices (one MQTT connection each) and the devices they speak for.
+# The access token is the MQTT user name; use secret tokens for the demonstration.
+GATEWAYS = {
+    "esp32-spots": ("TB_TOKEN_SPOTS", "esp32-spots-token", "ESP32 senzora mjesta"),
+    "esp32-gates": ("TB_TOKEN_GATES", "esp32-gates-token", "ESP32 rampi"),
+    "alpr-service": ("TB_TOKEN_ALPR", "alpr-service-token", "ALPR servis (kamera + OCR)"),
+}
+# a device that sends nothing for this long is inactive (alarm "Uređaj nije dostupan"); heartbeat is 30 s
+INACTIVITY_TIMEOUT_MS = 90000
+# Garage settings read by the rule chain; written only when missing, so changes made in ThingsBoard stay
+GARAGE_SETTINGS = {"policy": "open", "allowlist": [], "acceptThreshold": 0.85, "freeMinutes": 15,
+                   "pricePerHourCents": 150, "dailyCapCents": 1500, "timeMultiplier": 1,
+                   "exitFuzzyMatch": False, "sessions": {}, "sensorFree": 0, "sensorOccupied": 0,
+                   "manualPlate": ""}
 
 
 # --------------------------------------------------------------------- alarm rule helpers
@@ -66,7 +87,7 @@ def alarm(alarm_type: str, severity: str, create: List[Dict[str, Any]], clear: L
             "propagateRelationTypes": None}
 
 
-PROFILES: Dict[str, List[Dict[str, Any]]] = {
+PROFILES_A: Dict[str, List[Dict[str, Any]]] = {
     "ParkingSpot": [
         alarm("Senzor mjesta ne radi", "MAJOR",
               [cond_str_in("sensorStatus", ["OK", "SIMULATED"], negate=True)],
@@ -95,12 +116,21 @@ PROFILES: Dict[str, List[Dict[str, Any]]] = {
     ],
 }
 
+# varijanta B: "Rampa ne potvrđuje naredbe", "Uređaj nije dostupan", "Garaža puna" and
+# "Potrebna ručna intervencija" are raised by the rule chain (create/clear alarm nodes), not by profiles
+PROFILES_B: Dict[str, List[Dict[str, Any]]] = {
+    "ParkingSpot": PROFILES_A["ParkingSpot"],
+    "Gate": [a for a in PROFILES_A["Gate"] if a["alarmType"] == "Rampa u kvaru"],
+    "ALPR": PROFILES_A["ALPR"],
+    "Controller": [],
+}
+
 PROFILE_DESCRIPTIONS = {
     "ParkingSpot": "Parkirno mjesto (HC-SR04 + ESP32)",
     "Gate": "Ulazna ili izlazna rampa (SG90 + IR senzor + ESP32)",
     "ALPR": "Kamera s prepoznavanjem registracija",
     "GarageEdge": "Edge računalo: access control, sesije, gateway prema ThingsBoardu",
-    "Controller": "ESP32 / servis na edge računalu (heartbeat, online)",
+    "Controller": "ESP32 / servis (heartbeat, online); u varijanti B gateway za svoje uređaje",
 }
 
 
@@ -113,12 +143,28 @@ def default_positions(n: int) -> Dict[str, Dict[str, float]]:
 
 
 class TbClient:
-    def __init__(self, url: str, user: str, password: str) -> None:
+    def __init__(self, url: str, user: str, password: str, wait_s: float = 0) -> None:
         self.url = url.rstrip("/")
-        r = requests.post(self.url + "/api/auth/login", json={"username": user, "password": password}, timeout=20)
-        if r.status_code != 200:
-            raise SystemExit("login failed (%s): %s" % (r.status_code, r.text[:200]))
-        self.h = {"X-Authorization": "Bearer " + r.json()["token"]}
+        self.h = {"X-Authorization": "Bearer " + self._login(user, password, wait_s)}
+
+    def _login(self, user: str, password: str, wait_s: float) -> str:
+        """Log in; while ThingsBoard is still starting (first start installs the database) retry up to wait_s."""
+        end = time.time() + wait_s
+        while True:
+            try:
+                r = requests.post(self.url + "/api/auth/login", json={"username": user, "password": password},
+                                  timeout=20, allow_redirects=False)
+                if r.status_code == 200 and "token" in r.text:
+                    return r.json()["token"]
+                if r.status_code == 401:
+                    raise SystemExit("login failed (401): wrong user or password")
+                problem = "HTTP %s" % r.status_code
+            except requests.RequestException as e:
+                problem = type(e).__name__
+            if time.time() >= end:
+                raise SystemExit("ThingsBoard at %s is not ready (%s)" % (self.url, problem))
+            print("waiting for ThingsBoard (%s) ..." % problem)
+            time.sleep(5)
 
     def get(self, path: str, **params) -> Any:
         r = requests.get(self.url + path, headers=self.h, params=params, timeout=20)
@@ -141,13 +187,14 @@ class TbClient:
                 return p
         return None
 
-    def ensure_profile(self, name: str, alarms: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def ensure_profile(self, name: str, alarms: List[Dict[str, Any]], queue: Optional[str] = None) -> Dict[str, Any]:
         p = self.find_profile(name) or {
             "name": name, "type": "DEFAULT", "transportType": "DEFAULT", "provisionType": "DISABLED",
             "profileData": {"configuration": {"type": "DEFAULT"}, "transportConfiguration": {"type": "DEFAULT"},
                             "provisionConfiguration": {"type": "DISABLED", "provisionDeviceSecret": None}}}
         p["description"] = PROFILE_DESCRIPTIONS.get(name, "")
         p["profileData"]["alarms"] = alarms
+        p["defaultQueueName"] = queue
         return self.post("/api/deviceProfile", p)
 
     def ensure_device(self, name: str, profile: Dict[str, Any], label: str = "", gateway: bool = False,
@@ -178,6 +225,33 @@ class TbClient:
             body.pop("assetProfileId", None)
         return self.post("/api/asset", body)
 
+    def server_attributes_missing(self, entity: Dict[str, Any], attrs: Dict[str, Any]) -> List[str]:
+        """Write only the attributes that do not exist yet (keeps sessions and settings changed in ThingsBoard)."""
+        eid = entity["id"]
+        have = self.get("/api/plugins/telemetry/%s/%s/values/attributes/SERVER_SCOPE" % (eid["entityType"], eid["id"]))
+        names = {a["key"] for a in have or []}
+        missing = {k: v for k, v in attrs.items() if k not in names}
+        if missing:
+            self.server_attributes(entity, missing)
+        return sorted(missing)
+
+    def ensure_root_rule_chain(self, path: str) -> Dict[str, Any]:
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        name = data["ruleChain"]["name"]
+        page = self.get("/api/ruleChains", pageSize=100, page=0, textSearch=name, type="CORE")
+        existing = [r for r in page["data"] if r["name"] == name]
+        chain = existing[0] if existing else self.post("/api/ruleChain", {
+            "name": name, "type": "CORE", "debugMode": False, "additionalInfo": data["ruleChain"]["additionalInfo"]})
+        md = dict(data["metadata"])
+        md["ruleChainId"] = chain["id"]
+        if existing:
+            md["version"] = (self.get("/api/ruleChain/%s/metadata" % chain["id"]["id"]) or {}).get("version")
+        self.post("/api/ruleChain/metadata", md)
+        if not chain.get("root"):
+            self.post("/api/ruleChain/%s/root" % chain["id"]["id"])
+        return chain
+
     def relate(self, frm: Dict[str, Any], to: Dict[str, Any], rel_type: str = "Contains") -> None:
         self.post("/api/relation", {"from": frm["id"], "to": to["id"], "type": rel_type, "typeGroup": "COMMON"})
 
@@ -204,15 +278,24 @@ def main(argv=None) -> int:
     ap.add_argument("--user", default=os.environ.get("TB_USER", "tenant@thingsboard.org"))
     ap.add_argument("--password", default=os.environ.get("TB_PASSWORD", "tenant"))
     ap.add_argument("--spots", type=int, default=int(os.environ.get("GARAGE_SPOTS", "6")))
+    ap.add_argument("--varijanta", choices=["a", "b"], default=os.environ.get("GARAGE_VARIJANTA", "b").lower(),
+                    help="b (default): everything in ThingsBoard; a: old setup with the Garage-Edge gateway")
     ap.add_argument("--token", default=os.environ.get("TB_GATEWAY_TOKEN", DEFAULT_TOKEN),
-                    help="access token for the Garage-Edge gateway (use a secret one for the demo!)")
+                    help="varijanta A: access token for the Garage-Edge gateway (use a secret one for the demo!)")
+    ap.add_argument("--demo-pricing", action="store_true",
+                    help="varijanta B: 1 minute is billed as 1 hour (sets timeMultiplier=60 on Garage)")
     ap.add_argument("--positions", help="spots.json from SOFTWARE/maketa (floor plan positions)")
     ap.add_argument("--no-dashboards", action="store_true")
+    ap.add_argument("--wait", type=float, default=300, metavar="SECONDS",
+                    help="wait this long for ThingsBoard to start (default 300)")
     args = ap.parse_args(argv)
 
-    tb = TbClient(args.url, args.user, args.password)
-    print("connected to", args.url)
-    profiles = {name: tb.ensure_profile(name, alarms) for name, alarms in PROFILES.items()}
+    tb = TbClient(args.url, args.user, args.password, args.wait)
+    print("connected to", args.url, "- varijanta", args.varijanta.upper())
+    b = args.varijanta == "b"
+    # varijanta B: messages of every device in order (see QUEUE in rulechain/build_rule_chain.py)
+    queue = "SequentialByOriginator" if b else None
+    profiles = {name: tb.ensure_profile(name, alarms, queue) for name, alarms in (PROFILES_B if b else PROFILES_A).items()}
     print("device profiles:", ", ".join(profiles))
 
     positions = default_positions(args.spots)
@@ -237,13 +320,32 @@ def main(argv=None) -> int:
         d = tb.ensure_device(name, profiles["ALPR"], label)
         tb.server_attributes(d, {"gate": gate, "name": label})
         devices.append(d)
-    edge = tb.ensure_device("Garage-Edge", profiles["GarageEdge"], "Edge računalo", gateway=True, token=args.token)
-    tb.server_attributes(edge, {"name": "Edge računalo", "totalSpots": args.spots})
-    devices.append(edge)
+    tokens = {}
+    if b:
+        for name, (env, default, label) in GATEWAYS.items():
+            tokens[name] = os.environ.get(env, default)
+            d = tb.ensure_device(name, profiles["Controller"], label, gateway=True, token=tokens[name])
+            tb.server_attributes(d, {"name": label, "inactivityTimeout": INACTIVITY_TIMEOUT_MS})
+            devices.append(d)
+        settings = dict(GARAGE_SETTINGS, totalSpots=args.spots)
+        added = tb.server_attributes_missing(garage, settings)
+        if args.demo_pricing:
+            tb.server_attributes(garage, {"timeMultiplier": 60})
+        print("garage settings added:", ", ".join(added) or "none (kept the existing ones)")
+    else:
+        edge = tb.ensure_device("Garage-Edge", profiles["GarageEdge"], "Edge računalo", gateway=True, token=args.token)
+        tb.server_attributes(edge, {"name": "Edge računalo", "totalSpots": args.spots})
+        devices.append(edge)
     for d in devices:
         tb.relate(garage, d)
     print("devices:", ", ".join(d["name"] for d in devices))
-    print("gateway token for the bridge: TB_GATEWAY_TOKEN=%s" % args.token)
+    if b:
+        chain = tb.ensure_root_rule_chain(RULE_CHAIN)
+        print("root rule chain: %s -> %s/ruleChains/%s" % (chain["name"], args.url, chain["id"]["id"]))
+        for name, token in tokens.items():
+            print("access token %-13s %s" % (name, token))
+    else:
+        print("gateway token for the bridge: TB_GATEWAY_TOKEN=%s" % args.token)
 
     if not args.no_dashboards:
         for path in sorted(glob.glob(os.path.join(HERE, "..", "dashboards", "*.json"))):

@@ -9,6 +9,10 @@ exported (Dashboard -> Export) over the JSON files instead.
 
 Entity aliases use device TYPES and NAMES, never IDs, so the JSON works on any
 ThingsBoard where provision.py created the devices.
+
+Varijanta B: the summary, decisions and sessions are telemetry of the asset "Garage" (written by
+the rule chain); "Ručno odobri" / "Odbij" are RPC approve / deny to EntranceGate / ExitGate, and the
+plate for a manual approval can be typed into the Garage attribute manualPlate.
 """
 
 from __future__ import annotations
@@ -29,13 +33,13 @@ rnd = random.Random(42)
 
 # ------------------------------------------------------------------ JS used in widgets
 FLOOR_PLAN_FUNCTION = r"""
-var spots = [], gates = {}, alpr = {}, edge = {};
+var spots = [], gates = {}, alpr = {}, garage = {};
 for (var i = 0; i < data.length; i++) {
   var d = data[i], n = d.entityName || '';
   if (n.indexOf('ParkingSpot') === 0) spots.push(d);
   else if (n === 'EntranceGate' || n === 'ExitGate') gates[n] = d;
   else if (n.indexOf('ALPR') === 0) alpr[n] = d;
-  else if (n === 'Garage-Edge') edge = d;
+  else if (n === 'Garage') garage = d;
 }
 spots.sort(function (a, b) { return a.entityName < b.entityName ? -1 : 1; });
 function spotClass(s) { return s === 'FREE' ? 'free' : (s === 'OCCUPIED' ? 'occ' : 'unk'); }
@@ -64,7 +68,7 @@ for (var j = 0; j < spots.length; j++) {
 }
 html += '</div><div class="lane">&larr; &nbsp; prometnica &nbsp; &rarr;</div><div class="gates">' +
         gateHtml('EntranceGate', 'ULAZ', 'ALPR-Entrance') +
-        '<div class="free-count"><div class="num">' + (edge.freeSpots !== undefined && edge.freeSpots !== '' ? edge.freeSpots : '-') +
+        '<div class="free-count"><div class="num">' + (garage.freeSpots !== undefined && garage.freeSpots !== '' ? garage.freeSpots : '-') +
         '</div><div>slobodnih mjesta</div></div>' +
         gateHtml('ExitGate', 'IZLAZ', 'ALPR-Exit') + '</div></div>';
 return html;
@@ -203,7 +207,6 @@ def aliases() -> Dict[str, Dict[str, Any]]:
         "spots": device_type("Parkirna mjesta", ["ParkingSpot"]),
         "gates": device_type("Rampe", ["Gate"]),
         "alpr": device_type("Kamere", ["ALPR"]),
-        "edge": by_name("Edge", "DEVICE", "Garage-Edge"),
         "entrance": by_name("Ulazna rampa", "DEVICE", "EntranceGate"),
         "exit": by_name("Izlazna rampa", "DEVICE", "ExitGate"),
         "garage": by_name("Garaža", "ASSET", "Garage"),
@@ -271,23 +274,28 @@ def build_main(b: Builder) -> Dict[str, Any]:
         ds(A["spots"], [key("state", "spotState")]),
         ds(A["gates"], [key("state", "gateState"), key("vehiclePresent", "vehiclePresent")]),
         ds(A["alpr"], [key("plate", "alprPlate"), key("ocrConfidence", "alprConfidence")]),
-        ds(A["edge"], [key("freeSpots", "freeSpots")]),
+        ds(A["garage"], [key("freeSpots", "freeSpots")]),
     ], {"settings": {"useMarkdownTextFunction": True, "markdownTextFunction": FLOOR_PLAN_FUNCTION,
                      "markdownCss": FLOOR_PLAN_CSS, "applyDefaultMarkdownStyle": False}, "padding": "8px"})
-    free = value_card(b, "Slobodna mjesta", A["edge"], key("freeSpots", "Slobodna mjesta", decimals=0), "local_parking",
+    free = value_card(b, "Slobodna mjesta", A["garage"], key("freeSpots", "Slobodna mjesta", decimals=0), "local_parking",
                       "return value > 0 ? '#2e7d32' : '#c62828';")
-    occ = value_card(b, "Popunjenost", A["edge"], key("occupancyPct", "Popunjenost", units="%", decimals=0), "pie_chart")
-    act = value_card(b, "Aktivne sesije", A["edge"], key("activeSessions", "Vozila u garaži", decimals=0), "directions_car")
+    occ = value_card(b, "Popunjenost", A["garage"], key("occupancyPct", "Popunjenost", units="%", decimals=0), "pie_chart")
+    act = value_card(b, "Aktivne sesije", A["garage"], key("activeSessions", "Vozila u garaži", decimals=0), "directions_car")
     ent_state = value_card(b, "Ulazna rampa", A["entrance"], key("state", "Ulazna rampa"), "fence", STATE_ICON_COLOR)
     ex_state = value_card(b, "Izlazna rampa", A["exit"], key("state", "Izlazna rampa"), "fence", STATE_ICON_COLOR)
     btns = [
         rpc_button(b, "Otvori ulaz", "Otvori ulaz", A["entrance"], "open"),
         rpc_button(b, "Otvori izlaz", "Otvori izlaz", A["exit"], "open"),
-        rpc_button(b, "Odobri ulaz", "Ručno odobri ulaz", A["edge"], "approveEntry"),
-        rpc_button(b, "Odobri izlaz", "Ručno odobri izlaz", A["edge"], "approveExit"),
-        rpc_button(b, "Odbij", "Odbij vozilo na ulazu", A["edge"], "deny", primary=False),
+        rpc_button(b, "Odobri ulaz", "Ručno odobri ulaz", A["entrance"], "approve"),
+        rpc_button(b, "Odobri izlaz", "Ručno odobri izlaz", A["exit"], "approve"),
+        rpc_button(b, "Odbij", "Odbij vozilo na ulazu", A["entrance"], "deny", primary=False),
     ]
-    decisions = ts_table(b, "Odluke pristupa (zadnji sat)", A["edge"], [
+    # plate typed by the operator; the next "Ručno odobri" uses it (otherwise the last read plate)
+    manual_plate = b.widget("system.input_widgets.update_server_string_attribute", "Registracija za ručno odobrenje",
+                            [{"type": "entity", "entityAliasId": A["garage"], "filterId": None,
+                              "dataKeys": [key("manualPlate", "Registracija (prazno = zadnja očitana)", "attribute")]}],
+                            {"showTitle": True})
+    decisions = ts_table(b, "Odluke pristupa (zadnji sat)", A["garage"], [
         key("decisionDirection", "Smjer"), key("decisionPlate", "Registracija"),
         key("decision", "Odluka", settings={"useCellStyleFunction": True, "cellStyleFunction": STATE_COLOR}),
         key("decisionReason", "Razlog"), key("decisionConfidence", "Pouzdanost", decimals=2),
@@ -310,7 +318,7 @@ def build_main(b: Builder) -> Dict[str, Any]:
         (ex_state, 20, 6, 4, 3),
         (btns[0], 16, 6, 4, 1), (btns[1], 16, 7, 4, 1), (btns[2], 16, 8, 4, 1),
         (decisions, 0, 9, 14, 7),
-        (alarms, 14, 9, 10, 6), (btns[3], 14, 15, 5, 1), (btns[4], 19, 15, 5, 1),
+        (alarms, 14, 9, 10, 4), (manual_plate, 14, 13, 10, 2), (btns[3], 14, 15, 5, 1), (btns[4], 19, 15, 5, 1),
     ]
     return dashboard("Garaža - nadzor", {v["id"]: v for v in a.values()}, placed,
                      "Stanje mjesta, rampi i kamera u stvarnom vremenu; ručno upravljanje; odluke i alarmi.")
@@ -324,24 +332,24 @@ def build_analytics(b: Builder) -> Dict[str, Any]:
     a = aliases()
     A = {k: v["id"] for k, v in a.items()}
     day, week, hour = 86400000, 7 * 86400000, 3600000
-    occupancy = chart(b, "Zauzetost kroz vrijeme", A["edge"], [
+    occupancy = chart(b, "Zauzetost kroz vrijeme", A["garage"], [
         key("occupiedSpots", "Zauzeta mjesta", color="#c62828"), key("freeSpots", "Slobodna mjesta", color="#2e7d32"),
         key("unknownSpots", "Nepoznato", color="#757575")], day, 60000, "NONE")
-    pct = chart(b, "Popunjenost [%] (prosjek po satu)", A["edge"], [
+    pct = chart(b, "Popunjenost [%] (prosjek po satu)", A["garage"], [
         key("occupancyPct", "Popunjenost", color="#1565c0", units="%", decimals=0)], week, hour, "AVG", bar=True, units="%")
-    entries = chart(b, "Broj ulazaka po satu", A["edge"], [
+    entries = chart(b, "Broj ulazaka po satu", A["garage"], [
         key("entry", "Ulasci", color="#1565c0", decimals=0), key("exit", "Izlasci", color="#f9a825", decimals=0)],
         day, hour, "SUM", bar=True)
-    duration = chart(b, "Prosječno trajanje parkiranja [min] po danu", A["edge"], [
+    duration = chart(b, "Prosječno trajanje parkiranja [min] po danu", A["garage"], [
         key("durationMin", "Trajanje", color="#6a1b9a", units="min", decimals=0)], week, day, "AVG", bar=True, units="min")
-    revenue = chart(b, "Prihod po danu [EUR]", A["edge"], [
+    revenue = chart(b, "Prihod po danu [EUR]", A["garage"], [
         key("price", "Prihod", color="#2e7d32", units="EUR", decimals=2)], week, day, "SUM", bar=True, units="EUR")
-    avg_card = b.widget("system.cards.aggregated_value_card", "Prosječno trajanje (7 dana)", [ds(A["edge"], [
+    avg_card = b.widget("system.cards.aggregated_value_card", "Prosječno trajanje (7 dana)", [ds(A["garage"], [
         key("durationMin", "Prosječno trajanje", units="min", decimals=0)])], {
         "useDashboardTimewindow": False,
         "timewindow": {"realtime": {"realtimeType": 0, "interval": day, "timewindowMs": week},
                        "aggregation": {"type": "AVG", "limit": 50000}}})
-    sessions = ts_table(b, "Završene parkirne sesije (7 dana)", A["edge"], [
+    sessions = ts_table(b, "Završene parkirne sesije (7 dana)", A["garage"], [
         key("sessionPlate", "Registracija"), key("sessionEvent", "Događaj"), key("sessionEntryTime", "Ulazak (UTC)"),
         key("durationMin", "Trajanje [min]", decimals=1), key("price", "Cijena [EUR]", decimals=2)], week)
     placed = [

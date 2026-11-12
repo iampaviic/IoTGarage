@@ -1,0 +1,1324 @@
+{
+ "ruleChain": {
+  "name": "Garaža (varijanta B)",
+  "type": "CORE",
+  "firstRuleNodeId": null,
+  "root": false,
+  "debugMode": false,
+  "configuration": null,
+  "additionalInfo": {
+   "description": "IoT Garaža, varijanta B: odluke, sesije, naplata i alarmi. Generira SOFTWARE/thingsboard/rulechain/build_rule_chain.py"
+  }
+ },
+ "metadata": {
+  "firstNodeIndex": 0,
+  "nodes": [
+   {
+    "type": "org.thingsboard.rule.engine.profile.TbDeviceProfileNode",
+    "name": "Pravila alarma profila",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 1,
+    "configuration": {
+     "persistAlarmRulesState": false,
+     "fetchAlarmRulesStateOnStart": false
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 60,
+     "layoutY": 60
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbMsgTypeSwitchNode",
+    "name": "Vrsta poruke",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "version": 0
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 60,
+     "layoutY": 240
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.telemetry.TbMsgTimeseriesNode",
+    "name": "Spremi telemetriju",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 1,
+    "configuration": {
+     "defaultTTL": 0,
+     "useServerTs": false,
+     "processingSettings": {
+      "type": "ON_EVERY_MESSAGE"
+     }
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 350,
+     "layoutY": 60
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.telemetry.TbMsgAttributesNode",
+    "name": "Spremi atribute uređaja",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 3,
+    "configuration": {
+     "processingSettings": {
+      "type": "ON_EVERY_MESSAGE"
+     },
+     "scope": "CLIENT_SCOPE",
+     "notifyDevice": false,
+     "sendAttributesUpdatedNotification": false,
+     "updateAttributesOnlyOnValueChange": true
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 350,
+     "layoutY": 150
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.telemetry.TbMsgAttributesNode",
+    "name": "Spremi atribute garaže",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 3,
+    "configuration": {
+     "processingSettings": {
+      "type": "ON_EVERY_MESSAGE"
+     },
+     "scope": "SERVER_SCOPE",
+     "notifyDevice": false,
+     "sendAttributesUpdatedNotification": false,
+     "updateAttributesOnlyOnValueChange": false
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1220,
+     "layoutY": 60
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+    "name": "Brojevi mjesta?",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return true;",
+     "tbelScript": "return msg.freeSpots != null && msg.occupiedSpots != null;"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 350,
+     "layoutY": 240
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbChangeOriginatorNode",
+    "name": "Na asset Garage",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "originatorSource": "ENTITY",
+     "entityType": "ASSET",
+     "entityNamePattern": "Garage",
+     "relationsQuery": {
+      "direction": "FROM",
+      "maxLevel": 1,
+      "fetchLastLevelOnly": false,
+      "filters": [
+       {
+        "relationType": "Contains",
+        "entityTypes": [],
+        "negate": false
+       }
+      ]
+     }
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 640,
+     "layoutY": 240
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.flow.TbCheckpointNode",
+    "name": "Red garaže (brojevi)",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": "SequentialByOriginator",
+    "configurationVersion": 1,
+    "configuration": {
+     "version": 0
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 640,
+     "layoutY": 330
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "Brojevi senzora",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// Counts of the sensor node (esp32-spots) -> server attributes of the Garage asset\nreturn {msg: {sensorFree: msg.freeSpots, sensorOccupied: msg.occupiedSpots}, metadata: metadata,\n        msgType: 'POST_ATTRIBUTES_REQUEST'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 930,
+     "layoutY": 240
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.metadata.TbGetAttributesNode",
+    "name": "Atributi garaže (sažetak)",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 1,
+    "configuration": {
+     "fetchTo": "METADATA",
+     "clientAttributeNames": [],
+     "sharedAttributeNames": [],
+     "serverAttributeNames": [
+      "sessions",
+      "totalSpots",
+      "sensorFree",
+      "sensorOccupied"
+     ],
+     "latestTsKeyNames": [],
+     "tellFailureIfAbsent": false,
+     "getLatestValueWithTs": false
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1510,
+     "layoutY": 60
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "Sažetak garaže",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// Garage summary after a sensor or session change. Originator: asset \"Garage\".\n// free spots for a new car = min(FREE spots, total - active sessions); UNKNOWN is never counted as free\nfunction num(v, d) {\n    if (v == null || v == '') { return d; }\n    return parseInt(v.toString());\n}\nvar total = num(metadata.ss_totalSpots, 6);\nvar free = num(metadata.ss_sensorFree, 0);\nvar occupied = num(metadata.ss_sensorOccupied, 0);\nvar active = 0;\nif (metadata.ss_sessions != null && metadata.ss_sessions != '') { active = JSON.parse(metadata.ss_sessions).size(); }\nvar available = Math.min(free, total - active);\nif (available < 0) { available = 0; }\nvar unknown = total - free - occupied;\nif (unknown < 0) { unknown = 0; }\nvar pct = total > 0 ? Math.round(1000.0 * occupied / total) / 10.0 : 0.0;\nreturn {msg: {totalSpots: total, freeSpots: free, occupiedSpots: occupied, unknownSpots: unknown, occupancyPct: pct,\n              activeSessions: active, availableSpots: available, full: available == 0},\n        metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1510,
+     "layoutY": 150
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+    "name": "Garaža puna?",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return true;",
+     "tbelScript": "return msg.full == true;"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1510,
+     "layoutY": 240
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+    "name": "Alarm: garaža puna",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "alarmType": "Garaža puna",
+     "scriptLang": "TBEL",
+     "alarmDetailsBuildTbel": "var details = {};\ndetails.message = 'Nema slobodnih mjesta';\nreturn details;",
+     "alarmDetailsBuildJs": "return {};",
+     "severity": "WARNING",
+     "propagate": true,
+     "propagateToOwner": false,
+     "propagateToTenant": false,
+     "useMessageAlarmData": false,
+     "overwriteAlarmDetails": true,
+     "dynamicSeverity": false,
+     "relationTypes": []
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1800,
+     "layoutY": 240
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.action.TbClearAlarmNode",
+    "name": "Ugasi: garaža puna",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "alarmType": "Garaža puna",
+     "scriptLang": "TBEL",
+     "alarmDetailsBuildTbel": "var details = {};\n\nreturn details;",
+     "alarmDetailsBuildJs": "return {};"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1800,
+     "layoutY": 330
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+    "name": "Vozilo na rampi?",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return true;",
+     "tbelScript": "return msg.vehicleArrived == true && (metadata.deviceName == 'EntranceGate' || metadata.deviceName == 'ExitGate');"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 350,
+     "layoutY": 420
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "Zahtjev readPlate",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// A vehicle arrived at a closed gate -> ask the ALPR device of that gate to read the plate (RPC readPlate)\nvar gate = metadata.deviceName == 'ExitGate' ? 'EXIT' : 'ENTRANCE';\nmetadata.gate = gate;\nmetadata.direction = gate == 'ENTRANCE' ? 'ENTRY' : 'EXIT';\nmetadata.gateDevice = metadata.deviceName;\nmetadata.alprDevice = gate == 'ENTRANCE' ? 'ALPR-Entrance' : 'ALPR-Exit';\nmetadata.manual = 'false';\nreturn {msg: {method: 'readPlate', params: {gate: gate}}, metadata: metadata, msgType: 'RPC_CALL_FROM_SERVER_TO_DEVICE'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 350,
+     "layoutY": 510
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbChangeOriginatorNode",
+    "name": "Na ALPR uređaj rampe",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "originatorSource": "ENTITY",
+     "entityType": "DEVICE",
+     "entityNamePattern": "${alprDevice}",
+     "relationsQuery": {
+      "direction": "FROM",
+      "maxLevel": 1,
+      "fetchLastLevelOnly": false,
+      "filters": [
+       {
+        "relationType": "Contains",
+        "entityTypes": [],
+        "negate": false
+       }
+      ]
+     }
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 350,
+     "layoutY": 600
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.rpc.TbSendRPCRequestNode",
+    "name": "RPC readPlate",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "timeoutInSeconds": 15
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 350,
+     "layoutY": 690
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "ALPR ne odgovara",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// The ALPR device did not answer readPlate in time -> treated as an unreadable plate (manual decision)\nreturn {msg: {status: 'TIMEOUT', ocrConfidence: 0.0}, metadata: metadata, msgType: msgType};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 640,
+     "layoutY": 690
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbJsSwitchNode",
+    "name": "Ručna radnja?",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return [];",
+     "tbelScript": "if (msg.method == 'approve' || msg.method == 'deny') { return ['manual']; }\nreturn ['device'];"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 60,
+     "layoutY": 420
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.rpc.TbSendRPCRequestNode",
+    "name": "RPC uređaju",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "timeoutInSeconds": 10
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 60,
+     "layoutY": 510
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.metadata.TbGetOriginatorFieldsNode",
+    "name": "Ime rampe",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 1,
+    "configuration": {
+     "fetchTo": "METADATA",
+     "dataMapping": {
+      "name": "originatorName"
+     },
+     "ignoreNullStrings": false
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 60,
+     "layoutY": 600
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+    "name": "Je li rampa?",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return true;",
+     "tbelScript": "return metadata.originatorName == 'EntranceGate' || metadata.originatorName == 'ExitGate';"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 60,
+     "layoutY": 690
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "Ručno odobri / odbij",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// Dashboard button: RPC approve / deny to EntranceGate or ExitGate.\n// Optional params.plate; without it the plate typed on the dashboard (manualPlate) or the last read plate is used.\nvar gate = metadata.originatorName == 'ExitGate' ? 'EXIT' : 'ENTRANCE';\nvar params = msg.params;\nif (params instanceof String) { params = params == '' ? {} : JSON.parse(params); }\nmetadata.gate = gate;\nmetadata.direction = gate == 'ENTRANCE' ? 'ENTRY' : 'EXIT';\nmetadata.gateDevice = metadata.originatorName;\nmetadata.manual = 'true';\nmetadata.manualAction = msg.method;\nmetadata.manualPlate = params != null && params.plate != null ? params.plate.toString() : '';\nreturn {msg: {}, metadata: metadata, msgType: msgType};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 60,
+     "layoutY": 780
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbChangeOriginatorNode",
+    "name": "Na asset Garage (odluka)",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "originatorSource": "ENTITY",
+     "entityType": "ASSET",
+     "entityNamePattern": "Garage",
+     "relationsQuery": {
+      "direction": "FROM",
+      "maxLevel": 1,
+      "fetchLastLevelOnly": false,
+      "filters": [
+       {
+        "relationType": "Contains",
+        "entityTypes": [],
+        "negate": false
+       }
+      ]
+     }
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 640,
+     "layoutY": 510
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.flow.TbCheckpointNode",
+    "name": "Red garaže (odluka)",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": "SequentialByOriginator",
+    "configurationVersion": 1,
+    "configuration": {
+     "version": 0
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 640,
+     "layoutY": 600
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.metadata.TbGetAttributesNode",
+    "name": "Atributi garaže (odluka)",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 1,
+    "configuration": {
+     "fetchTo": "METADATA",
+     "clientAttributeNames": [],
+     "sharedAttributeNames": [],
+     "serverAttributeNames": [
+      "sessions",
+      "totalSpots",
+      "sensorFree",
+      "sensorOccupied",
+      "policy",
+      "allowlist",
+      "acceptThreshold",
+      "freeMinutes",
+      "pricePerHourCents",
+      "dailyCapCents",
+      "timeMultiplier",
+      "lastPlateEntrance",
+      "lastPlateExit",
+      "manualPlate",
+      "exitFuzzyMatch"
+     ],
+     "latestTsKeyNames": [],
+     "tellFailureIfAbsent": false,
+     "getLatestValueWithTs": false
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 930,
+     "layoutY": 510
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "Odluka, sesija, cijena",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// Entry / exit decision and parking sessions (varijanta B).\n// Originator: asset \"Garage\". Input:\n//   automatic: msg = answer of the ALPR device to RPC readPlate {status, plate, ocrConfidence, ...}\n//   manual:    msg = {} and metadata.manual = 'true', metadata.manualAction = approve | deny\n// metadata: gate, direction, gateDevice + server attributes of Garage with the prefix ss_\n// Output: msg = telemetry of the decision for the Garage asset; metadata.attrs = server attributes to save\n// (sessions, last read plates), metadata.openGate = 'true' when the gate must open.\n// Same rules as SOFTWARE/edge/edge_service/decisions.py and SOFTWARE/baza/parking_sessions/pricing.py.\n\nfunction str(v, d) {\n    if (v == null || v == '') { return d; }\n    return v.toString();\n}\n\nfunction num(v, d) {\n    if (v == null || v == '') { return d; }\n    return parseDouble(v.toString());\n}\n\nfunction normalize(p) {\n    if (p == null) { return ''; }\n    return p.toString().toUpperCase().replace(' ', '').replace('-', '');\n}\n\n// Levenshtein distance; with exitFuzzyMatch the exit accepts one wrongly read character if only one session matches\nfunction distance(a, b) {\n    var prev = [];\n    for (var j = 0; j <= b.length(); j++) { prev.add(j); }\n    for (var i = 1; i <= a.length(); i++) {\n        var cur = [i];\n        for (var j = 1; j <= b.length(); j++) {\n            var cost = a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1;\n            cur.add(Math.min(Math.min(cur[j - 1] + 1, prev[j] + 1), prev[j - 1] + cost));\n        }\n        prev = cur;\n    }\n    return prev[b.length()];\n}\n\n// price in cents: first freeMinutes free, then every started hour, at most dailyCap per started day\nfunction priceCents(durationS, freeMinutes, perHour, dailyCap, multiplier) {\n    var billed = durationS * multiplier;\n    if (billed <= freeMinutes * 60) { return 0; }\n    var hours = (int) Math.ceil(billed / 3600.0);\n    if (dailyCap <= 0) { return hours * perHour; }\n    var days = (int) Math.floor(hours / 24.0);\n    var rest = hours - days * 24;\n    return days * dailyCap + Math.min(rest * perHour, dailyCap);\n}\n\nvar now = Date.now();\nvar nowIso = new Date(now).toISOString().substring(0, 19) + 'Z';\nvar direction = metadata.direction;\nvar entry = direction == 'ENTRY';\nvar manual = metadata.manual == 'true';\nvar accept = num(metadata.ss_acceptThreshold, 0.85);\nvar total = (int) num(metadata.ss_totalSpots, 6);\nvar sensorFree = (int) num(metadata.ss_sensorFree, 0);\nvar sessions = {};\nif (metadata.ss_sessions != null && metadata.ss_sessions != '') { sessions = JSON.parse(metadata.ss_sessions); }\nvar available = Math.min(sensorFree, total - sessions.size());\nif (available < 0) { available = 0; }\nvar lastKey = entry ? 'lastPlateEntrance' : 'lastPlateExit';\n\nvar attrs = {};\nvar out = {};\nvar plate = '';\nvar confidence = -1.0;\nvar decision = '';\nvar reason = '';\n\nif (manual) {\n    plate = normalize(metadata.manualPlate);\n    if (plate == '') { plate = normalize(metadata.ss_manualPlate); }\n    if (plate == '') { plate = normalize(metadata['ss_' + lastKey]); }\n    attrs.manualPlate = '';\n    if (metadata.manualAction == 'deny') {\n        decision = 'DENIED';\n        reason = 'MANUAL_DENIAL';\n    }\n} else {\n    plate = normalize(msg.plate);\n    confidence = num(msg.ocrConfidence, 0.0);\n    var status = str(msg.status, 'NO_PLATE');\n    if (plate != '') { attrs[lastKey] = plate; }\n    // no automatic decision below the accept threshold: the operator decides (gate never opens on its own)\n    if (status == 'TIMEOUT' || status == 'CAMERA_ERROR') {\n        decision = 'MANUAL_REQUIRED';\n        reason = status;\n    } else if (plate == '' || status == 'NO_PLATE' || status == 'NO_TEXT') {\n        decision = 'MANUAL_REQUIRED';\n        reason = 'NO_PLATE';\n    } else if (status == 'INVALID_FORMAT') {\n        decision = 'MANUAL_REQUIRED';\n        reason = 'INVALID_FORMAT';\n    } else if (confidence < accept) {\n        decision = 'MANUAL_REQUIRED';\n        reason = 'LOW_CONFIDENCE';\n    }\n}\n\nif (decision == '' && entry) {\n    var allowlist = [];\n    if (metadata.ss_allowlist != null && metadata.ss_allowlist != '') { allowlist = JSON.parse(metadata.ss_allowlist); }\n    if (plate != '' && sessions[plate] != null) {\n        decision = 'DENIED';\n        reason = 'ALREADY_INSIDE';\n    } else if (!manual && str(metadata.ss_policy, 'open') == 'allowlist' && allowlist.indexOf(plate) < 0) {\n        decision = 'DENIED';\n        reason = 'NOT_ON_ALLOWLIST';\n    } else if (!manual && available <= 0) {\n        decision = 'DENIED';\n        reason = 'GARAGE_FULL';\n    } else {\n        decision = 'GRANTED';\n        reason = manual ? 'MANUAL_APPROVAL' : 'AUTHORIZED';\n        if (plate != '') {\n            var hex = Long.toHexString(now).toUpperCase();\n            var sid = 'S-' + nowIso.substring(0, 10).replace('-', '') + '-' + nowIso.substring(11, 19).replace(':', '')\n                + '-' + hex.substring(hex.length() - 4);\n            var s = {sessionId: sid, entryTime: nowIso, entryTs: now};\n            s.entryMode = manual ? 'MANUAL' : 'AUTO';\n            if (!manual) { s.entryConfidence = confidence; }\n            sessions[plate] = s;\n            out.sessionEvent = 'SESSION_OPENED';\n            out.sessionId = sid;\n            out.sessionPlate = plate;\n            out.entry = 1;\n        }\n    }\n} else if (decision == '') {\n    var key = '';\n    if (plate != '' && sessions[plate] != null) {\n        key = plate;\n    } else if (plate != '' && metadata.ss_exitFuzzyMatch == 'true') {\n        var matches = [];\n        foreach (k : sessions.keySet()) {\n            if (distance(plate, k) <= 1) { matches.add(k); }\n        }\n        if (matches.size() == 1) { key = matches[0]; }\n    }\n    if (key != '') {\n        var s = sessions[key];\n        var durationS = (int) Math.floor((now - parseLong(s.entryTs.toString())) / 1000.0);\n        var cents = priceCents(durationS, num(metadata.ss_freeMinutes, 15), num(metadata.ss_pricePerHourCents, 150),\n            num(metadata.ss_dailyCapCents, 1500), num(metadata.ss_timeMultiplier, 1));\n        sessions.remove(key);\n        decision = 'GRANTED';\n        reason = manual ? 'MANUAL_APPROVAL' : 'AUTHORIZED';\n        out.sessionEvent = 'SESSION_CLOSED';\n        out.sessionId = s.sessionId;\n        out.sessionPlate = key;\n        out.sessionEntryTime = s.entryTime;\n        out.exit = 1;\n        out.durationS = durationS;\n        out.durationMin = Math.round(durationS / 6.0) / 10.0;\n        out.price = cents / 100.0;\n        plate = key;\n    } else if (manual) {\n        decision = 'GRANTED';\n        reason = 'MANUAL_APPROVAL';\n    } else {\n        decision = 'DENIED';\n        reason = 'NO_ACTIVE_SESSION';\n    }\n}\n\nattrs.sessions = sessions;\nout.decision = decision;\nout.decisionReason = reason;\nout.decisionPlate = plate == '' ? '-' : plate;\nout.decisionDirection = direction;\nout.decisionManual = manual;\nout.manualRequired = decision == 'MANUAL_REQUIRED' || reason == 'NO_ACTIVE_SESSION';\nif (confidence >= 0) { out.decisionConfidence = confidence; }\n\nmetadata.attrs = JSON.stringify(attrs);\nmetadata.openGate = decision == 'GRANTED' ? 'true' : 'false';\nmetadata.cmdReason = manual ? 'MANUAL' : (entry ? 'AUTHORIZED_ENTRY' : 'AUTHORIZED_EXIT');\nmetadata.cmdPlate = plate;\nmetadata.decision = decision;\nmetadata.decisionReason = reason;\nmetadata.decisionPlate = out.decisionPlate;\nreturn {msg: out, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 930,
+     "layoutY": 600
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "Sesije i zadnje registracije",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// Server attributes of the Garage asset changed by the decision (sessions, last read plates)\nreturn {msg: JSON.parse(metadata.attrs), metadata: metadata, msgType: 'POST_ATTRIBUTES_REQUEST'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1220,
+     "layoutY": 150
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+    "name": "Treba operater?",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return true;",
+     "tbelScript": "return msg.manualRequired == true;"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1220,
+     "layoutY": 600
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+    "name": "Alarm: ručna intervencija",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "alarmType": "Potrebna ručna intervencija",
+     "scriptLang": "TBEL",
+     "alarmDetailsBuildTbel": "var details = {};\ndetails.plate = metadata.decisionPlate;\ndetails.reason = metadata.decisionReason;\ndetails.gate = metadata.gate;\ndetails.message = metadata.gate + ': ' + metadata.decisionPlate + ' (' + metadata.decisionReason + ')';\nreturn details;",
+     "alarmDetailsBuildJs": "return {};",
+     "severity": "WARNING",
+     "propagate": true,
+     "propagateToOwner": false,
+     "propagateToTenant": false,
+     "useMessageAlarmData": false,
+     "overwriteAlarmDetails": true,
+     "dynamicSeverity": false,
+     "relationTypes": []
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1510,
+     "layoutY": 600
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.action.TbClearAlarmNode",
+    "name": "Ugasi: ručna intervencija",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "alarmType": "Potrebna ručna intervencija",
+     "scriptLang": "TBEL",
+     "alarmDetailsBuildTbel": "var details = {};\n\nreturn details;",
+     "alarmDetailsBuildJs": "return {};"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1510,
+     "layoutY": 690
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+    "name": "Naredba rampi?",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return true;",
+     "tbelScript": "return metadata.openGate == 'true' || metadata.manual == 'true';"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 930,
+     "layoutY": 690
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbChangeOriginatorNode",
+    "name": "Na rampu",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "originatorSource": "ENTITY",
+     "entityType": "DEVICE",
+     "entityNamePattern": "${gateDevice}",
+     "relationsQuery": {
+      "direction": "FROM",
+      "maxLevel": 1,
+      "fetchLastLevelOnly": false,
+      "filters": [
+       {
+        "relationType": "Contains",
+        "entityTypes": [],
+        "negate": false
+       }
+      ]
+     }
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 930,
+     "layoutY": 780
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "RPC open / deny",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// RPC to the gate: open after GRANTED; deny (short signal) when the operator's request did not open it.\n// Automatic decisions must not reuse the RPC id of an earlier request; a manual one answers the dashboard.\nif (metadata.manual != 'true') {\n    metadata.remove('requestUUID');\n    metadata.remove('oneway');\n    metadata.remove('expirationTime');\n    metadata.remove('persistent');\n    metadata.remove('retries');\n    metadata.remove('originServiceId');\n}\nvar method = metadata.openGate == 'true' ? 'open' : 'deny';\nreturn {msg: {method: method, params: {reason: metadata.cmdReason, plate: metadata.cmdPlate}}, metadata: metadata,\n        msgType: 'RPC_CALL_FROM_SERVER_TO_DEVICE'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 930,
+     "layoutY": 870
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.rpc.TbSendRPCRequestNode",
+    "name": "RPC rampi",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "timeoutInSeconds": 5
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 930,
+     "layoutY": 960
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "Rampa potvrdila",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// The gate answered the command\nvar out = {ackTimeout: false, lastCommandSuccess: msg.success == true};\nif (msg.reason != null) { out.lastCommandReason = msg.reason; }\nreturn {msg: out, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1220,
+     "layoutY": 870
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "Rampa ne odgovara",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// The gate did not answer the command in time\nreturn {msg: {ackTimeout: true}, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1220,
+     "layoutY": 960
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.action.TbClearAlarmNode",
+    "name": "Ugasi: rampa ne potvrđuje",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "alarmType": "Rampa ne potvrđuje naredbe",
+     "scriptLang": "TBEL",
+     "alarmDetailsBuildTbel": "var details = {};\n\nreturn details;",
+     "alarmDetailsBuildJs": "return {};"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1510,
+     "layoutY": 870
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+    "name": "Alarm: rampa ne potvrđuje",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "alarmType": "Rampa ne potvrđuje naredbe",
+     "scriptLang": "TBEL",
+     "alarmDetailsBuildTbel": "var details = {};\ndetails.message = metadata.gateDevice + ' nije potvrdila naredbu';\nreturn details;",
+     "alarmDetailsBuildJs": "return {};",
+     "severity": "MAJOR",
+     "propagate": true,
+     "propagateToOwner": false,
+     "propagateToTenant": false,
+     "useMessageAlarmData": false,
+     "overwriteAlarmDetails": true,
+     "dynamicSeverity": false,
+     "relationTypes": []
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1510,
+     "layoutY": 960
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbJsSwitchNode",
+    "name": "Veza izgubljena: tko?",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return [];",
+     "tbelScript": "return [metadata.deviceType];"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1800,
+     "layoutY": 420
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbJsSwitchNode",
+    "name": "Veza uspostavljena: tko?",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return [];",
+     "tbelScript": "return [metadata.deviceType];"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1800,
+     "layoutY": 60
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "Mjesto UNKNOWN / OFFLINE",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// The spot lost its connection (sensor node offline): unknown, never \"free\"\nreturn {msg: {state: 'UNKNOWN', stateCode: -1, sensorStatus: 'OFFLINE'}, metadata: metadata,\n        msgType: 'POST_TELEMETRY_REQUEST'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 2090,
+     "layoutY": 420
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "online = false",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "return {msg: {online: false}, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 2090,
+     "layoutY": 510
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "online = true",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "return {msg: {online: true}, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 2090,
+     "layoutY": 60
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.action.TbCreateAlarmNode",
+    "name": "Alarm: uređaj nije dostupan",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "alarmType": "Uređaj nije dostupan",
+     "scriptLang": "TBEL",
+     "alarmDetailsBuildTbel": "var details = {};\ndetails.message = metadata.deviceName + ' se ne javlja';\nreturn details;",
+     "alarmDetailsBuildJs": "return {};",
+     "severity": "MAJOR",
+     "propagate": true,
+     "propagateToOwner": false,
+     "propagateToTenant": false,
+     "useMessageAlarmData": false,
+     "overwriteAlarmDetails": true,
+     "dynamicSeverity": false,
+     "relationTypes": []
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 2090,
+     "layoutY": 600
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.action.TbClearAlarmNode",
+    "name": "Ugasi: uređaj nije dostupan",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "alarmType": "Uređaj nije dostupan",
+     "scriptLang": "TBEL",
+     "alarmDetailsBuildTbel": "var details = {};\n\nreturn details;",
+     "alarmDetailsBuildJs": "return {};"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 2090,
+     "layoutY": 150
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.filter.TbJsFilterNode",
+    "name": "Čvor senzora?",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return true;",
+     "tbelScript": "return metadata.deviceName == 'esp32-spots';"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1800,
+     "layoutY": 600
+    }
+   },
+   {
+    "type": "org.thingsboard.rule.engine.transform.TbTransformMsgNode",
+    "name": "Nema slobodnih (nepoznato)",
+    "debugSettings": null,
+    "singletonMode": false,
+    "queueName": null,
+    "configurationVersion": 0,
+    "configuration": {
+     "scriptLang": "TBEL",
+     "jsScript": "return {msg: msg, metadata: metadata, msgType: msgType};",
+     "tbelScript": "// The sensor node is offline: no spot is known to be free (UNKNOWN is never counted as free)\nreturn {msg: {freeSpots: 0, occupiedSpots: 0}, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};\n"
+    },
+    "additionalInfo": {
+     "description": "",
+     "layoutX": 1800,
+     "layoutY": 690
+    }
+   }
+  ],
+  "connections": [
+   {
+    "fromIndex": 0,
+    "toIndex": 1,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 1,
+    "toIndex": 2,
+    "type": "Post telemetry"
+   },
+   {
+    "fromIndex": 1,
+    "toIndex": 3,
+    "type": "Post attributes"
+   },
+   {
+    "fromIndex": 1,
+    "toIndex": 5,
+    "type": "Post telemetry"
+   },
+   {
+    "fromIndex": 5,
+    "toIndex": 6,
+    "type": "True"
+   },
+   {
+    "fromIndex": 6,
+    "toIndex": 7,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 7,
+    "toIndex": 8,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 8,
+    "toIndex": 4,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 4,
+    "toIndex": 9,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 9,
+    "toIndex": 10,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 10,
+    "toIndex": 2,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 10,
+    "toIndex": 11,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 11,
+    "toIndex": 12,
+    "type": "True"
+   },
+   {
+    "fromIndex": 11,
+    "toIndex": 13,
+    "type": "False"
+   },
+   {
+    "fromIndex": 1,
+    "toIndex": 14,
+    "type": "Post telemetry"
+   },
+   {
+    "fromIndex": 14,
+    "toIndex": 15,
+    "type": "True"
+   },
+   {
+    "fromIndex": 15,
+    "toIndex": 16,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 16,
+    "toIndex": 17,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 17,
+    "toIndex": 18,
+    "type": "Failure"
+   },
+   {
+    "fromIndex": 1,
+    "toIndex": 19,
+    "type": "RPC Request to Device"
+   },
+   {
+    "fromIndex": 19,
+    "toIndex": 20,
+    "type": "device"
+   },
+   {
+    "fromIndex": 19,
+    "toIndex": 21,
+    "type": "manual"
+   },
+   {
+    "fromIndex": 21,
+    "toIndex": 22,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 22,
+    "toIndex": 23,
+    "type": "True"
+   },
+   {
+    "fromIndex": 17,
+    "toIndex": 24,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 18,
+    "toIndex": 24,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 23,
+    "toIndex": 24,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 24,
+    "toIndex": 25,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 25,
+    "toIndex": 26,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 26,
+    "toIndex": 27,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 27,
+    "toIndex": 2,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 27,
+    "toIndex": 28,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 28,
+    "toIndex": 4,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 27,
+    "toIndex": 29,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 29,
+    "toIndex": 30,
+    "type": "True"
+   },
+   {
+    "fromIndex": 29,
+    "toIndex": 31,
+    "type": "False"
+   },
+   {
+    "fromIndex": 27,
+    "toIndex": 32,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 32,
+    "toIndex": 33,
+    "type": "True"
+   },
+   {
+    "fromIndex": 33,
+    "toIndex": 34,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 34,
+    "toIndex": 35,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 35,
+    "toIndex": 36,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 35,
+    "toIndex": 37,
+    "type": "Failure"
+   },
+   {
+    "fromIndex": 36,
+    "toIndex": 2,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 36,
+    "toIndex": 38,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 37,
+    "toIndex": 2,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 37,
+    "toIndex": 39,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 1,
+    "toIndex": 40,
+    "type": "Disconnect Event"
+   },
+   {
+    "fromIndex": 1,
+    "toIndex": 40,
+    "type": "Inactivity Event"
+   },
+   {
+    "fromIndex": 1,
+    "toIndex": 41,
+    "type": "Connect Event"
+   },
+   {
+    "fromIndex": 1,
+    "toIndex": 41,
+    "type": "Activity Event"
+   },
+   {
+    "fromIndex": 40,
+    "toIndex": 42,
+    "type": "ParkingSpot"
+   },
+   {
+    "fromIndex": 40,
+    "toIndex": 43,
+    "type": "Controller"
+   },
+   {
+    "fromIndex": 42,
+    "toIndex": 2,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 43,
+    "toIndex": 2,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 43,
+    "toIndex": 45,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 43,
+    "toIndex": 47,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 47,
+    "toIndex": 48,
+    "type": "True"
+   },
+   {
+    "fromIndex": 48,
+    "toIndex": 6,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 41,
+    "toIndex": 44,
+    "type": "Controller"
+   },
+   {
+    "fromIndex": 44,
+    "toIndex": 2,
+    "type": "Success"
+   },
+   {
+    "fromIndex": 44,
+    "toIndex": 46,
+    "type": "Success"
+   }
+  ],
+  "ruleChainConnections": null
+ }
+}

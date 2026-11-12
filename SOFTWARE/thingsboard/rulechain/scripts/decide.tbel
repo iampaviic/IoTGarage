@@ -1,0 +1,184 @@
+// Entry / exit decision and parking sessions (varijanta B).
+// Originator: asset "Garage". Input:
+//   automatic: msg = answer of the ALPR device to RPC readPlate {status, plate, ocrConfidence, ...}
+//   manual:    msg = {} and metadata.manual = 'true', metadata.manualAction = approve | deny
+// metadata: gate, direction, gateDevice + server attributes of Garage with the prefix ss_
+// Output: msg = telemetry of the decision for the Garage asset; metadata.attrs = server attributes to save
+// (sessions, last read plates), metadata.openGate = 'true' when the gate must open.
+// Same rules as SOFTWARE/edge/edge_service/decisions.py and SOFTWARE/baza/parking_sessions/pricing.py.
+
+function str(v, d) {
+    if (v == null || v == '') { return d; }
+    return v.toString();
+}
+
+function num(v, d) {
+    if (v == null || v == '') { return d; }
+    return parseDouble(v.toString());
+}
+
+function normalize(p) {
+    if (p == null) { return ''; }
+    return p.toString().toUpperCase().replace(' ', '').replace('-', '');
+}
+
+// Levenshtein distance; with exitFuzzyMatch the exit accepts one wrongly read character if only one session matches
+function distance(a, b) {
+    var prev = [];
+    for (var j = 0; j <= b.length(); j++) { prev.add(j); }
+    for (var i = 1; i <= a.length(); i++) {
+        var cur = [i];
+        for (var j = 1; j <= b.length(); j++) {
+            var cost = a.charAt(i - 1) == b.charAt(j - 1) ? 0 : 1;
+            cur.add(Math.min(Math.min(cur[j - 1] + 1, prev[j] + 1), prev[j - 1] + cost));
+        }
+        prev = cur;
+    }
+    return prev[b.length()];
+}
+
+// price in cents: first freeMinutes free, then every started hour, at most dailyCap per started day
+function priceCents(durationS, freeMinutes, perHour, dailyCap, multiplier) {
+    var billed = durationS * multiplier;
+    if (billed <= freeMinutes * 60) { return 0; }
+    var hours = (int) Math.ceil(billed / 3600.0);
+    if (dailyCap <= 0) { return hours * perHour; }
+    var days = (int) Math.floor(hours / 24.0);
+    var rest = hours - days * 24;
+    return days * dailyCap + Math.min(rest * perHour, dailyCap);
+}
+
+var now = Date.now();
+var nowIso = new Date(now).toISOString().substring(0, 19) + 'Z';
+var direction = metadata.direction;
+var entry = direction == 'ENTRY';
+var manual = metadata.manual == 'true';
+var accept = num(metadata.ss_acceptThreshold, 0.85);
+var total = (int) num(metadata.ss_totalSpots, 6);
+var sensorFree = (int) num(metadata.ss_sensorFree, 0);
+var sessions = {};
+if (metadata.ss_sessions != null && metadata.ss_sessions != '') { sessions = JSON.parse(metadata.ss_sessions); }
+var available = Math.min(sensorFree, total - sessions.size());
+if (available < 0) { available = 0; }
+var lastKey = entry ? 'lastPlateEntrance' : 'lastPlateExit';
+
+var attrs = {};
+var out = {};
+var plate = '';
+var confidence = -1.0;
+var decision = '';
+var reason = '';
+
+if (manual) {
+    plate = normalize(metadata.manualPlate);
+    if (plate == '') { plate = normalize(metadata.ss_manualPlate); }
+    if (plate == '') { plate = normalize(metadata['ss_' + lastKey]); }
+    attrs.manualPlate = '';
+    if (metadata.manualAction == 'deny') {
+        decision = 'DENIED';
+        reason = 'MANUAL_DENIAL';
+    }
+} else {
+    plate = normalize(msg.plate);
+    confidence = num(msg.ocrConfidence, 0.0);
+    var status = str(msg.status, 'NO_PLATE');
+    if (plate != '') { attrs[lastKey] = plate; }
+    // no automatic decision below the accept threshold: the operator decides (gate never opens on its own)
+    if (status == 'TIMEOUT' || status == 'CAMERA_ERROR') {
+        decision = 'MANUAL_REQUIRED';
+        reason = status;
+    } else if (plate == '' || status == 'NO_PLATE' || status == 'NO_TEXT') {
+        decision = 'MANUAL_REQUIRED';
+        reason = 'NO_PLATE';
+    } else if (status == 'INVALID_FORMAT') {
+        decision = 'MANUAL_REQUIRED';
+        reason = 'INVALID_FORMAT';
+    } else if (confidence < accept) {
+        decision = 'MANUAL_REQUIRED';
+        reason = 'LOW_CONFIDENCE';
+    }
+}
+
+if (decision == '' && entry) {
+    var allowlist = [];
+    if (metadata.ss_allowlist != null && metadata.ss_allowlist != '') { allowlist = JSON.parse(metadata.ss_allowlist); }
+    if (plate != '' && sessions[plate] != null) {
+        decision = 'DENIED';
+        reason = 'ALREADY_INSIDE';
+    } else if (!manual && str(metadata.ss_policy, 'open') == 'allowlist' && allowlist.indexOf(plate) < 0) {
+        decision = 'DENIED';
+        reason = 'NOT_ON_ALLOWLIST';
+    } else if (!manual && available <= 0) {
+        decision = 'DENIED';
+        reason = 'GARAGE_FULL';
+    } else {
+        decision = 'GRANTED';
+        reason = manual ? 'MANUAL_APPROVAL' : 'AUTHORIZED';
+        if (plate != '') {
+            var hex = Long.toHexString(now).toUpperCase();
+            var sid = 'S-' + nowIso.substring(0, 10).replace('-', '') + '-' + nowIso.substring(11, 19).replace(':', '')
+                + '-' + hex.substring(hex.length() - 4);
+            var s = {sessionId: sid, entryTime: nowIso, entryTs: now};
+            s.entryMode = manual ? 'MANUAL' : 'AUTO';
+            if (!manual) { s.entryConfidence = confidence; }
+            sessions[plate] = s;
+            out.sessionEvent = 'SESSION_OPENED';
+            out.sessionId = sid;
+            out.sessionPlate = plate;
+            out.entry = 1;
+        }
+    }
+} else if (decision == '') {
+    var key = '';
+    if (plate != '' && sessions[plate] != null) {
+        key = plate;
+    } else if (plate != '' && metadata.ss_exitFuzzyMatch == 'true') {
+        var matches = [];
+        foreach (k : sessions.keySet()) {
+            if (distance(plate, k) <= 1) { matches.add(k); }
+        }
+        if (matches.size() == 1) { key = matches[0]; }
+    }
+    if (key != '') {
+        var s = sessions[key];
+        var durationS = (int) Math.floor((now - parseLong(s.entryTs.toString())) / 1000.0);
+        var cents = priceCents(durationS, num(metadata.ss_freeMinutes, 15), num(metadata.ss_pricePerHourCents, 150),
+            num(metadata.ss_dailyCapCents, 1500), num(metadata.ss_timeMultiplier, 1));
+        sessions.remove(key);
+        decision = 'GRANTED';
+        reason = manual ? 'MANUAL_APPROVAL' : 'AUTHORIZED';
+        out.sessionEvent = 'SESSION_CLOSED';
+        out.sessionId = s.sessionId;
+        out.sessionPlate = key;
+        out.sessionEntryTime = s.entryTime;
+        out.exit = 1;
+        out.durationS = durationS;
+        out.durationMin = Math.round(durationS / 6.0) / 10.0;
+        out.price = cents / 100.0;
+        plate = key;
+    } else if (manual) {
+        decision = 'GRANTED';
+        reason = 'MANUAL_APPROVAL';
+    } else {
+        decision = 'DENIED';
+        reason = 'NO_ACTIVE_SESSION';
+    }
+}
+
+attrs.sessions = sessions;
+out.decision = decision;
+out.decisionReason = reason;
+out.decisionPlate = plate == '' ? '-' : plate;
+out.decisionDirection = direction;
+out.decisionManual = manual;
+out.manualRequired = decision == 'MANUAL_REQUIRED' || reason == 'NO_ACTIVE_SESSION';
+if (confidence >= 0) { out.decisionConfidence = confidence; }
+
+metadata.attrs = JSON.stringify(attrs);
+metadata.openGate = decision == 'GRANTED' ? 'true' : 'false';
+metadata.cmdReason = manual ? 'MANUAL' : (entry ? 'AUTHORIZED_ENTRY' : 'AUTHORIZED_EXIT');
+metadata.cmdPlate = plate;
+metadata.decision = decision;
+metadata.decisionReason = reason;
+metadata.decisionPlate = out.decisionPlate;
+return {msg: out, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};

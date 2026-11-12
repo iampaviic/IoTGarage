@@ -1,0 +1,3 @@
+// The spot lost its connection (sensor node offline): unknown, never "free"
+return {msg: {state: 'UNKNOWN', stateCode: -1, sensorStatus: 'OFFLINE'}, metadata: metadata,
+        msgType: 'POST_TELEMETRY_REQUEST'};

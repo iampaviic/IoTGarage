@@ -1,0 +1,2 @@
+// The ALPR device did not answer readPlate in time -> treated as an unreadable plate (manual decision)
+return {msg: {status: 'TIMEOUT', ocrConfidence: 0.0}, metadata: metadata, msgType: msgType};

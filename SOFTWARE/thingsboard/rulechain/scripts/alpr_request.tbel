@@ -1,0 +1,8 @@
+// A vehicle arrived at a closed gate -> ask the ALPR device of that gate to read the plate (RPC readPlate)
+var gate = metadata.deviceName == 'ExitGate' ? 'EXIT' : 'ENTRANCE';
+metadata.gate = gate;
+metadata.direction = gate == 'ENTRANCE' ? 'ENTRY' : 'EXIT';
+metadata.gateDevice = metadata.deviceName;
+metadata.alprDevice = gate == 'ENTRANCE' ? 'ALPR-Entrance' : 'ALPR-Exit';
+metadata.manual = 'false';
+return {msg: {method: 'readPlate', params: {gate: gate}}, metadata: metadata, msgType: 'RPC_CALL_FROM_SERVER_TO_DEVICE'};

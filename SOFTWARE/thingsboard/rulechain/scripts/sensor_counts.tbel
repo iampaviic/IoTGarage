@@ -1,0 +1,3 @@
+// Counts of the sensor node (esp32-spots) -> server attributes of the Garage asset
+return {msg: {sensorFree: msg.freeSpots, sensorOccupied: msg.occupiedSpots}, metadata: metadata,
+        msgType: 'POST_ATTRIBUTES_REQUEST'};

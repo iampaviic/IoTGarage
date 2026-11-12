@@ -1,0 +1,2 @@
+// Server attributes of the Garage asset changed by the decision (sessions, last read plates)
+return {msg: JSON.parse(metadata.attrs), metadata: metadata, msgType: 'POST_ATTRIBUTES_REQUEST'};

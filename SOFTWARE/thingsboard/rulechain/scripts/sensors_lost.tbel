@@ -1,0 +1,2 @@
+// The sensor node is offline: no spot is known to be free (UNKNOWN is never counted as free)
+return {msg: {freeSpots: 0, occupiedSpots: 0}, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};

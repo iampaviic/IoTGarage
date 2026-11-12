@@ -1,0 +1,4 @@
+// The gate answered the command
+var out = {ackTimeout: false, lastCommandSuccess: msg.success == true};
+if (msg.reason != null) { out.lastCommandReason = msg.reason; }
+return {msg: out, metadata: metadata, msgType: 'POST_TELEMETRY_REQUEST'};

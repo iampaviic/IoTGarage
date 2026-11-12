@@ -1,0 +1,12 @@
+// Dashboard button: RPC approve / deny to EntranceGate or ExitGate.
+// Optional params.plate; without it the plate typed on the dashboard (manualPlate) or the last read plate is used.
+var gate = metadata.originatorName == 'ExitGate' ? 'EXIT' : 'ENTRANCE';
+var params = msg.params;
+if (params instanceof String) { params = params == '' ? {} : JSON.parse(params); }
+metadata.gate = gate;
+metadata.direction = gate == 'ENTRANCE' ? 'ENTRY' : 'EXIT';
+metadata.gateDevice = metadata.originatorName;
+metadata.manual = 'true';
+metadata.manualAction = msg.method;
+metadata.manualPlate = params != null && params.plate != null ? params.plate.toString() : '';
+return {msg: {}, metadata: metadata, msgType: msgType};
